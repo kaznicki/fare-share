@@ -22,13 +22,15 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ITEM-03**: Multi-quantity line items (e.g., "Burger x2 $30") are automatically expanded into individual assignable items
 - [ ] **ITEM-04**: Tax, subtotal, and total lines are auto-detected and excluded from the item list
 
-### People & Assignment
+### Collaborative Claiming
 
-- [ ] **PEOP-01**: User can add people by name to the party
-- [ ] **PEOP-02**: User can assign an item to one specific person
-- [ ] **PEOP-03**: User can assign an item to multiple specific people (shared item, split equally)
-- [ ] **PEOP-04**: User can mark an item as "shared by everyone" with one tap
-- [ ] **PEOP-05**: Items show visual indicators of assignment status (assigned, unassigned, shared)
+- [ ] **CLAM-01**: Host can generate a shareable session link after reviewing items
+- [ ] **CLAM-02**: Each person opens the shared link and enters their name to join the session
+- [ ] **CLAM-03**: Each person can claim items for themselves from the item list
+- [ ] **CLAM-04**: A person can mark an item as shared with specific other people (split equally)
+- [ ] **CLAM-05**: A person can mark an item as "shared by everyone" with one tap
+- [ ] **CLAM-06**: Items show visual indicators of claim status (unclaimed, claimed by whom, shared)
+- [ ] **CLAM-07**: All participants see claims update in real-time as people claim items
 
 ### Tax & Tip
 
@@ -40,11 +42,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Results & Sharing
 
-- [ ] **RSLT-01**: User sees a per-person breakdown showing items, subtotal, tax share, tip share, and total
+- [ ] **RSLT-01**: Each person sees their own breakdown showing items, subtotal, tax share, tip share, and total
 - [ ] **RSLT-02**: Sum of all person totals equals the bill total to the penny (correct rounding)
-- [ ] **RSLT-03**: User can copy/share the breakdown as formatted text
-- [ ] **RSLT-04**: User can generate a shareable link (no account needed for recipient to view)
-- [ ] **RSLT-05**: Shared link shows an individual-person view of what they owe
+- [ ] **RSLT-03**: Host can copy/share the full breakdown as formatted text
+- [ ] **RSLT-04**: Breakdown updates live as items are claimed (no page refresh needed)
+- [ ] **RSLT-05**: Unclaimed items are clearly visible so the group knows what's left to claim
 
 ### Foundation
 
@@ -69,9 +71,9 @@ Deferred to future release. Tracked but not in current roadmap.
 Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
-|---------|--------|
+| --- | --- |
 | Native mobile app (iOS/Android) | Web-first approach, evaluate after v1 |
-| User accounts / login | Stateless simplifies everything, no persistence needed |
+| User accounts / login | Lightweight session via shared link, no formal sign-up |
 | Payment processing | SplitCheck is a calculator, not a payment platform |
 | Social features (friends, feeds) | Tool, not social network — adds moderation burden |
 | Unequal shared item splits (60/40) | Adds UI complexity, marginal value — split equally or don't share |
@@ -84,14 +86,14 @@ Explicitly excluded. Documented to prevent scope creep.
 Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
-|-------------|-------|--------|
-| (populated during roadmap creation) | | |
+| --- | --- | --- |
+| (populated during roadmap creation) |  |  |
 
 **Coverage:**
-- v1 requirements: 23 total
+- v1 requirements: 25 total
 - Mapped to phases: 0
-- Unmapped: 23
+- Unmapped: 25
 
 ---
 *Requirements defined: 2026-02-14*
-*Last updated: 2026-02-14 after initial definition*
+*Last updated: 2026-02-14 after roadmap creation*
