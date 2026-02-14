@@ -1,3 +1,4 @@
+
 # Requirements: SplitCheck
 
 **Defined:** 2026-02-14
@@ -87,12 +88,40 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 | --- | --- | --- |
-| (populated during roadmap creation) |  |  |
+| FOUN-01 | Phase 1 - Foundation | Pending |
+| FOUN-02 | Phase 1 - Foundation | Pending |
+| FOUN-03 | Phase 1 - Foundation | Pending |
+| SCAN-01 | Phase 2 - Receipt Scanning | Pending |
+| SCAN-02 | Phase 2 - Receipt Scanning | Pending |
+| SCAN-03 | Phase 2 - Receipt Scanning | Pending |
+| SCAN-04 | Phase 2 - Receipt Scanning | Pending |
+| SCAN-05 | Phase 2 - Receipt Scanning | Pending |
+| ITEM-01 | Phase 3 - Item Management | Pending |
+| ITEM-02 | Phase 3 - Item Management | Pending |
+| ITEM-03 | Phase 3 - Item Management | Pending |
+| ITEM-04 | Phase 3 - Item Management | Pending |
+| CLAM-01 | Phase 4 - Live Session & Claiming | Pending |
+| CLAM-02 | Phase 4 - Live Session & Claiming | Pending |
+| CLAM-03 | Phase 4 - Live Session & Claiming | Pending |
+| CLAM-04 | Phase 4 - Live Session & Claiming | Pending |
+| CLAM-05 | Phase 4 - Live Session & Claiming | Pending |
+| CLAM-06 | Phase 4 - Live Session & Claiming | Pending |
+| CLAM-07 | Phase 4 - Live Session & Claiming | Pending |
+| CALC-01 | Phase 5 - Calculation | Pending |
+| CALC-02 | Phase 5 - Calculation | Pending |
+| CALC-03 | Phase 5 - Calculation | Pending |
+| CALC-04 | Phase 5 - Calculation | Pending |
+| CALC-05 | Phase 5 - Calculation | Pending |
+| RSLT-01 | Phase 6 - Results & Sharing | Pending |
+| RSLT-02 | Phase 6 - Results & Sharing | Pending |
+| RSLT-03 | Phase 6 - Results & Sharing | Pending |
+| RSLT-04 | Phase 6 - Results & Sharing | Pending |
+| RSLT-05 | Phase 6 - Results & Sharing | Pending |
 
 **Coverage:**
 - v1 requirements: 25 total
-- Mapped to phases: 0
-- Unmapped: 25
+- Mapped to phases: 25
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-14*
