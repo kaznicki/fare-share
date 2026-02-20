@@ -1,12 +1,12 @@
-# SplitCheck
+# Tab Splitter
 
 ## What This Is
 
-A collaborative mobile-friendly web app that lets one person (the "host") photograph a restaurant receipt, extract line items via OCR, then share a live link with the table so everyone can claim their own items. The app calculates what each person owes including their share of tax and tip in real-time. Designed for the real-world messiness of group dining — shared appetizers, bottles of wine, auto-gratuity, and duplicate items.
+A mobile web app for splitting restaurant bills at the item level. One person photographs the receipt, the app extracts line items via OCR, and each person in the group claims what they ordered — including shared items and duplicates — before seeing their individual total.
 
 ## Core Value
 
-Accurately split a restaurant bill among any number of people so everyone pays exactly their fair share, with minimal manual effort.
+Everyone pays exactly what they ordered (plus their proportional share of tax and tip) without doing any mental math.
 
 ## Requirements
 
@@ -16,53 +16,40 @@ Accurately split a restaurant bill among any number of people so everyone pays e
 
 ### Active
 
-- [ ] Photograph a receipt and extract line items via OCR (item names, prices, quantities)
-- [ ] Review and edit OCR results — fix names, correct prices, adjust quantities
-- [ ] Automatically split multi-quantity line items (e.g., "Burger x2 - $30") into individual assignable items
-- [ ] Host shares a live link; each person opens it, enters their name, and claims their own items
-- [ ] People can claim items for themselves, mark items as shared with specific people, or shared by everyone
-- [ ] Shared items split evenly among people who claimed them
-- [ ] Real-time updates — everyone sees claims appear live as people claim items
-- [ ] Tip options: choose percentage (15/18/20/custom), flat dollar amount, or gratuity already included
-- [ ] Tax split proportionally based on each person's subtotal
-- [ ] Display final breakdown showing what each person owes (subtotal + tax share + tip share)
-- [ ] Share results — each person sees their own total on the shared link
-- [ ] Manual item entry as backup when photo scanning isn't available or practical
+- [ ] User can photograph a receipt and have line items extracted automatically
+- [ ] User can share a session via QR code or link so others can join on their phones
+- [ ] Each person can enter their name and claim the items they ordered
+- [ ] Duplicate items (same item ordered by two people) can each be claimed independently
+- [ ] Shared items can be claimed by multiple people and the cost split among them
+- [ ] Tax and tip are distributed proportionally based on each person's subtotal
+- [ ] Each person sees their final amount owed at the end
 
 ### Out of Scope
 
-- Native mobile app (iOS/Android) — web-first, evaluate later
-- Payment processing or Venmo integration — just show amounts
-- User accounts or login — lightweight session via shared link, no formal accounts
-- Receipt history or saving past splits — v2 consideration
+- User accounts / authentication — ephemeral sessions only
+- In-app payments — app shows balances, people settle externally
+- Saving session history — sessions are disposable
+- Native mobile app — mobile web browser only
 
 ## Context
 
-- Receipt OCR is the primary input method; manual entry is a backup
-- Receipts are messy: abbreviated item names, varied formats, quantity notation differences (x2, qty 2, separate lines)
-- Wine and shared dishes are common edge cases — same item name can appear multiple times as different things (glass vs bottle, different tables sharing)
-- Restaurants often auto-add gratuity for large parties — must handle gracefully
-- Users will be at a restaurant table on their phones — UI must be fast and thumb-friendly
+- Session flow: one person (the "host") scans the receipt, a QR code / shareable link is generated, others join on their own phones and claim items
+- OCR edge cases to handle: duplicate line items (two people ordered the same thing), shared items (one item, multiple claimants)
+- No backend persistence needed beyond the active session lifetime
 
 ## Constraints
 
-- **Platform**: Mobile-friendly responsive web app (works in phone browsers)
-- **OCR**: Needs reliable receipt text extraction — research best approach
-- **UX**: Must be usable at a dinner table — quick, intuitive, minimal taps
-- **Math**: Rounding must be handled so totals add up to the penny
+- **Platform**: Mobile web — must work well on phone browsers, camera access via browser API
+- **Auth**: None — no login, no accounts
+- **Session**: Ephemeral — no long-term storage required
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Web app over native | Faster to build, no app store, works on any phone | — Pending |
-| Photo-first input | Core differentiator over manual-entry-only splitters | — Pending |
-| Three tip modes | Covers percentage, flat amount, and auto-gratuity scenarios | — Pending |
-| Split multi-quantity items automatically | Handles "Burger x2" and similar receipt patterns | — Pending |
-| Review/edit step after OCR | Receipts are messy — users need to verify and fix before assigning | — Pending |
-| Collaborative claiming over host-assigns-all | Distributes the work, better UX for large parties | — Pending |
-| Real-time sync via WebSocket/polling | Everyone sees claims live, feels collaborative | — Pending |
-| No formal accounts | People enter their name on the shared link, no sign-up friction | — Pending |
+| No accounts | Lower friction, fits one-off restaurant use case | — Pending |
+| Proportional tax/tip | Fairer than equal split when orders vary in price | — Pending |
+| Browser camera (not native app) | Faster to build, no app store | — Pending |
 
 ---
-*Last updated: 2026-02-14 after initialization*
+*Last updated: 2026-02-20 after initialization*
