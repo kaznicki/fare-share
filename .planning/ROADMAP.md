@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Scaffold Next.js, Tailwind v4, custom HTTP+WebSocket server, canonical types, module skeletons
+- [x] 01-01-PLAN.md — Scaffold Next.js, Tailwind v4, custom HTTP+WebSocket server, canonical types, module skeletons
 - [ ] 01-02-PLAN.md — In-memory session store with 4-hour TTL, POST /api/sessions, GET /api/sessions/[id]
 - [ ] 01-03-PLAN.md — POST /api/ocr calling GPT-4o Vision with Zod validation, dev mock mode
 
@@ -107,7 +107,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Planned | - |
+| 1. Foundation | 1/3 | In Progress|  |
 | 2. Host Flow | 0/3 | Not started | - |
 | 3. Real-Time Layer | 0/2 | Not started | - |
 | 4. Item Claiming | 0/3 | Not started | - |

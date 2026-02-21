@@ -1,102 +1,63 @@
-# Project State: SplitCheck
-
-**Last updated:** 2026-02-14
-**Phase:** Not started
-**Status:** Roadmap created, awaiting Phase 1 planning
-
----
+# Project State
 
 ## Project Reference
 
-**Core Value:** Accurately split a restaurant bill among any number of people so everyone pays exactly their fair share, with minimal manual effort.
+See: .planning/PROJECT.md (updated 2026-02-20)
 
-**Current Focus:** Initialize foundation phase with mobile-responsive web app scaffolding and persistent state management.
-
-**Key Constraints:**
-- Mobile-first responsive web app (works in phone browsers)
-- OCR-based receipt scanning (Tesseract.js + cloud fallback)
-- Collaborative claiming — host scans, everyone claims their own items via shared link
-- Real-time sync so all participants see claims live
-- Rounding must sum to the penny (integer math throughout)
-
----
+**Core value:** Everyone pays exactly what they ordered (plus proportional tax and tip) without doing any mental math
+**Current focus:** Phase 1 — Foundation
 
 ## Current Position
 
-**Phase:** 1 - Foundation & Project Setup
-**Plan:** Not yet created
-**Status:** Pending
+Phase: 1 of 5 (in progress)
+Plan: 1 of 3 in current phase
+Status: Executing
+Last activity: 2026-02-21 — Plan 01-01 complete (scaffold + server + types)
 
-**Progress:** [..................] 0/7 phases (0%)
-
-**Current work:**
-- None (roadmap just created)
-
-**Next action:**
-- Run `/gsd:plan-phase 1` to create execution plan for Foundation phase
-
----
+Progress: [██░░░░░░░░] 7% (1 of 13 total plans)
 
 ## Performance Metrics
 
-### Velocity
-- **Phases completed:** 0
-- **Plans completed:** 0
-- **Average plans per phase:** N/A (no data)
-- **Project started:** 2026-02-14
+**Velocity:**
+- Total plans completed: 1
+- Average duration: ~5 min
+- Total execution time: ~5 min
 
-### Efficiency
-- **Blocked plans:** 0
-- **Revised plans:** 0
-- **Research phases:** 0
+**By Phase:**
 
----
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| 1. Foundation | 1/3 | ~5 min | ~5 min |
+
+**Recent Trend:**
+- Last 5 plans: 01-01 (5 min)
+- Trend: —
+
+*Updated after each plan completion*
 
 ## Accumulated Context
 
-### Key Decisions
+### Decisions
 
-| Decision | Rationale | Date | Outcome |
-|----------|-----------|------|---------|
-| 7-phase roadmap structure | Follow natural data flow with collaborative claiming as core | 2026-02-14 | Approved |
-| Collaborative claiming over host-assigns-all | Distributes the work, better UX for large parties | 2026-02-14 | Approved |
-| Real-time sync via WebSocket/polling | Everyone sees claims live, feels collaborative | 2026-02-14 | Approved |
-| No formal user accounts | People enter their name on the shared link, no sign-up | 2026-02-14 | Approved |
-| Standard depth (7 phases) | Balances granularity with manageability | 2026-02-14 | Approved |
+- **OCR engine:** Server-side GPT-4o Vision API (not Tesseract.js). Manual correction is an explicit v1 requirement, implying OCR must be good enough that corrections are occasional fixes — Tesseract on thermal receipt fonts produces too many errors. Server is already required for WebSockets so no extra infrastructure cost. If GPT-4o costs are unacceptable, the UI contract (`{ id, name, price, qty }`) is identical and the swap to Tesseract is isolated to `POST /api/ocr`.
+- **Real-time layer:** Custom `ws` WebSocket server attached to Next.js custom HTTP server (not PartyKit). Server-side OCR requires a server anyway; custom ws adds no extra infrastructure and avoids PartyKit's free-tier 10-project limit.
+- **Deployment target:** Railway, Fly.io, or Render — NOT Vercel. Vercel serverless does not support persistent WebSocket connections.
+- **Money math:** All prices stored as integer cents from day one. Floating-point arithmetic is never used for monetary values. Largest Remainder Method for shared item and tax/tip distribution.
+- **Claims model:** Append-only Set per item (`claims[itemId] = Set<participantName>`). No single-owner model. Full-state broadcast after every change. Full snapshot sent on every WebSocket connect (handles reconnects).
+- **WebSocket routing:** noServer: true mode — routes upgrade events manually; /ws goes to wss, /_next/webpack-hmr delegated to Next.js HMR handler, all other paths destroyed.
+- **Dev script:** tsx watch server.ts (not next dev) — bypasses Next.js built-in server to ensure custom server with WebSocket runs.
 
-### Known Blockers
+### Pending Todos
 
-(None currently)
+None yet.
 
-### Technical Notes
+### Blockers/Concerns
 
-**Critical pitfalls identified in research:**
-1. **Rounding errors** - Must use integer arithmetic (cents) throughout, apply rounding only at final step with largest-remainder method
-2. **OCR accuracy** - Real receipts are messy; preprocessing (crop, enhance, deskew) is essential
-3. **Multi-quantity parsing** - Receipts use wildly different notations ("2 Burger", "Burger x2", "Burger @15 x2 30")
-4. **Mobile camera issues** - Dim lighting, glare, blurry photos require robust preprocessing pipeline
-5. **Tax line detection** - May be misidentified as menu item; use keyword detection and position heuristics
-
----
+- OCR accuracy on real restaurant receipts is unvalidated. Validate in Phase 1 by photographing 5-10 real receipts before building the full correction UI. If accuracy is below 80%, the correction step becomes the primary workflow rather than a safety net — the product still functions but feels heavier.
+- OpenAI API key required before Plan 01-03 can be fully tested. User must set OPENAI_API_KEY in .env.local.
 
 ## Session Continuity
 
-### Last Session Summary
-- **Date:** 2026-02-14
-- **Completed:** Created 7-phase roadmap covering all 25 v1 requirements with collaborative claiming flow
-- **Output:** ROADMAP.md, STATE.md, updated REQUIREMENTS.md traceability
-
-### Handoff Notes
-Project is initialized with complete roadmap. All v1 requirements mapped to phases with 100% coverage. Ready for Phase 1 planning.
-
-**Next agent:** Plan-Phase (for Phase 1: Foundation & Project Setup)
-
-**Context needed:**
-- PROJECT.md (core value, constraints)
-- REQUIREMENTS.md (FOUN-01, FOUN-02, FOUN-03)
-- ROADMAP.md (Phase 1 goals and success criteria)
-- Research SUMMARY.md (stack recommendations: Next.js, Zustand, Tailwind)
-
----
-
-*State initialized: 2026-02-14*
+Last session: 2026-02-21T16:59:37Z
+Stopped at: Completed 01-foundation/01-01-PLAN.md — scaffold, server, types, session store, OCR stub
+Resume file: None
