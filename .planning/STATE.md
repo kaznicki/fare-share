@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 2 of 5 (complete)
-Plan: 4 of 4 in current phase (complete)
+Plan: 5 of 5 in current phase (complete — includes gap closure plan 02-05)
 Status: Phase complete — ready for Phase 3
-Last activity: 2026-02-21 — Plan 02-04 complete (Human verification of all 12 Phase 2 requirements)
+Last activity: 2026-02-21 — Plan 02-05 complete (Gap closure: OCR error banner + Add Item auto-focus)
 
-Progress: [████░░░░░░] 46% (6 of 13 total plans)
+Progress: [████░░░░░░] 46% (6 of 13 total plans — gap closure plan is bonus, not counted in roadmap total)
 
 ## Performance Metrics
 
@@ -37,6 +37,7 @@ Progress: [████░░░░░░] 46% (6 of 13 total plans)
 *Updated after each plan completion*
 | Phase 02-host-flow P02 | 2 | 2 tasks | 4 files |
 | Phase 02-host-flow P04 | 5 | 1 task | 0 files |
+| Phase 02-host-flow P05 (gap closure) | 5 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -59,13 +60,14 @@ Progress: [████░░░░░░] 46% (6 of 13 total plans)
 2.99 * 100 = 1298.9999... rounds to 1299 correctly; never Math.floor or parseInt.
 - **OCR mock mode:** USE_OCR_MOCK=true env var bypasses GPT-4o API, returns deterministic 4-item fixture for cost-free UI development.
 - **Three-screen host flow state machine:** app/host/page.tsx owns screen state ('capture' | 'reviewing' | 'share') via conditional rendering — no router navigation, keeps ephemeral OCR data in memory without URL serialization.
-- **OCR-04 error path:** CameraCapture catch block calls onComplete with empty OcrResult { items: [], taxCents: 0, tipCents: 0 } — host advances to manual correction rather than being blocked on capture screen.
+- **OCR-04 error path (corrected in 02-05):** CameraCapture catch block calls only setError() — onComplete() is exclusively in the "Continue anyway" button onClick. This keeps the error banner visible until the host consciously chooses to proceed.
 - **Stub components without 'use client':** OcrReview.tsx and ShareScreen.tsx stubs intentionally omit 'use client' — Plans 02 and 03 own that directive when implementing the real components.
 - **ShareScreen QR card wrapper:** White card (`bg-white rounded-2xl shadow-md p-4`) wraps QRCodeSVG to ensure scan contrast against any page background. UI theme stays flexible.
 - **Clipboard copy pattern:** navigator.clipboard.writeText() + document.execCommand fallback — covers Safari and non-HTTPS localhost preview environments.
 - [Phase 02-host-flow]: qty expansion (CORR-05) in POST /api/sessions via flatMap — session store receives only qty:1 items
 - [Phase 02-host-flow]: Tap-to-edit pattern: editingField state in ItemRow, autoFocus input, onBlur commits; never contenteditable
 - [Phase 02-host-flow]: TaxTipFields uses key prop trick (key={taxCents/tipCents}) to reset defaultValue after blur — no controlled input needed
+- [Phase 02-host-flow gap closure]: autoFocusName prop + newItemId state pattern — parent tracks last-added item id, passes autoFocusName only to that row, clears on first onChange; avoids re-focus on blur/re-render
 
 ### Pending Todos
 
@@ -78,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-21T17:50:00Z
-Stopped at: Completed 02-host-flow/02-04-PLAN.md — Human verification of all 12 Phase 2 requirements. Phase 2 complete.
+Last session: 2026-02-21T18:10:00Z
+Stopped at: Completed 02-host-flow/02-05-PLAN.md — Gap closure: OCR error banner (OCR-04) and Add Item auto-focus (CORR-03). Phase 2 gap closure complete. Ready for Phase 3.
 Resume file: None
