@@ -46,12 +46,13 @@ Plans:
   3. Items with quantity greater than 1 appear as separate individually-claimable rows after the host creates the session
   4. Host sees a large QR code and a copyable share link immediately after creating the session
   5. If OCR fails, host sees an error and can proceed by adding items manually
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 02-01: Camera capture UI with image preview and retake flow (`<input capture="environment">`)
-- [ ] 02-02: OCR correction screen — inline edit, delete, add item, qty stepper, tax/tip fields
-- [ ] 02-03: Session creation, quantity expansion logic, QR code + copy link share screen
+- [ ] 02-01-PLAN.md — Install qrcode.react, host page state machine, CameraCapture component (camera input, preview, canvas compression, OCR POST)
+- [ ] 02-02-PLAN.md — OcrReview screen: ItemRow (tap-to-edit name/price, qty stepper, delete), TaxTipFields (pinned footer), session creation POST
+- [ ] 02-03-PLAN.md — ShareScreen: QR code (qrcode.react QRCodeSVG) and clipboard copy with fallback
+- [ ] 02-04-PLAN.md — Human verification of complete Phase 2 host flow (all 12 requirements)
 
 ### Phase 3: Real-Time Layer
 **Goal**: Participants can open the share URL, enter their name, and connect to the live session room; the host and all participants see who is present in real time; reconnecting participants receive complete current state
@@ -108,7 +109,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-02-21 |
-| 2. Host Flow | 0/3 | Not started | - |
+| 2. Host Flow | 0/4 | Not started | - |
 | 3. Real-Time Layer | 0/2 | Not started | - |
 | 4. Item Claiming | 0/3 | Not started | - |
 | 5. Summary and Finalization | 0/2 | Not started | - |
