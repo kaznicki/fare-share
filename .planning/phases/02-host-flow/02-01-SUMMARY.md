@@ -82,7 +82,7 @@ Each task was committed atomically:
 1. **Task 1: Install qrcode.react and scaffold host page state machine** - `f653be1` (feat)
 2. **Task 2: Build CameraCapture component (camera input, preview, canvas compression, OCR POST)** - `895e405` (feat)
 
-**Plan metadata:** (docs commit to follow)
+**Plan metadata:** `5c7b933` (docs: complete plan)
 
 ## Files Created/Modified
 - `app/host/page.tsx` - Three-screen state machine owning host flow (capture/reviewing/share)
@@ -116,3 +116,14 @@ None — no external service configuration required. USE_OCR_MOCK=true in .env.l
 ---
 *Phase: 02-host-flow*
 *Completed: 2026-02-21*
+
+## Self-Check: PASSED
+
+- FOUND: app/host/page.tsx
+- FOUND: components/host/CameraCapture.tsx
+- FOUND: components/host/OcrReview.tsx
+- FOUND: components/host/ShareScreen.tsx
+- FOUND: .planning/phases/02-host-flow/02-01-SUMMARY.md
+- FOUND commit f653be1 (Task 1)
+- FOUND commit 895e405 (Task 2)
+- FOUND commit 5c7b933 (docs/metadata)
