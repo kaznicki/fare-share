@@ -13,7 +13,7 @@ Five phases build Tab Splitter from the server foundation up through the full us
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Custom server, session store, and OCR endpoint running and testable without a UI (completed 2026-02-21)
-- [ ] **Phase 2: Host Flow** - Host can photograph a receipt, correct OCR output, and share a QR-code join link
+- [x] **Phase 2: Host Flow** - Host can photograph a receipt, correct OCR output, and share a QR-code join link (completed 2026-02-21)
 - [ ] **Phase 3: Real-Time Layer** - Participants can join via the share URL and the WebSocket room broadcasts presence in real time
 - [ ] **Phase 4: Item Claiming** - Participants claim items on their phones; all screens update live; shared and duplicate items work correctly
 - [ ] **Phase 5: Summary and Finalization** - Host finalizes; every person sees their exact amount owed with proportional tax and tip
@@ -50,9 +50,9 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md — Install qrcode.react, host page state machine, CameraCapture component (camera input, preview, canvas compression, OCR POST)
-- [ ] 02-02-PLAN.md — OcrReview screen: ItemRow (tap-to-edit name/price, qty stepper, delete), TaxTipFields (pinned footer), session creation POST
-- [ ] 02-03-PLAN.md — ShareScreen: QR code (qrcode.react QRCodeSVG) and clipboard copy with fallback
-- [ ] 02-04-PLAN.md — Human verification of complete Phase 2 host flow (all 12 requirements)
+- [x] 02-02-PLAN.md — OcrReview screen: ItemRow (tap-to-edit name/price, qty stepper, delete), TaxTipFields (pinned footer), session creation POST
+- [x] 02-03-PLAN.md — ShareScreen: QR code (qrcode.react QRCodeSVG) and clipboard copy with fallback
+- [x] 02-04-PLAN.md — Human verification of complete Phase 2 host flow (all 12 requirements)
 
 ### Phase 3: Real-Time Layer
 **Goal**: Participants can open the share URL, enter their name, and connect to the live session room; the host and all participants see who is present in real time; reconnecting participants receive complete current state
@@ -109,7 +109,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 | --- | --- | --- | --- |
 | 1. Foundation | 3/3 | Complete | 2026-02-21 |
-| 2. Host Flow | 3/4 | In Progress |  |
+| 2. Host Flow | 4/4 | Complete | 2026-02-21 |
 | 3. Real-Time Layer | 0/2 | Not started | - |
 | 4. Item Claiming | 0/3 | Not started | - |
 | 5. Summary and Finalization | 0/2 | Not started | - |

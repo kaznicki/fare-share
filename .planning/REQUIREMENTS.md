@@ -92,14 +92,14 @@
 | OCR-02 | Image preview | Phase 2 | COMPLETE (02-01) |
 | OCR-03 | OCR extraction | Phase 2 | COMPLETE (02-01) |
 | OCR-04 | OCR failure handling | Phase 2 | COMPLETE (02-01) |
-| CORR-01 | Inline item edit | Phase 2 |
-| CORR-02 | Delete spurious rows | Phase 2 |
-| CORR-03 | Add item manually | Phase 2 |
-| CORR-04 | Edit tax/tip | Phase 2 |
-| CORR-05 | Quantity expansion | Phase 2 |
-| SESS-01 | Session creation | Phase 2 |
-| SESS-02 | QR code display | Phase 2 |
-| SESS-03 | Copy link fallback | Phase 2 |
+| CORR-01 | Inline item edit | Phase 2 | COMPLETE (02-02) |
+| CORR-02 | Delete spurious rows | Phase 2 | COMPLETE (02-02) |
+| CORR-03 | Add item manually | Phase 2 | COMPLETE (02-02) |
+| CORR-04 | Edit tax/tip | Phase 2 | COMPLETE (02-02) |
+| CORR-05 | Quantity expansion | Phase 2 | COMPLETE (02-02) |
+| SESS-01 | Session creation | Phase 2 | COMPLETE (02-02) |
+| SESS-02 | QR code display | Phase 2 | COMPLETE (02-03) |
+| SESS-03 | Copy link fallback | Phase 2 | COMPLETE (02-03) |
 | JOIN-01 | Participant name entry + join | Phase 3 |
 | JOIN-02 | Participant joined broadcast | Phase 3 |
 | CLAIM-01 | Tap to claim / unclaim | Phase 4 |
