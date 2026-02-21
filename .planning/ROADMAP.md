@@ -1,190 +1,114 @@
-# Roadmap: SplitCheck
-
-**Created:** 2026-02-14
-**Depth:** Standard (5-8 phases)
-**Coverage:** 25/25 v1 requirements mapped
+# Roadmap: Tab Splitter
 
 ## Overview
 
-This roadmap delivers a collaborative receipt-scanning bill splitter through seven phases. The architecture centers on a real-time collaborative session where a host scans the receipt and shares a link, then everyone claims their own items live. Phases follow the natural data flow while front-loading the highest-risk work (OCR, real-time infrastructure).
+Five phases build Tab Splitter from the server foundation up through the full user workflow: the server and OCR endpoint first, then the host flow (camera, correction, share), then the real-time WebSocket layer and participant join, then item claiming with live sync, and finally the summary math and finalization. Each phase delivers a coherent, testable capability that the next phase builds on top of. The project is complete when every person at a restaurant table can see exactly what they owe — including their proportional share of tax and tip — without doing any mental math.
 
 ## Phases
 
-### Phase 1: Foundation & Project Setup
+**Phase Numbering:**
+- Integer phases (1, 2, 3): Planned milestone work
+- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-**Goal:** Mobile-responsive Next.js application is running with project structure, state management, integer math utilities, and localStorage persistence
+Decimal phases appear between their surrounding integers in numeric order.
 
-**Dependencies:** None (foundation)
+- [ ] **Phase 1: Foundation** - Custom server, session store, and OCR endpoint running and testable without a UI
+- [ ] **Phase 2: Host Flow** - Host can photograph a receipt, correct OCR output, and share a QR-code join link
+- [ ] **Phase 3: Real-Time Layer** - Participants can join via the share URL and the WebSocket room broadcasts presence in real time
+- [ ] **Phase 4: Item Claiming** - Participants claim items on their phones; all screens update live; shared and duplicate items work correctly
+- [ ] **Phase 5: Summary and Finalization** - Host finalizes; every person sees their exact amount owed with proportional tax and tip
 
-**Requirements:**
-- FOUN-01: App is a mobile-friendly responsive web app that works in phone browsers
-- FOUN-02: App uses integer arithmetic (cents) for all calculations to prevent rounding errors
-- FOUN-03: State persists to localStorage so progress isn't lost on accidental navigation
+## Phase Details
 
-**Success Criteria:**
-1. User can access the app from a mobile browser and see a responsive, touch-friendly interface
-2. User can navigate away and return without losing their current work
-3. All internal monetary values are stored and calculated in cents (integer math)
-4. Project has Tailwind CSS + shadcn/ui configured with mobile-first responsive layout
+### Phase 1: Foundation
+**Goal**: A working server that accepts an image, calls OCR, returns structured line items, and can create and retrieve sessions — all verifiable via curl with no browser required
+**Depends on**: Nothing (first phase)
+**Requirements**: (none — this phase builds the infrastructure that all requirements depend on)
+**Success Criteria** (what must be TRUE):
+  1. `POST /api/ocr` accepts a receipt image and returns a JSON array of line items with name, price in cents, and quantity
+  2. `POST /api/sessions` accepts items plus tax and tip amounts and returns a session ID and share URL
+  3. The session exists in the in-memory store and can be retrieved for 4 hours before auto-expiry
+  4. The custom Next.js server starts successfully with the WebSocket server attached to the same HTTP process
+**Plans**: 3 plans
 
-**Status:** Pending
+Plans:
+- [ ] 01-01-PLAN.md — Scaffold Next.js, Tailwind v4, custom HTTP+WebSocket server, canonical types, module skeletons
+- [ ] 01-02-PLAN.md — In-memory session store with 4-hour TTL, POST /api/sessions, GET /api/sessions/[id]
+- [ ] 01-03-PLAN.md — POST /api/ocr calling GPT-4o Vision with Zod validation, dev mock mode
 
----
+### Phase 2: Host Flow
+**Goal**: Host can photograph a receipt, review and correct extracted items (including tax and tip), and share a QR code or link that others can use to join — the complete host-side experience before anyone claims anything
+**Depends on**: Phase 1
+**Requirements**: OCR-01, OCR-02, OCR-03, OCR-04, CORR-01, CORR-02, CORR-03, CORR-04, CORR-05, SESS-01, SESS-02, SESS-03
+**Success Criteria** (what must be TRUE):
+  1. Host can take a photo of a receipt using their phone's rear camera from within the app, see a preview, and submit it for OCR
+  2. Host sees the extracted item list and can edit any item's name, price, or quantity inline; can delete spurious rows (subtotal lines); can add items manually; can edit tax and tip
+  3. Items with quantity greater than 1 appear as separate individually-claimable rows after the host creates the session
+  4. Host sees a large QR code and a copyable share link immediately after creating the session
+  5. If OCR fails, host sees an error and can proceed by adding items manually
+**Plans**: TBD
 
-### Phase 2: Receipt Scanning & OCR
+Plans:
+- [ ] 02-01: Camera capture UI with image preview and retake flow (`<input capture="environment">`)
+- [ ] 02-02: OCR correction screen — inline edit, delete, add item, qty stepper, tax/tip fields
+- [ ] 02-03: Session creation, quantity expansion logic, QR code + copy link share screen
 
-**Goal:** Host can photograph a receipt and see extracted line items with confidence indicators, with manual entry as fallback
+### Phase 3: Real-Time Layer
+**Goal**: Participants can open the share URL, enter their name, and connect to the live session room; the host and all participants see who is present in real time; reconnecting participants receive complete current state
+**Depends on**: Phase 2
+**Requirements**: JOIN-01, JOIN-02, SYNC-02
+**Success Criteria** (what must be TRUE):
+  1. Participant opens the share URL, enters only a name (no account required), and lands on the session item list within a few seconds
+  2. All other participants see a "joined" notification when a new person connects, without refreshing
+  3. A participant who loses connection (phone screen locks, network switch) rejoins and sees the complete current session state — no claims are missing from their view
+**Plans**: TBD
 
-**Dependencies:** Phase 1 (foundation)
+Plans:
+- [ ] 03-01: WebSocket server session room management — join, presence broadcast, full-state snapshot on connect
+- [ ] 03-02: Participant join UI — name entry screen, WebSocket connect on submit, item list scaffold
 
-**Requirements:**
-- SCAN-01: User can photograph a receipt and have line items extracted automatically via OCR
-- SCAN-02: Receipt image is preprocessed (crop, enhance contrast, deskew) before OCR
-- SCAN-03: User can manually enter items as fallback when OCR is unavailable or fails
-- SCAN-04: App uses cloud OCR fallback when client-side OCR confidence is low
-- SCAN-05: Each extracted item shows a confidence indicator so user knows what to double-check
+### Phase 4: Item Claiming
+**Goal**: Participants can claim items on their phones, see shared costs update in real time, and all screens across the table converge to the same claim state within seconds
+**Depends on**: Phase 3
+**Requirements**: CLAIM-01, CLAIM-02, CLAIM-03, CLAIM-04, SYNC-01
+**Success Criteria** (what must be TRUE):
+  1. Participant taps an item row to claim it and sees it highlight immediately; tapping again removes the claim
+  2. When multiple participants claim the same row, each person's share of that item's price updates in real time on everyone's screen
+  3. Two separate rows created from a qty:2 item can be claimed independently by two different participants
+  4. Every participant can see who has claimed each item (names shown on each row) so there are no silent disputes
+  5. A claim made on one phone appears on all other phones within two seconds
+**Plans**: TBD
 
-**Success Criteria:**
-1. Host can capture a receipt photo and see extracted items within seconds
-2. Each extracted item shows a confidence indicator (high/medium/low)
-3. Host can switch to manual entry mode and type items in directly
-4. Receipt images are automatically enhanced before OCR processing
-5. Low-confidence extractions trigger cloud OCR fallback for better accuracy
+Plans:
+- [ ] 04-01: Claim WebSocket message handlers — append-only Set model, deduplication, full-state broadcast
+- [ ] 04-02: Item list UI with tap-to-claim, visual states (unclaimed / mine / shared / theirs), real-time price split display
+- [ ] 04-03: Zustand store wiring — WebSocket messages update store; components read from store (prevents React 19 state tearing)
 
-**Status:** Pending
+### Phase 5: Summary and Finalization
+**Goal**: Host can finalize the session and every participant immediately sees their exact total owed, calculated using proportional tax and tip with cent-accurate math that sums exactly to the receipt total
+**Depends on**: Phase 4
+**Requirements**: MATH-01, MATH-02, MATH-03, FINAL-01, FINAL-02
+**Success Criteria** (what must be TRUE):
+  1. Host sees an indicator when all items are claimed and can tap a "Finalize" button to trigger the summary
+  2. Each participant sees their individual total — subtotal plus their proportional tax share plus their proportional tip share
+  3. Host sees a table of every participant's name and amount owed
+  4. The sum of all per-person totals equals the receipt total exactly — no missing or extra cents
+  5. If items remain unclaimed at finalization, host chooses to split them among all participants or absorb them as the host
+**Plans**: TBD
 
----
-
-### Phase 3: Item Management & Review
-
-**Goal:** Host can review, edit, and refine the extracted item list before sharing, including multi-quantity expansion and tax line detection
-
-**Dependencies:** Phase 2 (needs extracted items)
-
-**Requirements:**
-- ITEM-01: User can review and edit OCR-extracted items (fix names, correct prices, adjust quantities)
-- ITEM-02: User can manually add or remove items from the list
-- ITEM-03: Multi-quantity line items (e.g., "Burger x2 $30") are automatically expanded into individual assignable items
-- ITEM-04: Tax, subtotal, and total lines are auto-detected and excluded from the item list
-
-**Success Criteria:**
-1. Host can tap any item to edit its name, price, or quantity
-2. Host can add new items or delete incorrect ones
-3. "Burger x2 $30" is automatically split into two separate $15 items
-4. Tax and total lines are excluded from the claimable item list
-5. Host sees a clean, accurate item list ready for the group to claim
-
-**Status:** Pending
-
----
-
-### Phase 4: Live Session & Collaborative Claiming
-
-**Goal:** Host can create a live session and share a link; participants join, enter their name, and claim items with real-time updates visible to everyone
-
-**Dependencies:** Phase 3 (needs reviewed item list)
-
-**Requirements:**
-- CLAM-01: Host can generate a shareable session link after reviewing items
-- CLAM-02: Each person opens the shared link and enters their name to join the session
-- CLAM-03: Each person can claim items for themselves from the item list
-- CLAM-04: A person can mark an item as shared with specific other people (split equally)
-- CLAM-05: A person can mark an item as "shared by everyone" with one tap
-- CLAM-06: Items show visual indicators of claim status (unclaimed, claimed by whom, shared)
-- CLAM-07: All participants see claims update in real-time as people claim items
-
-**Success Criteria:**
-1. Host taps "Share" and gets a link to send to the group
-2. Participant opens the link, enters their name, and sees the item list
-3. Participant can tap items to claim them; their name appears on claimed items instantly
-4. Participant can mark an item as shared and select who shares it
-5. All participants see claims appear in real-time without refreshing
-6. Unclaimed items are visually distinct from claimed items
-
-**Status:** Pending
-
----
-
-### Phase 5: Tax, Tip & Calculation Engine
-
-**Goal:** Host configures tax and tip; the calculation engine computes accurate per-person totals that update live as items are claimed
-
-**Dependencies:** Phase 4 (needs item claims/assignments)
-
-**Requirements:**
-- CALC-01: Tax is split proportionally based on each person's subtotal
-- CALC-02: User can choose tip as a percentage (15%, 18%, 20%, or custom)
-- CALC-03: User can enter a flat dollar tip amount
-- CALC-04: User can select "gratuity already included" to skip additional tip calculation
-- CALC-05: Tax amount is pre-filled from receipt OCR when detected
-
-**Success Criteria:**
-1. Host can select tip mode (percentage, flat amount, or already included)
-2. Tax is pre-filled from the receipt when detected by OCR
-3. Each person's tax and tip share is proportional to their claimed subtotal
-4. Per-person totals update live as items are claimed or unclaimed
-5. Sum of all person totals equals the bill total to the penny
-
-**Status:** Pending
-
----
-
-### Phase 6: Results & Sharing
-
-**Goal:** Each participant sees their own itemized breakdown; host can share a text summary; unclaimed items are clearly surfaced
-
-**Dependencies:** Phase 5 (needs calculated results)
-
-**Requirements:**
-- RSLT-01: Each person sees their own breakdown showing items, subtotal, tax share, tip share, and total
-- RSLT-02: Sum of all person totals equals the bill total to the penny (correct rounding)
-- RSLT-03: Host can copy/share the full breakdown as formatted text
-- RSLT-04: Breakdown updates live as items are claimed (no page refresh needed)
-- RSLT-05: Unclaimed items are clearly visible so the group knows what's left to claim
-
-**Success Criteria:**
-1. Each participant sees a personalized view: "You owe $X" with itemized breakdown
-2. Host sees the full breakdown for everyone
-3. Host can copy the breakdown as formatted text to paste in a message
-4. Results update live as remaining items get claimed
-5. Unclaimed items are prominently shown so the group can resolve them
-
-**Status:** Pending
-
----
-
-### Phase 7: Polish & Edge Cases
-
-**Goal:** App handles real-world edge cases gracefully, mobile UX is refined, and the end-to-end flow is smooth
-
-**Dependencies:** Phase 6 (all features built)
-
-**Requirements:**
-- (Cross-cutting quality across all requirements)
-
-**Success Criteria:**
-1. Full flow works end-to-end: scan → review → share → claim → see totals
-2. Edge cases handled: 0 items claimed, 1 person, all shared items, disconnected participant
-3. Mobile UX is polished: thumb-friendly tap targets, fast interactions, clear visual hierarchy
-4. Error states are handled gracefully (OCR failure, lost connection, expired session)
-
-**Status:** Pending
-
----
+Plans:
+- [ ] 05-01: Bill-splitting math — proportional tax/tip in integer cents, Largest Remainder Method, zero-subtotal guard
+- [ ] 05-02: Summary UI — per-person view, host summary table, unclaimed item handler, finalize trigger
 
 ## Progress
 
-| Phase | Status | Plans | Completed |
-|-------|--------|-------|-----------|
-| 1 - Foundation | Pending | 0/0 | - |
-| 2 - Receipt Scanning | Pending | 0/0 | - |
-| 3 - Item Management | Pending | 0/0 | - |
-| 4 - Live Session & Claiming | Pending | 0/0 | - |
-| 5 - Calculation | Pending | 0/0 | - |
-| 6 - Results & Sharing | Pending | 0/0 | - |
-| 7 - Polish & Edge Cases | Pending | 0/0 | - |
+**Execution Order:**
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
-**Overall:** 0/7 phases complete
-
----
-*Last updated: 2026-02-14 after roadmap creation*
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Foundation | 0/3 | Planned | - |
+| 2. Host Flow | 0/3 | Not started | - |
+| 3. Real-Time Layer | 0/2 | Not started | - |
+| 4. Item Claiming | 0/3 | Not started | - |
+| 5. Summary and Finalization | 0/2 | Not started | - |
