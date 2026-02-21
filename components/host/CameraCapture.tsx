@@ -55,9 +55,8 @@ export default function CameraCapture({ onComplete }: Props) {
       if (previewUrl) URL.revokeObjectURL(previewUrl)
       onComplete(result)
     } catch {
-      // OCR-04: on failure, show error banner and allow host to proceed with empty item list
+      // OCR-04: on failure, show error banner — host advances via "Continue anyway" button
       setError('Could not read the receipt. You can add items manually instead.')
-      onComplete({ items: [], taxCents: 0, tipCents: 0 })
     }
   })
 
