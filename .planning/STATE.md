@@ -35,6 +35,7 @@ Progress: [████░░░░░░] 38% (5 of 13 total plans)
 - Trend: Fast and consistent
 
 *Updated after each plan completion*
+| Phase 02-host-flow P02 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -52,13 +53,18 @@ Progress: [████░░░░░░] 38% (5 of 13 total plans)
 - **No edge runtime:** Session store uses Map and setTimeout — incompatible with edge runtime. No `export const runtime = 'edge'` in session API routes.
 - **OCR: response_format json_object + Zod:** Used response_format: json_object + ReceiptSchema.parse() instead of zodResponseFormat for vision inputs — safer for probabilistic image understanding outputs.
 - **OCR lazy client:** getOpenAI() singleton prevents "No API key" error when module imported before app.prepare() loads .env.local.
-- **OCR math:** Math.round(dollars * 100) for cent conversion — $12.99 * 100 = 1298.9999... rounds to 1299 correctly; never Math.floor or parseInt.
+- **OCR math:** Math.round(dollars * 100) for cent conversion — ### Decisions
+
+2.99 * 100 = 1298.9999... rounds to 1299 correctly; never Math.floor or parseInt.
 - **OCR mock mode:** USE_OCR_MOCK=true env var bypasses GPT-4o API, returns deterministic 4-item fixture for cost-free UI development.
 - **Three-screen host flow state machine:** app/host/page.tsx owns screen state ('capture' | 'reviewing' | 'share') via conditional rendering — no router navigation, keeps ephemeral OCR data in memory without URL serialization.
 - **OCR-04 error path:** CameraCapture catch block calls onComplete with empty OcrResult { items: [], taxCents: 0, tipCents: 0 } — host advances to manual correction rather than being blocked on capture screen.
 - **Stub components without 'use client':** OcrReview.tsx and ShareScreen.tsx stubs intentionally omit 'use client' — Plans 02 and 03 own that directive when implementing the real components.
 - **ShareScreen QR card wrapper:** White card (`bg-white rounded-2xl shadow-md p-4`) wraps QRCodeSVG to ensure scan contrast against any page background. UI theme stays flexible.
 - **Clipboard copy pattern:** navigator.clipboard.writeText() + document.execCommand fallback — covers Safari and non-HTTPS localhost preview environments.
+- [Phase 02-host-flow]: qty expansion (CORR-05) in POST /api/sessions via flatMap — session store receives only qty:1 items
+- [Phase 02-host-flow]: Tap-to-edit pattern: editingField state in ItemRow, autoFocus input, onBlur commits; never contenteditable
+- [Phase 02-host-flow]: TaxTipFields uses key prop trick (key={taxCents/tipCents}) to reset defaultValue after blur — no controlled input needed
 
 ### Pending Todos
 
@@ -71,6 +77,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-21T17:44:34Z
-Stopped at: Completed 02-host-flow/02-03-PLAN.md — ShareScreen with QR code and clipboard copy
+Last session: 2026-02-21T17:45:22Z
+Stopped at: Completed 02-host-flow/02-02-PLAN.md — OcrReview, ItemRow, TaxTipFields, qty expansion in sessions API
 Resume file: None
