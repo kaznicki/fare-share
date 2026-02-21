@@ -12,7 +12,7 @@ Five phases build Tab Splitter from the server foundation up through the full us
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Custom server, session store, and OCR endpoint running and testable without a UI
+- [x] **Phase 1: Foundation** - Custom server, session store, and OCR endpoint running and testable without a UI (completed 2026-02-21)
 - [ ] **Phase 2: Host Flow** - Host can photograph a receipt, correct OCR output, and share a QR-code join link
 - [ ] **Phase 3: Real-Time Layer** - Participants can join via the share URL and the WebSocket room broadcasts presence in real time
 - [ ] **Phase 4: Item Claiming** - Participants claim items on their phones; all screens update live; shared and duplicate items work correctly
@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md — Scaffold Next.js, Tailwind v4, custom HTTP+WebSocket server, canonical types, module skeletons
 - [x] 01-02-PLAN.md — In-memory session store with 4-hour TTL, POST /api/sessions, GET /api/sessions/[id]
-- [ ] 01-03-PLAN.md — POST /api/ocr calling GPT-4o Vision with Zod validation, dev mock mode
+- [x] 01-03-PLAN.md — POST /api/ocr calling GPT-4o Vision with Zod validation, dev mock mode
 
 ### Phase 2: Host Flow
 **Goal**: Host can photograph a receipt, review and correct extracted items (including tax and tip), and share a QR code or link that others can use to join — the complete host-side experience before anyone claims anything
@@ -107,7 +107,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/3 | In Progress|  |
+| 1. Foundation | 3/3 | Complete   | 2026-02-21 |
 | 2. Host Flow | 0/3 | Not started | - |
 | 3. Real-Time Layer | 0/2 | Not started | - |
 | 4. Item Claiming | 0/3 | Not started | - |
