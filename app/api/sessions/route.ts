@@ -29,7 +29,22 @@ export async function POST(req: NextRequest) {
     }
 
     const { items, taxCents, tipCents } = parsed.data
-    const sessionId = sessionStore.create({ items, taxCents, tipCents })
+
+    // CORR-05: Expand items with qty > 1 into separate claimable rows.
+    // e.g. { name: 'Burger', qty: 2 } → two rows with qty: 1 and distinct IDs.
+    // The session store records individual items so each guest can claim one unit.
+    const expandedItems = items.flatMap(item =>
+      item.qty === 1
+        ? [{ ...item, qty: 1 }]
+        : Array.from({ length: item.qty }, () => ({
+            id: crypto.randomUUID(),
+            name: item.name,
+            priceCents: item.priceCents,
+            qty: 1,
+          }))
+    )
+
+    const sessionId = sessionStore.create({ items: expandedItems, taxCents, tipCents })
 
     return NextResponse.json(
       {
