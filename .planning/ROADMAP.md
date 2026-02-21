@@ -49,7 +49,7 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Install qrcode.react, host page state machine, CameraCapture component (camera input, preview, canvas compression, OCR POST)
+- [x] 02-01-PLAN.md — Install qrcode.react, host page state machine, CameraCapture component (camera input, preview, canvas compression, OCR POST)
 - [ ] 02-02-PLAN.md — OcrReview screen: ItemRow (tap-to-edit name/price, qty stepper, delete), TaxTipFields (pinned footer), session creation POST
 - [ ] 02-03-PLAN.md — ShareScreen: QR code (qrcode.react QRCodeSVG) and clipboard copy with fallback
 - [ ] 02-04-PLAN.md — Human verification of complete Phase 2 host flow (all 12 requirements)
@@ -107,9 +107,9 @@ Plans:
 Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Foundation | 3/3 | Complete   | 2026-02-21 |
-| 2. Host Flow | 0/4 | Not started | - |
+| --- | --- | --- | --- |
+| 1. Foundation | 3/3 | Complete | 2026-02-21 |
+| 2. Host Flow | 1/4 | In progress | - |
 | 3. Real-Time Layer | 0/2 | Not started | - |
 | 4. Item Claiming | 0/3 | Not started | - |
 | 5. Summary and Finalization | 0/2 | Not started | - |

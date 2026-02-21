@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Everyone pays exactly what they ordered (plus proportional tax and tip) without doing any mental math
-**Current focus:** Phase 1 complete — moving to Phase 2 (Host Flow)
+**Current focus:** Phase 2 (Host Flow) — Plan 01 complete, moving to Plan 02 (OcrReview)
 
 ## Current Position
 
-Phase: 1 of 5 (complete)
-Plan: 3 of 3 in current phase
+Phase: 2 of 5 (in progress)
+Plan: 1 of 3 in current phase (complete)
 Status: Executing
-Last activity: 2026-02-21 — Plan 01-03 complete (GPT-4o Vision OCR endpoint + dev mock mode)
+Last activity: 2026-02-21 — Plan 02-01 complete (camera capture screen, host page state machine, qrcode.react installed)
 
-Progress: [████░░░░░░] 23% (3 of 13 total plans)
+Progress: [████░░░░░░] 31% (4 of 13 total plans)
 
 ## Performance Metrics
 
@@ -28,9 +28,10 @@ Progress: [████░░░░░░] 23% (3 of 13 total plans)
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 3/3 | ~11 min | ~3.7 min |
+| 2. Host Flow | 1/3 | ~2 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (5 min), 01-02 (2 min), 01-03 (4 min)
+- Last 5 plans: 01-01 (5 min), 01-02 (2 min), 01-03 (4 min), 02-01 (2 min)
 - Trend: Fast and consistent
 
 *Updated after each plan completion*
@@ -53,6 +54,9 @@ Progress: [████░░░░░░] 23% (3 of 13 total plans)
 - **OCR lazy client:** getOpenAI() singleton prevents "No API key" error when module imported before app.prepare() loads .env.local.
 - **OCR math:** Math.round(dollars * 100) for cent conversion — $12.99 * 100 = 1298.9999... rounds to 1299 correctly; never Math.floor or parseInt.
 - **OCR mock mode:** USE_OCR_MOCK=true env var bypasses GPT-4o API, returns deterministic 4-item fixture for cost-free UI development.
+- **Three-screen host flow state machine:** app/host/page.tsx owns screen state ('capture' | 'reviewing' | 'share') via conditional rendering — no router navigation, keeps ephemeral OCR data in memory without URL serialization.
+- **OCR-04 error path:** CameraCapture catch block calls onComplete with empty OcrResult { items: [], taxCents: 0, tipCents: 0 } — host advances to manual correction rather than being blocked on capture screen.
+- **Stub components without 'use client':** OcrReview.tsx and ShareScreen.tsx stubs intentionally omit 'use client' — Plans 02 and 03 own that directive when implementing the real components.
 
 ### Pending Todos
 
@@ -65,6 +69,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-21T17:06:34Z
-Stopped at: Completed 01-foundation/01-03-PLAN.md — GPT-4o Vision OCR endpoint, dev mock mode, Phase 1 complete
+Last session: 2026-02-21T17:41:05Z
+Stopped at: Completed 02-host-flow/02-01-PLAN.md — camera capture screen, host page state machine, qrcode.react installed
 Resume file: None

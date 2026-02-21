@@ -1,128 +1,146 @@
-
-# Requirements: SplitCheck
-
-**Defined:** 2026-02-14
-**Core Value:** Accurately split a restaurant bill among any number of people so everyone pays exactly their fair share, with minimal manual effort.
+# Requirements: Tab Splitter
 
 ## v1 Requirements
 
-Requirements for initial release. Each maps to roadmap phases.
+### OCR — Receipt Capture and Extraction
 
-### Receipt Scanning
+**OCR-01** — User can photograph a receipt using the phone's rear camera from within the app (via `<input type="file" accept="image/*" capture="environment">`).
 
-- [ ] **SCAN-01**: User can photograph a receipt and have line items extracted automatically via OCR
-- [ ] **SCAN-02**: Receipt image is preprocessed (crop, enhance contrast, deskew) before OCR
-- [ ] **SCAN-03**: User can manually enter items as fallback when OCR is unavailable or fails
-- [ ] **SCAN-04**: App uses cloud OCR fallback when client-side OCR confidence is low
-- [ ] **SCAN-05**: Each extracted item shows a confidence indicator so user knows what to double-check
+**OCR-02** — After capturing a photo, user sees an image preview and can choose to retake before submitting to OCR.
 
-### Item Management
+**OCR-03** — The app extracts line items (name, price, quantity) from the receipt photo automatically and presents them as a structured list.
 
-- [ ] **ITEM-01**: User can review and edit OCR-extracted items (fix names, correct prices, adjust quantities)
-- [ ] **ITEM-02**: User can manually add or remove items from the list
-- [ ] **ITEM-03**: Multi-quantity line items (e.g., "Burger x2 $30") are automatically expanded into individual assignable items
-- [ ] **ITEM-04**: Tax, subtotal, and total lines are auto-detected and excluded from the item list
+**OCR-04** — If OCR fails or produces no results, user sees an error message and can proceed to add items manually.
 
-### Collaborative Claiming
+---
 
-- [ ] **CLAM-01**: Host can generate a shareable session link after reviewing items
-- [ ] **CLAM-02**: Each person opens the shared link and enters their name to join the session
-- [ ] **CLAM-03**: Each person can claim items for themselves from the item list
-- [ ] **CLAM-04**: A person can mark an item as shared with specific other people (split equally)
-- [ ] **CLAM-05**: A person can mark an item as "shared by everyone" with one tap
-- [ ] **CLAM-06**: Items show visual indicators of claim status (unclaimed, claimed by whom, shared)
-- [ ] **CLAM-07**: All participants see claims update in real-time as people claim items
+### CORR — Manual OCR Correction (explicit v1 requirement)
 
-### Tax & Tip
+**CORR-01** — Host can edit any extracted item's name, price, or quantity inline before the session is created.
 
-- [ ] **CALC-01**: Tax is split proportionally based on each person's subtotal
-- [ ] **CALC-02**: User can choose tip as a percentage (15%, 18%, 20%, or custom)
-- [ ] **CALC-03**: User can enter a flat dollar tip amount
-- [ ] **CALC-04**: User can select "gratuity already included" to skip additional tip calculation
-- [ ] **CALC-05**: Tax amount is pre-filled from receipt OCR when detected
+**CORR-02** — Host can delete spurious rows (subtotal lines, header rows, tip lines) from the extracted item list.
 
-### Results & Sharing
+**CORR-03** — Host can add items manually (name + price) when a receipt is partially unreadable or an item is missing from the OCR output.
 
-- [ ] **RSLT-01**: Each person sees their own breakdown showing items, subtotal, tax share, tip share, and total
-- [ ] **RSLT-02**: Sum of all person totals equals the bill total to the penny (correct rounding)
-- [ ] **RSLT-03**: Host can copy/share the full breakdown as formatted text
-- [ ] **RSLT-04**: Breakdown updates live as items are claimed (no page refresh needed)
-- [ ] **RSLT-05**: Unclaimed items are clearly visible so the group knows what's left to claim
+**CORR-04** — Host can edit the extracted tax and tip amounts before creating the session.
 
-### Foundation
+**CORR-05** — Items with quantity greater than 1 are expanded into separate individually-claimable rows when the session is created (e.g., qty:2 "Burger" $9.00 becomes two separate "Burger" rows at $9.00 each).
 
-- [ ] **FOUN-01**: App is a mobile-friendly responsive web app that works in phone browsers
-- [ ] **FOUN-02**: App uses integer arithmetic (cents) for all calculations to prevent rounding errors
-- [ ] **FOUN-03**: State persists to localStorage so progress isn't lost on accidental navigation
+---
 
-## v2 Requirements
+### SESS — Session Creation and Sharing
 
-Deferred to future release. Tracked but not in current roadmap.
+**SESS-01** — After reviewing and correcting items, host can create a session that locks the item list and generates a unique, unguessable session URL.
 
-### Enhanced Features
+**SESS-02** — Host sees a QR code on screen that participants can scan to join the session on their own phones.
 
-- **V2-01**: Offline-first functionality (OCR runs without internet)
-- **V2-02**: Receipt history and saved past splits
-- **V2-03**: Deep links to Venmo/PayPal for payment requests
-- **V2-04**: Multi-currency support for international receipts
-- **V2-05**: Group/event management (track multiple bills across a trip)
+**SESS-03** — Host can copy a shareable link to the clipboard as a fallback for participants who cannot scan the QR code.
+
+---
+
+### JOIN — Participant Join Flow
+
+**JOIN-01** — Participant can open the share URL on their phone, enter only their name (no account or password required), and immediately access the session.
+
+**JOIN-02** — All participants in the session see when a new person joins in real time.
+
+---
+
+### CLAIM — Item Claiming
+
+**CLAIM-01** — Participant can tap any item row to claim it as something they ordered; tapping again removes the claim.
+
+**CLAIM-02** — Multiple participants can claim the same item row (shared item); the item's cost is divided equally among all claimants and each participant sees their share price in real time.
+
+**CLAIM-03** — Duplicate items (two separate rows created from qty expansion) can each be claimed independently by different participants.
+
+**CLAIM-04** — Each item row shows who has currently claimed it (names visible to all participants) so no one needs to ask at the table.
+
+---
+
+### SYNC — Real-Time Synchronization
+
+**SYNC-01** — Claim updates from any participant appear on all other participants' screens within one to two seconds, without requiring a page reload.
+
+**SYNC-02** — A participant who loses and regains their connection (e.g., phone locks, network switches) rejoins the session and sees the current, complete state of all claims without missing any updates.
+
+---
+
+### MATH — Tax, Tip, and Totals Calculation
+
+**MATH-01** — Each person's tax share is calculated proportionally to their food subtotal, not as an equal split.
+
+**MATH-02** — Each person's tip share is calculated proportionally to their food subtotal, not as an equal split.
+
+**MATH-03** — The sum of all per-person totals equals the receipt total exactly (no missing or extra cents due to rounding).
+
+---
+
+### FINAL — Finalization and Summary
+
+**FINAL-01** — Host can trigger finalization; each participant sees their individual total owed (subtotal + proportional tax + proportional tip) on a summary screen.
+
+**FINAL-02** — Host sees a summary showing every participant's name and amount owed; if items remain unclaimed at finalization, host chooses to split them among all participants or assign them to the host.
+
+---
+
+## Coverage Summary
+
+| ID | Category | Phase |
+|----|----------|-------|
+| OCR-01 | Camera capture | Phase 2 | COMPLETE (02-01) |
+| OCR-02 | Image preview | Phase 2 | COMPLETE (02-01) |
+| OCR-03 | OCR extraction | Phase 2 | COMPLETE (02-01) |
+| OCR-04 | OCR failure handling | Phase 2 | COMPLETE (02-01) |
+| CORR-01 | Inline item edit | Phase 2 |
+| CORR-02 | Delete spurious rows | Phase 2 |
+| CORR-03 | Add item manually | Phase 2 |
+| CORR-04 | Edit tax/tip | Phase 2 |
+| CORR-05 | Quantity expansion | Phase 2 |
+| SESS-01 | Session creation | Phase 2 |
+| SESS-02 | QR code display | Phase 2 |
+| SESS-03 | Copy link fallback | Phase 2 |
+| JOIN-01 | Participant name entry + join | Phase 3 |
+| JOIN-02 | Participant joined broadcast | Phase 3 |
+| CLAIM-01 | Tap to claim / unclaim | Phase 4 |
+| CLAIM-02 | Shared item split | Phase 4 |
+| CLAIM-03 | Duplicate item claiming | Phase 4 |
+| CLAIM-04 | Claim indicators visible to all | Phase 4 |
+| SYNC-01 | Real-time claim broadcast | Phase 4 |
+| SYNC-02 | Reconnect full-state snapshot | Phase 3 |
+| MATH-01 | Proportional tax | Phase 5 |
+| MATH-02 | Proportional tip | Phase 5 |
+| MATH-03 | Totals sum exactly | Phase 5 |
+| FINAL-01 | Per-person summary | Phase 5 |
+| FINAL-02 | Host summary + unclaimed handling | Phase 5 |
+
+**Total v1 requirements: 25**
+**All mapped to a phase: yes**
+
+---
+
+## v2 Requirements (Deferred)
+
+- Live camera viewfinder with crop guidance overlay (getUserMedia + canvas, in-app viewfinder rather than native camera app)
+- Share individual total via native share sheet (`navigator.share()`)
+- PWA offline support / installable app
+- Session expiry countdown indicator ("Session expires in ~4 hours")
+- OCR confidence flagging: visually highlight low-confidence rows for correction
+- Camera image quality guidance overlay at capture time ("lay receipt flat, good lighting")
+- Host item override after claiming has started
+- "Add to home screen" PWA install prompt
+
+---
 
 ## Out of Scope
 
-Explicitly excluded. Documented to prevent scope creep.
-
-| Feature | Reason |
-| --- | --- |
-| Native mobile app (iOS/Android) | Web-first approach, evaluate after v1 |
-| User accounts / login | Lightweight session via shared link, no formal sign-up |
-| Payment processing | SplitCheck is a calculator, not a payment platform |
-| Social features (friends, feeds) | Tool, not social network — adds moderation burden |
-| Unequal shared item splits (60/40) | Adds UI complexity, marginal value — split equally or don't share |
-| Dispute/negotiation features | Social problem, not software problem |
-| Receipt templates | Each receipt is independent, no recurring use case |
-| Gamification | Misaligned with utility-focused use case |
-
-## Traceability
-
-Which phases cover which requirements. Updated during roadmap creation.
-
-| Requirement | Phase | Status |
-| --- | --- | --- |
-| FOUN-01 | Phase 1 - Foundation | Pending |
-| FOUN-02 | Phase 1 - Foundation | Pending |
-| FOUN-03 | Phase 1 - Foundation | Pending |
-| SCAN-01 | Phase 2 - Receipt Scanning | Pending |
-| SCAN-02 | Phase 2 - Receipt Scanning | Pending |
-| SCAN-03 | Phase 2 - Receipt Scanning | Pending |
-| SCAN-04 | Phase 2 - Receipt Scanning | Pending |
-| SCAN-05 | Phase 2 - Receipt Scanning | Pending |
-| ITEM-01 | Phase 3 - Item Management | Pending |
-| ITEM-02 | Phase 3 - Item Management | Pending |
-| ITEM-03 | Phase 3 - Item Management | Pending |
-| ITEM-04 | Phase 3 - Item Management | Pending |
-| CLAM-01 | Phase 4 - Live Session & Claiming | Pending |
-| CLAM-02 | Phase 4 - Live Session & Claiming | Pending |
-| CLAM-03 | Phase 4 - Live Session & Claiming | Pending |
-| CLAM-04 | Phase 4 - Live Session & Claiming | Pending |
-| CLAM-05 | Phase 4 - Live Session & Claiming | Pending |
-| CLAM-06 | Phase 4 - Live Session & Claiming | Pending |
-| CLAM-07 | Phase 4 - Live Session & Claiming | Pending |
-| CALC-01 | Phase 5 - Calculation | Pending |
-| CALC-02 | Phase 5 - Calculation | Pending |
-| CALC-03 | Phase 5 - Calculation | Pending |
-| CALC-04 | Phase 5 - Calculation | Pending |
-| CALC-05 | Phase 5 - Calculation | Pending |
-| RSLT-01 | Phase 6 - Results & Sharing | Pending |
-| RSLT-02 | Phase 6 - Results & Sharing | Pending |
-| RSLT-03 | Phase 6 - Results & Sharing | Pending |
-| RSLT-04 | Phase 6 - Results & Sharing | Pending |
-| RSLT-05 | Phase 6 - Results & Sharing | Pending |
-
-**Coverage:**
-- v1 requirements: 25 total
-- Mapped to phases: 25
-- Unmapped: 0 ✓
-
----
-*Requirements defined: 2026-02-14*
-*Last updated: 2026-02-14 after roadmap creation*
+- User accounts, login, or session history — sessions are ephemeral and anonymous
+- In-app payment processing — the app shows what each person owes; they settle externally
+- Even-split mode — this product is item-level splitting only
+- Custom tip percentage per person — tip is distributed proportionally, no per-person customization
+- Editing item prices after claiming has started — items lock at session creation
+- Multi-currency support
+- In-app chat or dispute resolution
+- Native mobile app (iOS/Android) — mobile web browser only
+- Barcode or menu scanning — receipt splitting only, not order management
+- Session history or receipt archive — disposable sessions only
