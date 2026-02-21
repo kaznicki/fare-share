@@ -63,11 +63,11 @@ Plans:
   1. Participant opens the share URL, enters only a name (no account required), and lands on the session item list within a few seconds
   2. All other participants see a "joined" notification when a new person connects, without refreshing
   3. A participant who loses connection (phone screen locks, network switch) rejoins and sees the complete current session state — no claims are missing from their view
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: WebSocket server session room management — join, presence broadcast, full-state snapshot on connect
-- [ ] 03-02: Participant join UI — name entry screen, WebSocket connect on submit, item list scaffold
+- [ ] 03-01-PLAN.md — WebSocket join message handler in server.ts: parse join message, idempotent participant append, full-state broadcast
+- [ ] 03-02-PLAN.md — Participant join UI: dynamic route /session/[id], JoinForm name entry, SessionRoom WebSocket connection + read-only item list
 
 ### Phase 4: Item Claiming
 **Goal**: Participants can claim items on their phones, see shared costs update in real time, and all screens across the table converge to the same claim state within seconds
