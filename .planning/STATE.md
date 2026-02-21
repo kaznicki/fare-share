@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 1 of 5 (in progress)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: Executing
-Last activity: 2026-02-21 — Plan 01-01 complete (scaffold + server + types)
+Last activity: 2026-02-21 — Plan 01-02 complete (session store + REST API endpoints)
 
-Progress: [██░░░░░░░░] 7% (1 of 13 total plans)
+Progress: [███░░░░░░░] 15% (2 of 13 total plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: ~5 min
-- Total execution time: ~5 min
+- Total plans completed: 2
+- Average duration: ~3.5 min
+- Total execution time: ~7 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 1/3 | ~5 min | ~5 min |
+| 1. Foundation | 2/3 | ~7 min | ~3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (5 min)
+- Last 5 plans: 01-01 (5 min), 01-02 (2 min)
 - Trend: —
 
 *Updated after each plan completion*
@@ -46,6 +46,9 @@ Progress: [██░░░░░░░░] 7% (1 of 13 total plans)
 - **Claims model:** Append-only Set per item (`claims[itemId] = Set<participantName>`). No single-owner model. Full-state broadcast after every change. Full snapshot sent on every WebSocket connect (handles reconnects).
 - **WebSocket routing:** noServer: true mode — routes upgrade events manually; /ws goes to wss, /_next/webpack-hmr delegated to Next.js HMR handler, all other paths destroyed.
 - **Dev script:** tsx watch server.ts (not next dev) — bypasses Next.js built-in server to ensure custom server with WebSocket runs.
+- **getData() helper pattern:** Store exposes getData() to strip non-serializable fields (sockets Set) before JSON serialization — route handlers never destructure manually.
+- **Double validation (Zod + store boundary):** Zod rejects floats at API boundary; store's Number.isInteger check provides defense-in-depth for non-HTTP callers (WebSocket handlers, test scripts).
+- **No edge runtime:** Session store uses Map and setTimeout — incompatible with edge runtime. No `export const runtime = 'edge'` in session API routes.
 
 ### Pending Todos
 
@@ -58,6 +61,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-21T16:59:37Z
-Stopped at: Completed 01-foundation/01-01-PLAN.md — scaffold, server, types, session store, OCR stub
+Last session: 2026-02-21T17:04:40Z
+Stopped at: Completed 01-foundation/01-02-PLAN.md — session store, POST /api/sessions, GET /api/sessions/[id]
 Resume file: None
