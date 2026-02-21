@@ -1,241 +1,277 @@
 # Project Research Summary
 
-**Project:** SplitCheck
-**Domain:** Receipt-scanning bill splitter (mobile web app)
-**Researched:** 2026-02-14
-**Confidence:** MEDIUM-HIGH
+**Project:** Tab Splitter
+**Domain:** Mobile web restaurant bill splitter (ephemeral sessions, OCR, real-time multi-user)
+**Researched:** 2026-02-20
+**Confidence:** MEDIUM-HIGH (architecture and pitfalls HIGH; OCR approach MEDIUM due to unresolved conflict)
+
+---
 
 ## Executive Summary
 
-SplitCheck is a mobile-first web application for scanning restaurant receipts and automatically calculating per-person bills. Research shows this is a well-understood domain with clear table stakes (OCR, item assignment, tip calculation, sharing) and competitive differentiation through UX simplicity and robust edge case handling. The recommended architecture is client-heavy with a thin backend, using Next.js for the framework, Tesseract.js for client-side OCR with cloud fallback, and Zustand for state management.
+Tab Splitter is an item-level bill splitting app with a well-understood product pattern and a clear technical path — with one architectural decision that must be made before writing a line of code. The core flow is: host photographs receipt, OCR extracts line items, host corrects errors, participants join via QR link and claim their items in real-time on their own phones, and each person sees their proportional total including tax and tip. Two research agents independently reached the same architecture for the real-time layer (WebSocket, in-memory session state, custom Node.js server or PartyKit), the same UI requirements (48px touch targets, quantity expansion, largest-remainder math in integer cents), and the same anti-features to avoid (accounts, payment processing, session history). The research is in strong agreement on everything except OCR.
 
-The critical success factor is mathematical accuracy. Users will forgive poor OCR or clunky UI, but never forgive incorrect calculations. Rounding errors that cause person totals to not sum to the bill total will destroy trust permanently. Use integer arithmetic (cents, not dollars) throughout and apply rounding only at the final step using largest-remainder method.
+The single unresolved conflict between the four research files is the OCR engine. STACK.md recommends Tesseract.js (client-side, free, no server, privacy-preserving) while ARCHITECTURE.md and FEATURES.md recommend server-side Vision API (GPT-4o or Google Vision) for significantly better accuracy and structured JSON output. PITFALLS.md surfaced both sides fairly and leaned toward Tesseract.js with the reasoning that the mandatory manual correction step covers accuracy gaps and a server-side swap later is non-disruptive to the UI contract. **The resolution recommended here is: start with server-side GPT-4o Vision API.** The user explicitly listed manual OCR correction as a v1 requirement, which implies OCR must be good enough that corrections are occasional fixes, not constant re-entry. Tesseract on thermal receipt fonts without extensive preprocessing produces garbled output that would make the correction step the primary workflow, not a safety net. The API cost (~$0.01-0.03/image) is acceptable for a product at this stage, and the server is already required for the WebSocket layer — there is no additional infrastructure cost.
 
-The recommended approach prioritizes getting the core OCR-to-assignment flow working first, then layering calculation logic, and finally adding sharing capabilities. Handle shared items and multi-quantity items from the start — these are key differentiators and common real-world patterns. Defer payment integration, receipt history, and multi-currency support to v2+.
+The primary technical risks are: (1) the OCR approach must be locked in before implementation begins; (2) all monetary math must use integer cents from day one — floating-point errors in bill-splitting apps immediately destroy user trust; (3) WebSocket session state must send a full snapshot on every reconnect, or mobile network switches silently corrupt claim state; and (4) iOS Safari requires HTTPS for camera access, which must be set up in local development from day one or it causes a late-stage delay. All of these are well-documented and have clear mitigations.
+
+---
 
 ## Key Findings
 
 ### Recommended Stack
 
-A modern JavaScript stack optimized for mobile UX with minimal backend complexity. Next.js provides SSR for fast load times while keeping API routes and frontend in one codebase. Client-side OCR reduces server costs but requires cloud fallback for poor-quality images.
+Research produced two stack options depending on the OCR decision. The STACK.md researcher assumed Tesseract.js (client-side) and recommended a Vite SPA + PartyKit architecture with no custom server. ARCHITECTURE.md assumed server-side OCR and recommended Next.js + custom Node.js server + ws library. These architectures are coherent internally but diverge on the server requirement.
 
-**Core technologies:**
-- **Next.js 14+**: Framework with App Router — SSR for mobile performance, built-in API routes, image optimization
-- **Tailwind CSS + shadcn/ui**: UI framework — mobile-first responsive design, accessible touch-friendly components
-- **Zustand**: State management — lightweight, perfect for bill-splitting data model with computed totals
-- **Tesseract.js**: Primary OCR — client-side WASM, no server costs, works offline once loaded
-- **Google Cloud Vision API**: OCR fallback — superior accuracy on messy receipts, use when client-side confidence is low
-- **Turso or Vercel KV**: Database — minimal storage for shared link data (JSON blobs)
-- **Vercel**: Deployment — native Next.js support, free tier sufficient, edge functions
-- **Vitest + Playwright**: Testing — unit tests for calculation logic, E2E for full flow
+**Recommended stack (server-side OCR, adopted here):**
 
-**Risk areas:**
-- OCR accuracy on real-world receipts (Tesseract.js struggles with poor photos)
-- Receipt parsing complexity (extracting structure from raw text requires custom logic)
-- WASM load time (Tesseract.js model is ~2MB, needs lazy loading)
+| Technology | Purpose | Why |
+|------------|---------|-----|
+| Next.js 15 (App Router) | Pages + REST API | Route handlers for `/api/ocr` and `/api/sessions`; custom server escape hatch for WebSockets |
+| TypeScript 5.7+ | Type safety | Session state shape bugs caught at compile time; critical when OCR output is unstructured JSON |
+| Tailwind CSS 4.x | Styling | v4 Vite plugin; mobile-first utilities; safe-area support out of the box |
+| ws (WebSocket library) | Real-time sync | Attached to custom Next.js HTTP server; handles session rooms, claim broadcasts, presence |
+| Zustand 5 | Client state | Uses `useSyncExternalStore` — prevents React 19 concurrent mode state tearing with WebSocket updates |
+| OpenAI GPT-4o Vision | OCR | Returns structured JSON directly from a prompt; handles thermal receipt fonts better than Tesseract |
+| qrcode.react 4.x | QR code | SVG output; scales on all screen densities; more actively maintained |
+| Railway / Fly.io / Render | Deployment | Long-lived Node.js process required for WebSockets; Vercel serverless does NOT work |
+
+**If OCR decision is reversed to client-side (Tesseract.js):**
+Switch to Vite SPA + PartyKit. No custom server needed. Add nanoid for client-side session ID generation. Add canvas preprocessing (grayscale + contrast filter) before OCR. Tesseract.js v7 runs in a Web Worker. Deployment becomes Cloudflare Pages (free, global CDN).
+
+See STACK.md for full installation commands and version compatibility matrix.
 
 ### Expected Features
 
-**Must have (table stakes):**
-- **Receipt OCR with manual fallback** — photograph receipt and extract line items automatically, fall back to manual entry when OCR fails
-- **Basic item assignment** — tap items to assign to specific people, visual indication of who owes what
-- **Tax & tip handling** — three modes: percentage, flat amount, already included
-- **Per-person breakdown** — clear display of what each person owes with itemized detail
-- **Simple sharing** — share link or text summary, no account required to view
+All four research files agreed on the feature set. The following is the consolidated v1 scope.
 
-**Should have (competitive differentiators):**
-- **Shared item handling** — split appetizers/wine across multiple people with equal distribution (explicitly called out in project requirements)
-- **Multi-quantity items** — recognize "Burger x2" notation and allow splitting instances to different people
-- **Photo-first UX** — intelligent defaults to minimize taps (goal: photo → confirm → share in 30 seconds)
+**Must have (table stakes) — app feels broken without these:**
+- Receipt photo capture via `<input type="file" capture="environment">` (simple, works everywhere, no HTTPS required at the input level)
+- OCR line item extraction with structured output (name, price, qty per item)
+- Manual item correction UI: inline edit every row, delete spurious rows (subtotal lines), add items manually, edit tax and tip — this is an explicit v1 requirement
+- Quantity expansion: `qty: 2 Burger $9.00` becomes two separate claimable rows at session creation
+- Session sharing via QR code and copyable link (no account or app install for participants)
+- Participant name entry only (no account creation)
+- Item claiming by tapping full-row touch targets (48px minimum height, 64px recommended)
+- Shared item support: multiple people claim the same row; price splits proportionally
+- Real-time claim updates across all participants' phones (WebSocket broadcast)
+- Per-person total with proportional tax/tip distribution (Largest Remainder Method, integer cents)
+- Final summary: host view (all totals) + individual view (my total)
+- Unclaimed item handling at finalize: "split among all" or "host covers them"
 
-**Defer (v2+):**
-- **Payment integration** — deep linking to Venmo/PayPal as interim, full payment processing later
-- **Receipt history** — requires user accounts and cloud storage
-- **Offline-first** — client-side OCR enables this but adds complexity vs value
-- **Multi-currency** — not essential for US market focus
+**Should have (differentiators):**
+- Image preview before OCR call (retake option before spending an API call)
+- Image quality guidance overlay at capture time ("lay flat, good lighting")
+- OCR confidence flagging: flag low-confidence rows visually for correction
+- "Add item manually" button on correction screen (for unreadable receipts)
+- Share individual total via native share sheet (`navigator.share()`)
+- Session expiry indicator ("session expires in ~4 hours")
 
-**Anti-features (never build):**
-- Social network features (friend graphs, activity feeds)
-- Dispute/negotiation tools (interpersonal issues, not software issues)
-- Gamification (misaligned with utility use case)
-- Complex splitting algorithms (no custom percentages, keep it simple)
+**Defer to v2:**
+- Live camera viewfinder with crop guidance rectangle (getUserMedia + canvas)
+- PWA offline support / installable app
+- Camera viewfinder overlay for straightening
+- Item dispute / host override after claiming begins
+- Gamification / progress indicators during claiming
+- In-app chat
+
+**Explicitly out of scope (do not build):**
+- User accounts, login, or session history
+- Payment processing
+- Even-split mode
+- Custom tip per person
+- Edit items after claiming has started (lock prices at session creation)
+- Multi-currency
+
+See FEATURES.md for full UX wireframes and interaction details.
 
 ### Architecture Approach
 
-Client-heavy architecture with minimal backend. Core logic (OCR parsing, assignment, calculation) runs in browser. Backend only exists for share-link persistence and cloud OCR fallback. This minimizes costs, maximizes responsiveness, and keeps deployment simple.
+The recommended architecture is a single Node.js process running Next.js (via custom server) alongside a ws WebSocket server, with in-memory session state in a `Map`. REST handles mutation requests (create session, OCR). WebSocket handles real-time broadcast only. This is the correct separation: REST is testable, retryable, and idempotent; WebSocket is narrow and focused on broadcasting state changes to all sockets in a session room.
 
 **Major components:**
-1. **Camera Capture** — acquire receipt image, preprocess (crop, enhance, rotate)
-2. **OCR Engine** — convert image to raw text (Tesseract.js primary, Google Vision fallback)
-3. **Receipt Parser** — extract structured items from raw text (regex patterns for quantity, price, tax)
-4. **People Manager** — CRUD operations on party list
-5. **Item Assigner** — map items to people with shared item support
-6. **Calculation Engine** — pure function computing per-person totals with tax/tip distribution
-7. **Results View** — display breakdown and generate shareable link
-8. **Share Link Backend** — simple CRUD API for persisting split data
 
-**Data flow:** Photo → OCR → Parse → Review/Edit → Add People → Assign Items → Configure Tip → Calculate → Share
+1. **Custom HTTP server (`server.ts`)** — Creates the HTTP server, attaches ws WebSocket server, passes all other requests to Next.js. This is the foundational piece that must be built first, as changing from standard Route Handlers to a custom server is disruptive after the fact.
+2. **In-memory session store (`Map<sessionId, SessionState>`)** — Holds items, participants, and claims for the session lifetime (4-hour TTL via setTimeout). No database required. Redis is the correct upgrade path if horizontal scaling is ever needed.
+3. **POST /api/ocr** — Accepts image upload, calls GPT-4o Vision with a structured JSON prompt, returns `{ items: [{id, name, price, qty}], subtotal, tax, tip }`. Isolated and independently testable.
+4. **POST /api/sessions** — Creates session in store, returns sessionId and share URL.
+5. **WebSocket server (ws)** — Session rooms via Map of socket sets. On connect: send full state snapshot. On `claim-item`: append claimant to Set (deduplication), broadcast full claims object to all sockets in session.
+6. **Host UI** — Camera capture → image preview → OCR → correction screen → QR/share screen.
+7. **Participant UI** — Name entry → item list with claim indicators → real-time updates from WebSocket.
+8. **Summary UI** — Per-person totals calculated client-side from session state (pure function, no API call).
+
+**Deployment constraint (HIGH confidence, verified):** Vercel serverless does not support persistent WebSocket connections. Deploy on Railway, Fly.io, Render, or DigitalOcean App Platform.
+
+See ARCHITECTURE.md for full data flow diagrams and code patterns for each component.
 
 ### Critical Pitfalls
 
-1. **Rounding errors** — Sum of person totals must equal bill total to the penny. Use integer math (cents), apply rounding only at final step with largest-remainder method. Never use toFixed(2) for intermediate calculations. Test extensively with edge cases ($100 split 3 ways, single penny split 2 ways).
+All pitfalls from PITFALLS.md are worth reading. The top 7 with highest consequence if missed:
 
-2. **OCR accuracy on real receipts** — Real-world receipts are crumpled, blurry, faded thermal paper with inconsistent formats. Image preprocessing is critical (auto-crop, deskew, contrast enhancement). Show confidence indicators per item. Make review/edit fast and easy, not buried. Manual entry should be equal-quality alternative.
+1. **Floating-point money math** — Store all prices as integer cents from day one. `$12.99` → `1299`. Only convert to dollars at display. One floating-point bug in a bill-splitting app destroys user trust immediately. Write a test: sum of all per-person totals must equal receipt total exactly.
 
-3. **Multi-quantity item parsing** — Receipts use wildly different quantity notation ("2 Burger", "Burger x2", "Burger @15 x2 30"). Parse all known patterns. When quantity detected, calculate unit price and expand to individual items. Let users manually split/merge if parser fails. Default to quantity 1 when uncertain.
+2. **Last-write-wins on simultaneous claims** — Model claims as `claims[itemId] = Set<participantName>` server-side. Adding a claimant is an append to a Set — idempotent and race-safe. Never model claims as single-owner. Full state broadcast (not delta) after each claim eliminates out-of-order message bugs.
 
-4. **Mobile camera/image issues** — Dim restaurant lighting produces blurry photos. Flash creates glare on glossy paper. Preprocessing pipeline (auto-brightness, contrast) is essential. Guide overlay helps alignment. Accept gallery photos for retakes. Show OCR results immediately so users can retry.
+3. **WebSocket reconnect without full state snapshot** — On every new WebSocket connection (both new joins and reconnects), immediately send the complete current session state. iOS Safari drops WebSocket connections on screen lock. Clients that miss events get permanently stale state unless the server always sends a full snapshot on connect.
 
-5. **Tax line misidentification** — OCR may read tax as a menu item or miss it entirely. Use keyword detection (TAX, HST, GST, VAT, TX) and position heuristics (appears after items, before total). Validate: tax should be 0-15% of subtotal. Auto-exclude from item list.
+4. **iOS Safari + HTTPS for getUserMedia** — Camera access requires HTTPS. iOS Safari does not treat local network IP addresses as secure contexts. Set up a Cloudflare Tunnel or ngrok from day one of development. If `getUserMedia` is not used (using `<input capture="environment">` instead), this risk is lower but still relevant if the viewfinder UI is ever added.
+
+5. **iOS Safari keyboard + fixed-position buttons** — Virtual keyboard on iOS does not shrink the layout viewport. Fixed-position CTAs at the bottom of the screen disappear behind the keyboard. Use `100dvh` (dynamic viewport height) and flow-positioned buttons. Test on a real iPhone, not Chrome DevTools emulation.
+
+6. **Duplicate claim by same person** — Optimistic UI + network lag = user taps twice. Server must deduplicate using a Set before storing. UI should disable claim button while a claim is in-flight, and use server-authoritative state (not optimistic local state) as the source of truth.
+
+7. **AI-generated state logic accumulates structural debt** — Write `types.ts` by hand before generating any state logic. Keep types as the single source of truth. Use small, targeted prompts ("implement `splitItemCents`") not large prompts ("implement session state management"). Review generated code for store/component boundary violations before accepting.
+
+---
 
 ## Implications for Roadmap
 
-Based on research, suggested phase structure follows the natural data flow with clear dependencies:
+ARCHITECTURE.md's suggested build order is validated by FEATURES.md's feature dependency graph. Both converge on the same sequence. The phases below map directly to that order with pitfall mitigations layered in.
 
-### Phase 1: Foundation — Receipt Capture & OCR
-**Rationale:** Get the image-to-text pipeline working first. Everything depends on having items to work with. This is the highest technical risk area (OCR accuracy).
+### Phase 1: Foundation — Custom Server + Session Store + OCR Endpoint
 
-**Delivers:** Users can photograph receipts and see extracted items (even if assignment logic isn't built yet).
+**Rationale:** The custom server shape is the most disruptive thing to change later. It must be locked in first. All other phases depend on it. The OCR decision must also be locked in during this phase — do not start Phase 2 without a confirmed OCR approach.
 
-**Addresses:**
-- Receipt OCR with manual fallback (table stakes)
-- Camera capture module
-- OCR engine (Tesseract.js + preprocessing)
-- Basic receipt parser (extract items, prices, tax)
+**Delivers:** Working server that accepts an image, calls OCR, returns structured items. No UI yet. Testable via curl.
 
-**Avoids:**
-- OCR accuracy pitfall (via preprocessing and cloud fallback)
-- Mobile camera issues (via guide overlays and image enhancement)
+**Addresses:** Receipt photo capture, OCR extraction, session creation API.
 
-**Research flag:** Standard patterns for OCR integration (Tesseract.js docs, Google Vision API). May need brief `/gsd:research-phase` for receipt parsing regex patterns (non-standard).
+**Implements:** `server.ts` custom server, `POST /api/ocr`, `POST /api/sessions`, in-memory session store with 4-hour TTL, session ID generation (`crypto.randomUUID()`).
 
-### Phase 2: Core Flow — People & Assignment
-**Rationale:** With items extracted, the next logical step is assigning them to people. This is the heart of the app's interaction model. Must handle shared items and multi-quantity from the start (project requirements).
+**Must avoid:** Starting with Next.js Route Handlers assuming WebSockets can be added later (they cannot without the custom server). Starting with floating-point prices (use cents from day one). Do not skip setting up HTTPS tunnel for local dev.
 
-**Delivers:** Users can add people, assign items (including shared items), and see visual feedback of assignments.
+**Research flag:** LOW — architecture is well-documented. Custom Next.js server is the official documented escape hatch. OCR via GPT-4o Vision is a standard API call. No additional phase research needed.
 
-**Addresses:**
-- People manager (add/remove/rename)
-- Item assignment UI (tap to assign)
-- Shared item handling (differentiator — split appetizers across N people)
-- Multi-quantity item expansion (differentiator — handle "Burger x2")
-- Review/edit screen for correcting OCR errors
+**Critical pre-phase decision:** Confirm OCR approach (server-side Vision API recommended here). Document the choice. Do not start implementation until this is resolved.
 
-**Avoids:**
-- Multi-quantity parsing pitfall (recognize all notation patterns)
-- Shared item UX confusion (clear two-path interaction: solo vs shared)
+---
 
-**Research flag:** Standard patterns (React interaction patterns). No research needed unless complex gesture support is added.
+### Phase 2: Host Flow — Camera, OCR Correction UI, QR Share
 
-### Phase 3: Calculation — Tax, Tip, & Totals
-**Rationale:** With assignments complete, calculate what everyone owes. This is the mathematical core where accuracy is critical.
+**Rationale:** The host flow is the entry point of the product. Without it, nothing else can be tested end-to-end. Build it early so OCR quality is validated against real receipts before the participant flow is built on top of it.
 
-**Delivers:** Per-person breakdown with itemized totals, tax share, and tip calculation.
+**Delivers:** Host can photograph a receipt, see extracted items, correct errors, and share a QR code/link. Session exists in memory. No participants yet.
 
-**Addresses:**
-- Tax & tip handling (3 modes: percentage, flat, included)
-- Calculation engine (proportional distribution)
-- Per-person breakdown display
-- Rounding logic (CRITICAL)
+**Addresses:** Receipt photo capture, OCR correction UI (explicit v1 requirement), quantity stepper, tax/tip edit, session sharing, QR code.
 
-**Avoids:**
-- Rounding errors pitfall (integer math, largest-remainder distribution)
-- Tip calculation edge cases (clear defaults, transparency)
+**Must avoid:** Treating OCR output as final — the correction screen must always be shown, never skipped. Not expanding quantities at session creation (qty:2 Burger must become two claimable rows). Skipping image preview before OCR call.
 
-**Research flag:** Standard patterns (financial calculation best practices well-documented). Brief spike on rounding algorithms recommended.
+**Touch target note:** Every interactive element in the correction UI must be 44px minimum, 64px recommended for list rows.
 
-### Phase 4: Sharing — Links & Export
-**Rationale:** With results calculated, enable sharing so the app is useful at the table. Requires backend for persistent share links.
+**Research flag:** LOW for QR code and session sharing (standard patterns). MEDIUM for OCR correction UX — refer to FEATURES.md wireframes. No additional research phase needed.
 
-**Delivers:** Shareable links and text summaries. Recipients can view breakdown without app/account.
+---
 
-**Addresses:**
-- Simple sharing (table stakes)
-- Share link backend (Next.js API routes)
-- Database integration (Turso/Vercel KV)
-- Standalone shared view page
+### Phase 3: Real-Time Layer — WebSocket Server + Participant Join
 
-**Avoids:**
-- State loss pitfall (persist data when generating share link)
+**Rationale:** WebSocket is gated by the session store (Phase 1) and must be in place before the claiming UI can be built. Participant join is the first thing that exercises the real-time path.
 
-**Research flag:** Standard patterns (Next.js API routes, simple CRUD). No research needed.
+**Delivers:** Participants can open the share URL, enter a name, and connect to the WebSocket session room. Presence broadcast works (other participants see who joined). Full state snapshot sent on connect.
 
-### Phase 5: Polish — Edge Cases & Mobile UX
-**Rationale:** With core functionality complete, refine the real-world experience. Handle messy inputs and prevent frustration.
+**Addresses:** No-friction participant join, live presence, WebSocket reconnect safety.
 
-**Delivers:** Robust handling of edge cases, state persistence, improved mobile UX, comprehensive test coverage.
+**Must avoid:** Not sending full state snapshot on every connection (reconnect pitfall). Not deduplicating participants by name (same person rejoining creates duplicate entries).
 
-**Addresses:**
-- State persistence (localStorage for recovery)
-- Navigation guards (prevent accidental loss)
-- OCR error handling and retry flows
-- Enhanced preprocessing for poor images
-- Comprehensive test suite (Vitest + Playwright)
+**Research flag:** LOW — WebSocket + custom server is a documented pattern with working code in ARCHITECTURE.md.
 
-**Avoids:**
-- State loss from accidental navigation
-- Poor OCR from suboptimal image quality
+---
 
-**Research flag:** Standard patterns. May need brief investigation of specific edge cases discovered during testing.
+### Phase 4: Item Claiming UI — With Real-Time Sync
+
+**Rationale:** Claiming is the core user interaction. Build it after WebSocket is proven working (Phase 3) so real-time behavior can be verified from the start.
+
+**Delivers:** Participants see the item list and can tap to claim. Claims broadcast to all participants instantly. Shared item logic works (multiple claimants, split price shown).
+
+**Addresses:** Claim by tapping, shared item splitting, duplicate item support (quantity-expanded rows), live claim updates.
+
+**Must avoid:** Allowing floating-point in claim calculations (enforce cents model). Last-write-wins claim bug (Set-based server model). Touch targets below 44px. Not disabling the claim button while in-flight (duplicate claim pitfall). Not showing real-time price split on shared items.
+
+**Research flag:** LOW — claiming UX patterns and real-time broadcast are well-documented. FEATURES.md has detailed visual state definitions for item rows (unclaimed / claimed-by-me / shared / claimed-by-others).
+
+---
+
+### Phase 5: Summary + Finalization
+
+**Rationale:** Final phase — all data is in place (session state with complete claims). Summary is a pure derivation step with no new infrastructure.
+
+**Delivers:** Host can finalize. Each participant sees their individual total. Unclaimed items are handled. Totals sum exactly to receipt total.
+
+**Addresses:** Per-person totals with proportional tax/tip, finalize flow, unclaimed item handling, share individual total.
+
+**Must avoid:** Division by zero when someone claimed nothing (`totalSubtotal === 0` guard). Largest-remainder algorithm not implemented (pennies don't sum to receipt total). Not giving host a "finalize" button (auto-finalize on "all claimed" is an anti-pattern — someone may temporarily unclaim).
+
+**Research flag:** LOW — math is fully specified in FEATURES.md with working TypeScript implementation. Largest Remainder Method is the documented algorithm (Betterment engineering blog source).
+
+---
 
 ### Phase Ordering Rationale
 
-- **Sequential dependencies:** Phase 2 needs items from Phase 1, Phase 3 needs assignments from Phase 2, Phase 4 needs results from Phase 3. This is the natural data flow.
-- **Risk-first approach:** Phase 1 tackles the highest technical risk (OCR accuracy) early. If OCR proves unworkable, we discover it before investing in downstream features.
-- **Differentiator priority:** Shared items and multi-quantity handling (key differentiators) are built into Phase 2, not deferred. The architecture research identified these as core patterns, not add-ons.
-- **Pitfall alignment:** Phase order matches pitfall severity. Rounding (CRITICAL) is addressed in Phase 3 before sharing. OCR accuracy (HIGH) is Phase 1 focus.
+- Phase 1 must come first because the custom server shape is the most disruptive change — it affects how all Route Handlers are written. Every subsequent phase runs on this foundation.
+- Phase 2 (host flow) comes before participant flow because real receipts need to be tested against the OCR pipeline early. If OCR quality is unacceptable with the chosen engine, Phase 1 needs a revision before the full UI is built on top of it.
+- Phase 3 (WebSocket) must precede Phase 4 (claiming) because claiming requires real-time broadcast.
+- Phase 5 (summary) is last because it is a pure derivation from completed session state — no new infrastructure.
+- Phases 2 and 3 could be partially parallelized if multiple developers are working: the static host UI (camera capture, correction screen) does not require WebSocket to be complete.
 
 ### Research Flags
 
-**Phases likely needing deeper research during planning:**
-- **Phase 1 (Receipt Parser):** Receipt format patterns are non-standard. May need `/gsd:research-phase` to catalog regex patterns for quantity/price extraction across different POS systems.
-- **Phase 3 (Rounding Logic):** Largest-remainder algorithm is well-documented but implementation for multi-person bill splitting may warrant brief spike to verify correctness.
+Phases needing deeper research during planning:
+- None identified. All five phases use well-documented patterns with verified sources.
 
-**Phases with standard patterns (skip research-phase):**
-- **Phase 2:** React interaction patterns, Zustand state management
-- **Phase 4:** Next.js API routes, simple database operations
-- **Phase 5:** Standard testing patterns, localStorage API
+Phases with standard patterns (skip research-phase):
+- All phases — OCR via Vision API, custom Next.js server, ws WebSocket library, in-memory session state, and proportional bill-splitting math all have official documentation and working code examples in the research files.
+
+---
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Next.js, Tailwind, Zustand are well-established for this use case. OCR approach (client + cloud fallback) is proven pattern. |
-| Features | MEDIUM-HIGH | Table stakes are clear from competitive analysis. Differentiators (shared items, multi-quantity) validated in project requirements. Payment integration deferred appropriately. |
-| Architecture | HIGH | Client-heavy pattern is correct for this use case. Component boundaries are clear. Build order follows natural dependencies. |
-| Pitfalls | HIGH | Rounding pitfall is well-documented in financial calculation apps. OCR challenges are known from domain research. Mitigation strategies are concrete. |
+| Stack | MEDIUM-HIGH | Core framework choices (Next.js, TypeScript, Tailwind, ws, Zustand) are HIGH confidence. OCR engine recommendation is MEDIUM — GPT-4o Vision accuracy on receipts is from training knowledge, not a controlled test against real receipts. |
+| Features | HIGH | Table stakes, UX patterns, math algorithms all sourced from official documentation (MDN, WCAG, Betterment engineering blog). OCR correction UI is an explicit user requirement. |
+| Architecture | HIGH | All architectural claims verified: custom server (official Next.js docs), WebSocket vs SSE (MDN), Vercel limitation (Vercel docs), in-memory Map pattern (standard practice). |
+| Pitfalls | HIGH | Floating-point money math, iOS Safari behavior, WebSocket reconnect — all verified sources. OCR accuracy specifics (Tesseract vs Vision API accuracy gap) are MEDIUM confidence based on third-party comparisons. |
 
 **Overall confidence:** MEDIUM-HIGH
 
-Research is based on established patterns and competitive analysis. The stack choices are mainstream and well-supported. The primary uncertainty is OCR parsing complexity — real-world receipt formats may reveal edge cases not covered in research.
+### Gaps to Address During Implementation
 
-### Gaps to Address
+1. **OCR accuracy validation** — The single biggest unknown is how well GPT-4o Vision performs on actual restaurant receipts from the user's typical dining environments. Validate by photographing 5-10 real receipts in the first implementation sprint before building the full correction UI. If accuracy is consistently above 90% of items correct, the correction UI serves as a safety net. If it's below 80%, the correction UI becomes the main workflow — which is still functional but changes the product feel.
 
-- **OCR parsing patterns:** Research identified common quantity notations but real POS systems may have variants. Plan to iterate on parser during Phase 1 based on test receipts from multiple restaurants.
+2. **PartyKit vs custom ws server** — STACK.md recommends PartyKit (free tier, managed, Cloudflare Durable Objects). ARCHITECTURE.md recommends raw ws on a custom server. If the decision is made to switch to a Vite SPA architecture (i.e., OCR is reversed to Tesseract.js client-side), PartyKit becomes the clearly correct choice — it eliminates the server entirely. If staying with server-side OCR (recommended), the custom ws server is already in the same process and adds no deployment complexity.
 
-- **Tip calculation conventions:** Research recommends pre-tax tipping as default (US convention) but some regions tip post-tax. May need to make this configurable or add regional detection in v2. Not critical for MVP.
+3. **Tesseract.js as fallback path** — If GPT-4o Vision API costs become a concern at scale, the UI contract (array of `{ id, name, price, qty }`) is identical regardless of OCR source. The swap from server-side Vision API to Tesseract.js (or vice versa) is isolated to `POST /api/ocr` and does not require UI changes.
 
-- **Shared link persistence strategy:** Research recommends auto-expiry after 30 days but doesn't specify cleanup mechanism. Implementation detail to resolve in Phase 4.
+4. **Session state persistence on server restart** — In-memory Map means a server restart drops all active sessions. For a restaurant-table use case (sessions last under 4 hours, low traffic), this is acceptable for v1. If the server is deployed on a platform that restarts frequently (e.g., free tier with cold starts), this could cause session loss. Use a platform that keeps the process alive (Railway, Fly.io) rather than one with cold-start serverless.
 
-- **OCR confidence threshold:** When to trigger cloud fallback? Research suggests showing confidence indicators but doesn't specify threshold (e.g., below 70% confidence = auto-fallback). Needs experimentation during Phase 1.
+---
 
 ## Sources
 
-### Primary (HIGH confidence)
-- **Stack research:** Current ecosystem knowledge of Next.js, React, OCR libraries (Tesseract.js, Google Vision), state management patterns. Verified against mainstream use in similar applications.
-- **Architecture patterns:** Industry best practices for client-heavy web apps, well-documented patterns for OCR integration and financial calculations.
+### Primary (HIGH confidence — official docs)
+- https://nextjs.org/docs/app/guides/custom-server — Custom server pattern, WebSocket support, static optimization trade-off
+- https://nextjs.org/docs/app/building-your-application/deploying — Vercel serverless WebSocket limitation (confirmed)
+- https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API — WebSocket bidirectional communication
+- https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia — getUserMedia HTTPS requirement, facingMode
+- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file — `capture="environment"` attribute
+- https://www.w3.org/WAI/WCAG21/Understanding/target-size.html — Touch target minimums
+- https://web.dev/articles/accessible-tap-targets — 48px tap target guidance
+- https://www.betterment.com/engineering/penny-precise-allocation-functions — Largest Remainder Method for cent distribution
+- https://brightinventions.pl/blog/decimals-pos-bill-splitting-restaurants/ — Integer cents for bill-splitting
 
-### Secondary (MEDIUM confidence)
-- **Competitive analysis:** Inferred from knowledge of Splitwise, Tab, Plates, Venmo/PayPal feature sets and UX patterns (as of Jan 2025 knowledge cutoff).
-- **Feature priorities:** Based on project requirements and general bill-splitting app user expectations. Project context explicitly calls out shared items and multi-quantity as requirements.
+### Secondary (MEDIUM confidence — community/vendor sources)
+- https://tailwindcss.com/blog/tailwindcss-v4 — Vite plugin, zero config setup
+- https://blog.cloudflare.com/cloudflare-acquires-partykit/ — PartyKit acquisition, Durable Objects architecture
+- https://developers.cloudflare.com/changelog/2025-04-07-durable-objects-free-tier/ — PartyKit free tier
+- https://github.com/naptha/tesseract.js — Tesseract.js v7 release (Dec 2025), WASM SIMD support
+- https://medium.com/ixor/comparing-tesseract-ocr-with-google-vision-ocr-for-text-recognition-in-invoices-bddf98f3f3bd — Accuracy gap between Tesseract and Vision APIs
+- https://startupnews.fyi/2026/01/23/billbob-launches-tackle-friendflation/ — Competing product patterns (no app install for participants)
+- https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report — AI-assisted code structural drift
+- https://frontstuff.io/how-to-handle-monetary-values-in-javascript — JavaScript floating-point money math
 
-### Tertiary (LOW confidence)
-- **OCR accuracy estimates:** "80%+ on standard receipts" and "confidence below 70%" thresholds are approximations. Need validation during Phase 1 implementation.
-- **Receipt format patterns:** Regex patterns for quantity/price extraction are based on general knowledge of POS systems, not exhaustive catalog. May need iteration.
-
-### Methodology Note
-Research conducted Feb 14, 2026 with knowledge cutoff Jan 2025. Did not include live user research or recent market surveys. Recommends validating assumptions (especially OCR parsing patterns and shared item UX) with prototypes during implementation.
+### Tertiary (LOW confidence — validate if decision changes)
+- Tesseract.js WASM bundle size (~10-15MB) and mobile latency on thermal receipts — training knowledge, not benchmarked for v7
+- GPT-4o Vision accuracy on restaurant receipts specifically — training knowledge, validate with real receipts in Phase 1
 
 ---
-**Research completed:** 2026-02-14
-**Ready for roadmap:** Yes
+*Research completed: 2026-02-20*
+*Ready for roadmap: yes*

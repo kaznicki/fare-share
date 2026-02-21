@@ -1,441 +1,560 @@
-# Features Research: Bill-Splitting & Receipt-Scanning Apps
+# Feature Landscape
 
-**Research Date:** 2026-02-14
-**Project:** SplitCheck
-**Milestone:** Greenfield - Feature landscape analysis
-
-## Executive Summary
-
-Bill-splitting and receipt-scanning apps operate in a crowded market with clear table stakes (OCR, basic splitting, payment integration) and room for differentiation through UX simplicity, edge case handling, and friction reduction. The competitive set includes Splitwise (expense tracking focus), Tab (receipt scanning focus), Plates (restaurant-specific), and Venmo/PayPal (payment-first with splitting bolted on).
-
-**Key Finding:** Most apps fail at handling messy real-world receipts (poor OCR quality, missing edge cases) or create too much friction in the splitting flow. Opportunity exists in photo-first UX with intelligent defaults and robust edge case handling.
+**Domain:** Mobile web restaurant bill splitter (item-level claiming, OCR, real-time multi-device)
+**Researched:** 2026-02-20
+**Overall confidence:** MEDIUM-HIGH (core patterns HIGH, OCR accuracy specifics MEDIUM, Tesseract receipt performance LOW)
 
 ---
 
-## Table Stakes Features
+## Context Note: Stack Conflict to Resolve
 
-Features users expect as baseline. Missing any of these = immediate abandonment.
+The STACK.md researcher recommends **Tesseract.js (client-side OCR)** while ARCHITECTURE.md recommends **server-side Vision API**. These are mutually exclusive. This FEATURES.md covers both approaches honestly and flags the tradeoffs for the roadmap decision.
 
-### 1. Receipt Capture & OCR
-**Complexity:** High
-**Dependencies:** None
-**Description:** Photograph receipt and extract line items automatically.
-
-**Must handle:**
-- Standard printed receipts (thermal, ink)
-- Restaurant-specific formats (varying layouts)
-- Poor lighting/image quality (blurry, crooked photos)
-- Multiple columns (item, quantity, price)
-- Tax and subtotal detection
-
-**Market benchmark:** Tab, Splitwise Scan, Plates all offer this. Users expect 80%+ accuracy on standard receipts.
-
-**Notes:** This is technically complex but absolutely non-negotiable. Fallback to manual entry is required when OCR fails.
+- **Tesseract.js (client-side):** No API cost, no server needed, privacy-preserving, but raw text output only (requires LLM post-processing for structure), WASM bundle load on first use, mobile performance not benchmarked for v7.
+- **Server-side Vision API (GPT-4o or Google Vision):** Best structured output, reliable latency, API cost per scan (~$0.01-0.03/image for GPT-4o), requires backend, images leave device.
+- **Recommended for v1:** Server-side Vision API. The manual correction requirement (explicitly requested) implies OCR quality must be high enough that corrections are occasional, not constant. Tesseract on receipts without preprocessing frequently produces garbled output that needs heavy corrections, defeating the purpose.
 
 ---
 
-### 2. Basic Item Assignment
-**Complexity:** Medium
-**Dependencies:** Receipt OCR or manual entry
-**Description:** Assign line items to people in the party.
+## Table Stakes
 
-**Core capabilities:**
-- Add people to split (names or labels like "Person 1")
-- Tap/click items to assign to specific person
-- Visual indication of who owes what
-- Unassigned items clearly marked
+Features users expect from an item-level bill splitter. Missing any of these = product feels broken or unusable.
 
-**Market benchmark:** Universal across all competitors. Interaction patterns vary (drag-and-drop, tap-to-assign, checkboxes).
-
----
-
-### 3. Tax & Tip Handling
-**Complexity:** Medium
-**Dependencies:** Item assignment
-**Description:** Apply tax and tip proportionally or as flat amounts.
-
-**Required modes:**
-- Tip as percentage (15%, 18%, 20%, custom)
-- Tip as flat dollar amount
-- Tax proportional distribution (based on items assigned)
-- "Tip already included" option
-
-**Market benchmark:** All major apps support this. SplitCheck specifically calls out three tip modes as core requirement.
-
-**Edge case:** Some apps let users exclude certain people from tip (e.g., if someone didn't drink alcohol, don't charge them for bar tip). This is becoming expected in restaurant-focused apps.
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Receipt photo capture | Core premise of the product — no manual entry | Low | `<input type="file" capture="environment">` is sufficient; getUserMedia optional enhancement |
+| Automatic line item extraction (OCR) | The differentiating action that saves time vs. manual entry | Medium | Server-side Vision API for structured JSON; see OCR section |
+| Manual item correction | OCR is never 100%; users must be able to fix name/price/qty errors before claiming begins | Medium | Per-project requirement (explicitly requested). Inline edit UX |
+| Session sharing via QR code and link | No one will type a URL at a restaurant table; QR is essential | Low | qrcode.react SVG component; copy-to-clipboard fallback |
+| No-friction participant join | Participants must not need to create accounts or download apps | Low | Just name entry after opening link; confirmed pattern in BillBob, Nowa, Split apps (2025) |
+| Claim items by tapping | Core claiming interaction — must be fast and obvious | Low | Large tap targets (≥48px per WCAG 2.2 / NN/G); visual state change on tap |
+| Shared item splitting | Multiple people claim same item → cost divided proportionally among claimants | Medium | Fundamental fairness requirement |
+| Duplicate item support | Two people ordered the same dish → each gets a separate, claimable instance | Medium | Requires quantity expansion before claiming: Qty 2 of "Burger" becomes two separate claimable rows |
+| Live presence / claim updates | See others' claims appear in real-time — prevents double-claiming disputes | Medium | WebSocket broadcast via PartyKit; essential social trust signal |
+| Per-person total with proportional tax/tip | The final output everyone needs | Low | Math only; proportional is explicitly required (not equal split) |
+| Final summary screen | Each person sees their total clearly before putting away their phone | Low | One screen per person, or a host summary showing everyone |
 
 ---
 
-### 4. Per-Person Breakdown
-**Complexity:** Low
-**Dependencies:** Item assignment, tax/tip calculation
-**Description:** Show each person what they owe with itemized breakdown.
+## Differentiators
 
-**Display requirements:**
-- Total amount per person (clear, large)
-- Itemized list (what they ordered)
-- Their share of tax/tip
-- Running total
+Features that set Tab Splitter apart from generic bill splitters (Splitwise, Venmo, calculator). Not expected by everyone, but meaningfully valued.
 
-**Market benchmark:** Universal. Presentation varies but functionality is identical.
-
----
-
-### 5. Manual Entry Fallback
-**Complexity:** Low
-**Dependencies:** None
-**Description:** Ability to manually enter items when OCR fails or receipt unavailable.
-
-**Must include:**
-- Add item (name, price, quantity)
-- Edit/delete items
-- Manual tax/tip entry
-- Same splitting flow as OCR path
-
-**Market benchmark:** All apps support this. It's the fallback for OCR failures and the primary mode when no receipt exists (e.g., Splitwise for non-receipt expenses).
-
-**Notes:** Should be equally first-class as photo entry, not feel like a "degraded" experience.
-
----
-
-### 6. Simple Sharing/Export
-**Complexity:** Low
-**Dependencies:** Per-person breakdown calculated
-**Description:** Share results with party members.
-
-**Minimum viable:**
-- Share link or text summary
-- Shows what each person owes
-- No account required to view (recipient just sees breakdown)
-
-**Market benchmark:** Text/link sharing is universal. Some apps require account creation to view, which adds friction.
-
----
-
-## Differentiating Features
-
-Features that provide competitive advantage. Not all are worth building, but these separate good apps from great ones.
-
-### 1. Shared Item Handling
-**Complexity:** Medium
-**Dependencies:** Item assignment
-**Description:** Split appetizers, bottles of wine, shared desserts across multiple people.
-
-**Implementation approaches:**
-- Mark item as "shared" then select which people split it
-- Equal split (3-way, 4-way) or custom percentages
-- Common use case: "Bottle of wine split among 3 people"
-
-**Market benchmark:** Tab and Plates support this. Splitwise has weaker support. This is a STRONG differentiator for restaurant use cases.
-
-**Priority:** HIGH - Explicitly called out in project context ("shared items: appetizers, bottles of wine").
-
-**Notes:** Edge case of edge cases: What if 2 people split an appetizer but one person had more? Let's not solve this (see anti-features).
-
----
-
-### 2. Multi-Quantity Item Handling
-**Complexity:** Medium
-**Dependencies:** Receipt OCR
-**Description:** Recognize and handle "Burger x2" style line items.
-
-**Scenarios:**
-- OCR detects "x2" or "2x" or "qty: 2"
-- User manually indicates item was ordered multiple times
-- Split 2x items to different people (e.g., 2 burgers, one to Alice, one to Bob)
-
-**Market benchmark:** Tab handles this moderately well. Most other apps struggle, requiring manual item duplication.
-
-**Priority:** HIGH - Explicitly called out in project context. Common in real receipts.
-
-**Technical note:** OCR needs to parse quantity notation. UI needs to show "Burger (qty 2)" and let user split instances across people.
-
----
-
-### 3. Photo-First UX with Intelligent Defaults
-**Complexity:** Medium
-**Dependencies:** Receipt OCR, item assignment
-**Description:** Optimize entire flow for "take photo → done in 30 seconds" use case.
-
-**Intelligent defaults:**
-- If party size = number of items, auto-assign one item per person
-- Default tip to local standard (18% in US)
-- Auto-detect tax from receipt
-- One-tap fixes for common OCR errors
-
-**Market benchmark:** Most apps require too many taps. Tab is closest to this vision but still has friction points.
-
-**Priority:** HIGH - This is THE differentiator. SplitCheck's value prop is speed and simplicity.
-
-**UX note:** Every tap removed is a win. Goal is "photo → confirm → share" in minimal steps.
-
----
-
-### 4. Offline-First Functionality
-**Complexity:** High
-**Dependencies:** None (architectural decision)
-**Description:** App works without internet connection; syncs when online.
-
-**Capabilities:**
-- Take photo and process locally (if OCR runs client-side)
-- Complete splitting flow offline
-- Share via text/screenshot even without connectivity
-- Sync to cloud when connection available (if accounts exist)
-
-**Market benchmark:** Most apps are online-only. This is a rare differentiator.
-
-**Priority:** MEDIUM - Nice to have for restaurants with poor WiFi, but adds significant technical complexity.
-
-**Trade-off:** Client-side OCR (TensorFlow.js, Tesseract) is lower quality than cloud OCR (Google Vision, AWS Textract). May not be worth it.
-
----
-
-### 5. Currency & Multi-Language Support
-**Complexity:** Medium
-**Dependencies:** Receipt OCR
-**Description:** Handle receipts in different languages and currencies.
-
-**Capabilities:**
-- Detect currency symbols (USD, EUR, GBP, etc.)
-- Parse non-English receipt formats
-- Display amounts in local currency
-- Optional: Currency conversion for international groups
-
-**Market benchmark:** Splitwise has strong multi-currency support (it's a global app). Restaurant-specific apps tend to be US-only.
-
-**Priority:** LOW for MVP - Focus on US/English initially. Add later if expanding internationally.
-
----
-
-### 6. Payment Integration
-**Complexity:** High
-**Dependencies:** Per-person breakdown, user accounts
-**Description:** Let people pay directly through the app.
-
-**Approaches:**
-- Venmo/PayPal integration (deep link to payment)
-- In-app payment (Stripe, Square) with real money movement
-- Request money via app, users pay externally
-
-**Market benchmark:** Venmo/PayPal have this natively (they're payment platforms). Splitwise, Tab, Plates generally don't move money—they just calculate and share breakdowns.
-
-**Priority:** LOW for MVP - Adds regulatory complexity, fees, and technical overhead. Deep linking to Venmo/PayPal might be middle ground.
-
-**Anti-feature risk:** Becoming a payment platform changes the product fundamentally. SplitCheck is a calculator, not a bank.
-
----
-
-### 7. Receipt History & Expense Tracking
-**Complexity:** Medium
-**Dependencies:** User accounts, cloud storage
-**Description:** Save past receipts and track spending over time.
-
-**Capabilities:**
-- Save receipts to user account
-- View past splits
-- Search/filter receipts by date, restaurant, people
-- Optional: Analytics (how much you spent this month)
-
-**Market benchmark:** Splitwise's core feature (expense tracking over time). Tab has history. Plates is more ephemeral.
-
-**Priority:** LOW for MVP - Adds account requirement and storage costs. SplitCheck's core use case is "one-time split, then done."
-
-**Decision point:** Is SplitCheck a single-use calculator or a long-term tracking tool? These are different products.
-
----
-
-### 8. Group/Event Management
-**Complexity:** High
-**Dependencies:** User accounts, receipt history
-**Description:** Track multiple receipts across a trip, event, or recurring group.
-
-**Use cases:**
-- Weekend trip with friends (multiple restaurant bills)
-- Monthly dinner club (track who's paid over time)
-- Roommates (recurring group with running balances)
-
-**Market benchmark:** Splitwise excels here. Tab and Plates are single-receipt focused.
-
-**Priority:** OUT OF SCOPE for MVP - This is a different product category (group expense tracking vs. single receipt splitting).
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Item-level OCR (not just total amount) | Splitwise splits the total; this splits by what you actually ate | High (OCR) | The core differentiator vs. all generic bill splitters |
+| Real-time collaborative claiming on individual phones | Vs. one person assigning everyone's items — participants own their own claims | Medium | Nowa and Tab apps use this model; builds trust |
+| No app download required for participants | Participants use a mobile browser; zero install friction | Low | Confirmed differentiator: BillBob explicitly markets "friends don't need the app" |
+| Quantity expansion (not just shared-item toggle) | Correctly handles "2x Burger" → two separate claimable items, not one item split two ways | Medium | Avoids ambiguity between "we shared one burger" vs "we each had a burger" |
+| Image preview before OCR | User can retake if photo is blurry before wasting an OCR call | Low | Preview step with retake option; established best practice in document scanning UX |
 
 ---
 
 ## Anti-Features
 
-Features to deliberately NOT build. These add complexity without proportional value or conflict with core vision.
+Features to explicitly NOT build in v1. Each one either adds disproportionate complexity, contradicts the ephemeral design, or solves a problem the product doesn't have.
 
-### 1. Social Network Features
-**Why avoid:** Following friends, public profiles, activity feeds, etc. turn SplitCheck into a social app. Adds complexity, moderation burden, and distracts from core utility.
-
-**Market examples:** Venmo has public feed (privacy concerns). Splitwise avoided this and stayed utility-focused.
-
-**Decision:** SplitCheck is a tool, not a social network. No friend graphs, no feeds, no public activity.
-
----
-
-### 2. Itemized Negotiation/Disputes
-**Why avoid:** Features like "I don't think I should pay for this" or "request adjustment" create interpersonal conflict within the app. These are social issues, not software issues.
-
-**Market examples:** Some apps let people "dispute" charges. This creates bad UX and doesn't solve the real problem (talk to your friends).
-
-**Decision:** Calculations are final once agreed. If someone disagrees, they handle it offline. App doesn't mediate.
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| User accounts / login | The product is explicitly ephemeral; accounts add sign-up friction that kills adoption at restaurants | Keep it anonymous with just a name field per session |
+| Payment processing (Venmo/PayPal integration) | Adds legal, compliance (PCI), and integration complexity; out of scope per project definition | Show totals only; let people pay each other externally |
+| Session history / receipt archive | Requires persistent storage (database), contradicts ephemeral design | Let session expire after 4 hours; done |
+| Custom tip entry per person | Tip is inherently proportional to subtotal; giving people different tip rates creates social awkwardness | Distribute tip proportionally, period |
+| Even-split mode | Contradicts the core value proposition (item-level fairness) | The product IS item-level splitting; even split is Splitwise territory |
+| Edit items after claiming has started | Once claims exist, changing item prices creates cascading confusion | Lock item prices at the point claiming begins; only allow corrections in the pre-claiming review step |
+| In-app chat / dispute resolution | Adds major surface area for a feature better served by people talking to each other at the table | Not needed for v1 |
+| Barcode/menu scanning | Different problem (ordering) from receipt splitting (paying) | Out of scope |
+| Multi-currency | Adds complexity with no clear market need for a restaurant table app | Out of scope |
 
 ---
 
-### 3. Gamification/Rewards
-**Why avoid:** Points, badges, leaderboards, etc. are misaligned with use case. You don't want to "win" at splitting bills. Adds clutter and feels gimmicky.
+## Feature: Receipt OCR
 
-**Market examples:** Some fintech apps add gamification to increase engagement. It works for habit-building (savings apps) but feels wrong for bill splitting.
+### Recommended Approach: Server-Side Vision API
 
-**Decision:** No gamification. SplitCheck is utilitarian.
+**Why:** Receipts contain structured tabular data (item name, qty, price). Vision APIs like GPT-4o can be prompted to return structured JSON directly. Tesseract.js returns raw text requiring regex or LLM post-processing to extract structure — adding another failure point.
 
----
-
-### 4. Complex Splitting Algorithms
-**Why avoid:** Features like "split appetizer 60/40 because I ate more" or "charge Jane 5% extra because she ordered expensive wine" are edge cases that add UI complexity and create social friction.
-
-**Market examples:** Some apps offer percentage-based custom splits. Rarely used and confusing.
-
-**Decision:** Keep splitting simple. Items are either assigned to one person, split equally among N people, or left unassigned. No custom percentages or "weighted" splits.
-
-**Boundary case:** Shared items with equal split (3-way, 4-way) is OK. Shared items with unequal split (60/40) is out of scope.
-
----
-
-### 5. Receipt Editing/Templating
-**Why avoid:** Features like "save this receipt as template" or "edit receipt details for future use" assume recurring use cases (same restaurant, same order). This is niche and adds complexity.
-
-**Market examples:** Some expense tracking apps let you template recurring expenses. Not relevant for one-time restaurant splits.
-
-**Decision:** Each receipt is independent. No templates, no "copy previous receipt."
-
----
-
-### 6. Multi-Currency Conversion
-**Why avoid:** Automatically converting currencies (e.g., splitting a EUR receipt among USD users) adds exchange rate complexity, potential for disputes ("that's not the rate I got"), and is a niche use case.
-
-**Market examples:** Splitwise supports this for international groups. It's complex and error-prone.
-
-**Decision:** For MVP, single currency per receipt. If receipt is in EUR, breakdown is in EUR. Users handle conversion externally if needed.
-
-**Future consideration:** Could add in v2 for international expansion, but not core.
-
----
-
-## Feature Dependencies Map
+**Flow:**
 
 ```
-Receipt OCR
-├── Item Assignment
-│   ├── Shared Item Handling
-│   ├── Multi-Quantity Handling
-│   └── Tax & Tip Calculation
-│       └── Per-Person Breakdown
-│           ├── Sharing/Export
-│           └── Payment Integration (future)
-│
-Manual Entry (parallel path)
-└── (same tree as above)
-
-User Accounts (optional layer)
-└── Receipt History
-    └── Group/Event Management (out of scope)
+1. Host takes photo (browser camera)
+2. Image preview shown → host confirms or retakes
+3. Image POSTed to /api/ocr (multipart)
+4. Server calls Vision API with JSON schema prompt
+5. Returns: { items: [{ id, name, price, qty }], subtotal, tax, tip }
+6. Host reviews extracted items in inline-edit UI
+7. Host can edit name, price, qty for any item
+8. Host can delete spurious items (total line, subtotal line)
+9. Host confirms → session created
 ```
 
-**Critical path:** Receipt capture → Item assignment → Tax/tip → Breakdown → Share. Everything else is secondary.
+**Image capture options (in order of recommendation):**
+
+1. `<input type="file" accept="image/*" capture="environment">` — opens rear camera on mobile, simplest, works everywhere, no HTTPS required for the input itself. This is the right v1 default.
+2. `getUserMedia({ video: { facingMode: 'environment' } })` + canvas capture — gives a live viewfinder with crop guidance overlay; requires HTTPS. Worth adding if image quality is a consistent problem.
+
+**Image quality guidance (at capture time):**
+- Show a message: "Lay receipt flat, good lighting, hold phone directly above"
+- Optionally render a target rectangle overlay on the viewfinder to encourage straightening
+- After capture, show a preview with "Looks good / Retake" before sending to OCR
+
+**OCR prompt design (HIGH confidence — pattern from GPT-4o Vision use):**
+
+```
+Extract all line items from this restaurant receipt as JSON.
+Return ONLY valid JSON, no explanation:
+{
+  "items": [{ "name": string, "price": number (in dollars), "qty": number }],
+  "subtotal": number,
+  "tax": number,
+  "tip": number
+}
+Exclude subtotal, tax, and tip from the items array.
+If qty is not shown, assume 1.
+```
+
+**Failure handling:**
+- If OCR returns malformed JSON → fallback to empty item list with error message "Couldn't read receipt. Add items manually."
+- Show a manual "Add item" button on the correction screen regardless of OCR success — some receipts are genuinely unreadable.
+
+**Tesseract.js as fallback (LOW confidence on viability):**
+Tesseract.js v7 is available and runs in a Web Worker. However, it returns raw text with no structure — extracting line items requires a regex parser or a second LLM call, adding latency and failure modes. The bundle (English lang data) is ~10MB (based on v5's 54% reduction from earlier sizes per official GitHub). Mobile performance on v7 is not officially benchmarked. If server-side API is not desired (cost, privacy), the viable path is: Tesseract.js raw text → LLM parse → structured JSON. Not recommended for v1.
 
 ---
 
-## Complexity Assessment
+## Feature: Manual OCR Correction UI
 
-### Low Complexity (< 2 weeks dev time)
-- Manual entry UI
-- Per-person breakdown display
-- Simple sharing (text/link)
-- Basic item assignment UI
+**This is a v1 requirement (explicitly requested by user).**
 
-### Medium Complexity (2-4 weeks)
-- Shared item handling
-- Multi-quantity items
-- Tax/tip modes (3 variants)
-- Photo-first UX optimization
+### Recommended Pattern: Full-Screen Inline Edit List
 
-### High Complexity (4+ weeks)
-- Receipt OCR (integration + error handling)
-- Offline-first architecture
-- Payment integration
-- Multi-currency support
+After OCR returns items, show the extracted list before creating the session. Host can correct anything.
 
-**MVP Recommendation:** Focus on Low + Medium complexity table stakes, plus shared items and multi-quantity (differentiators). Defer High complexity items except OCR (which is non-negotiable table stakes despite complexity).
+**UI pattern (confirmed by industry research):**
 
----
+```
+┌─────────────────────────────────────────┐
+│ Review your receipt                     │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ [✓] Caesar Salad         $12.00  1  │ │
+│ │ [✓] Margherita Pizza     $18.50  1  │ │
+│ │ [✓] Chicken Tacos         $9.00  2  │ │ ← qty 2 = expand to 2 rows at session creation
+│ │ [✓] Sparkling Water       $4.50  1  │ │
+│ │ [trash] Subtotal         $44.00     │ │ ← delete button for non-items
+│ └─────────────────────────────────────┘ │
+│                                         │
+│  + Add item manually                    │
+│                                         │
+│ Tax: [$  3.85]  Tip: [$  8.00]          │
+│                                         │
+│      [Create Session →]                 │
+└─────────────────────────────────────────┘
+```
 
-## Competitive Positioning
+**Interaction details:**
+- Tap any item row → fields become editable inline (name text field, price number field, qty stepper)
+- Confirm edit by tapping checkmark or tapping outside the row
+- Delete button (trash icon) removes spurious rows (totals, subtotals, headers)
+- "Add item manually" opens a bottom sheet / modal with name + price + qty inputs
+- Tax and tip are editable fields in case OCR misread them
+- Qty stepper: each unit in qty will become a separate claimable row at session creation
 
-| App | Strength | Weakness | SplitCheck Advantage |
-|-----|----------|----------|---------------------|
-| **Splitwise** | Group expense tracking, multi-currency | Weak receipt scanning, complex UI | Faster receipt-only flow, better OCR |
-| **Tab** | Good OCR, restaurant focus | Cluttered UI, slow flow | Simpler UX, better edge case handling |
-| **Plates** | Clean UI, restaurant-specific | Limited edge case support | Shared items, multi-quantity |
-| **Venmo/PayPal** | Ubiquitous, integrated payment | Bill splitting is afterthought, poor UX | Purpose-built for splitting, better OCR |
+**Quantity expansion (critical design decision):**
 
-**SplitCheck's positioning:** Fastest, simplest receipt-only splitting with robust edge case handling. Not trying to be Splitwise (long-term tracking) or Venmo (payment platform). Narrow focus, excellent execution.
+When the host enters `qty: 2` for "Chicken Tacos $9.00", this means two people each had a taco at $9.00 each — NOT that one $18.00 chicken taco was shared. At session creation, expand:
 
----
+```
+"Chicken Tacos" qty:2 price:$9.00
+→
+Row A: "Chicken Tacos" qty:1 price:$9.00  (claimable by one person)
+Row B: "Chicken Tacos" qty:1 price:$9.00  (claimable by another person)
+```
 
-## Recommendations for SplitCheck MVP
+This resolves the duplicate item problem without requiring any special UI — it's just row expansion.
 
-### Must Build (Table Stakes)
-1. Receipt OCR with fallback to manual entry
-2. Basic item assignment (tap to assign)
-3. Tax & tip handling (3 modes: percentage, flat, included)
-4. Per-person breakdown
-5. Simple sharing (link/text)
-
-### Should Build (Differentiators)
-6. Shared item handling (equal split among N people)
-7. Multi-quantity item handling ("Burger x2")
-8. Photo-first UX with intelligent defaults
-
-### Defer to V2
-- Payment integration (deep link to Venmo/PayPal as interim)
-- Receipt history (requires accounts)
-- Offline-first (complexity vs. value trade-off)
-- Multi-currency (not core US market)
-
-### Never Build (Anti-Features)
-- Social network features
-- Dispute/negotiation tools
-- Gamification
-- Complex splitting algorithms (unequal percentages)
-- Receipt templating
+**Shared items (multi-claim):** Any claimable row can be claimed by multiple people. When multiple people claim the same row, the $9.00 is divided equally among claimants. This covers "we split the nachos" scenarios.
 
 ---
 
-## Open Questions for Product Team
+## Feature: Session Sharing (QR Code + Link)
 
-1. **Accounts vs. Accountless:** Should SplitCheck require user accounts, or be fully anonymous/ephemeral? (Impacts history, sharing, payment integration)
+### Recommended Flow
 
-2. **OCR Provider:** Client-side (Tesseract.js, offline) vs. cloud (Google Vision API, higher accuracy)? Cost and latency trade-offs.
+```
+Host creates session → Server returns sessionId
+→ App generates share URL: https://[domain]/s/[sessionId]
+→ Show QR code (rendered client-side with qrcode.react)
+→ Show "Copy link" button below QR
+→ Participants scan QR or open link on their own phone
+```
 
-3. **Payment Integration Priority:** Is "request payment via Venmo" a V1 or V2 feature? Changes scope significantly.
+**QR code implementation:**
 
-4. **Shared Item UI:** How do users indicate an item is shared? (Long-press, toggle, separate flow?) Needs UX testing.
+Use `qrcode.react` with SVG output. SVG scales perfectly on all screen densities (HIGH confidence — standard practice). Render at ~200x200px. Display centered with good margin on a clean screen.
 
-5. **Receipt Retention:** Do we store photos/receipts server-side, or only client-side? (Privacy, storage costs, feature implications)
+```tsx
+import { QRCodeSVG } from 'qrcode.react'
+
+<QRCodeSVG
+  value={`https://tabsplitter.app/s/${sessionId}`}
+  size={200}
+  level="M"  // medium error correction — good for screen display
+/>
+```
+
+**Copy link fallback:** Some participants may have trouble scanning. Always provide a copyable URL below the QR code. Use `navigator.clipboard.writeText()` with a "Copied!" confirmation.
+
+**Short session IDs:** Use `nanoid(8)` for session IDs — generates a human-readable-ish ID that's short enough to type if truly needed, e.g. `V6h9pA2k`. (MEDIUM confidence — nanoid 8 chars provides ~10^14 combinations, more than sufficient for ephemeral sessions.)
 
 ---
 
-## Research Methodology
+## Feature: Real-Time Session Sync (WebSocket via PartyKit)
 
-This analysis draws from:
-- Competitive analysis of Splitwise, Tab, Plates, Venmo, PayPal, and others (as of Jan 2025 knowledge cutoff)
-- Common UX patterns in receipt scanning and bill splitting apps
-- Project context provided (SplitCheck requirements)
-- Industry best practices for mobile-first financial utilities
+### Recommended Architecture: PartyKit Rooms
 
-**Limitations:** Did not conduct live user research or recent market surveys (research date: Feb 2026, knowledge cutoff: Jan 2025). Recommend validating assumptions with user testing before committing to feature roadmap.
+Each session is a PartyKit room. All participants connect to the same room. The room broadcasts state changes.
+
+**Why PartyKit over raw ws server:** PartyKit is built on Cloudflare Durable Objects — each room is a persistent, single-threaded instance that guarantees consistent state. No race conditions between simultaneous claims. Free tier (10 live projects, 24h data lifecycle) matches ephemeral session semantics perfectly. (MEDIUM confidence — PartyKit free tier details from official site; Cloudflare acquisition confirmed HIGH confidence.)
+
+**Messages the WebSocket layer handles:**
+
+| Message Type | Direction | Payload | Effect |
+|-------------|-----------|---------|--------|
+| `join` | Client → Server | `{ name: string }` | Register participant; broadcast `participant-joined` |
+| `claim` | Client → Server | `{ itemId: string, action: "add" \| "remove" }` | Update room state; broadcast `state-update` |
+| `participant-joined` | Server → All | `{ name: string, participants: string[] }` | Refresh participant list |
+| `state-update` | Server → All | `{ claims: Record<itemId, string[]> }` | Re-render item list with claim indicators |
+| `session-finalized` | Server → All | `{ totals: Record<name, number> }` | Navigate to summary screen |
+
+**State sync strategy: full-state broadcast (not delta)**
+
+When any claim changes, broadcast the complete `claims` object (not just the diff). For a receipt of 20 items with 10 participants, this object is under 2KB — negligible. Full-state broadcast is simpler, eliminates out-of-order message bugs, and eliminates reconciliation logic.
+
+**Reconnection:** PartySocket handles auto-reconnect. On reconnect, the PartyKit room should send full state to the newly connected client via `onConnect`.
+
+```typescript
+// PartyKit server (party/session.ts)
+export default class SessionRoom implements Party.Server {
+  state: { claims: Record<string, string[]>; participants: string[] } = {
+    claims: {},
+    participants: [],
+  }
+
+  onConnect(conn: Party.Connection) {
+    // Send full state to new joiner
+    conn.send(JSON.stringify({ type: 'state-update', ...this.state }))
+  }
+
+  onMessage(message: string, sender: Party.Connection) {
+    const msg = JSON.parse(message)
+    if (msg.type === 'join') {
+      this.state.participants.push(msg.name)
+      this.room.broadcast(JSON.stringify({
+        type: 'participant-joined',
+        participants: this.state.participants,
+      }))
+    }
+    if (msg.type === 'claim') {
+      const claimants = this.state.claims[msg.itemId] ?? []
+      if (msg.action === 'add' && !claimants.includes(msg.name)) {
+        this.state.claims[msg.itemId] = [...claimants, msg.name]
+      }
+      if (msg.action === 'remove') {
+        this.state.claims[msg.itemId] = claimants.filter(n => n !== msg.name)
+      }
+      this.room.broadcast(JSON.stringify({
+        type: 'state-update',
+        claims: this.state.claims,
+      }))
+    }
+  }
+}
+```
 
 ---
 
-**Next Steps:** Use this research to inform requirements definition. Prioritize table stakes + top 2-3 differentiators for MVP. Validate edge case handling (shared items, multi-quantity) with prototypes before full build.
+## Feature: Item Claiming UX
+
+### Core Claim Interaction
+
+Each item row in the participant view must clearly show:
+1. What the item is (name + price)
+2. Whether the current participant has claimed it (their own visual state)
+3. Who else has claimed it (other participants' names/avatars)
+
+**Tap behavior:**
+- Unclaimed by me → tap = claim (add my name)
+- Claimed by me → tap = unclaim (remove my name)
+- Can also be claimed by others simultaneously → shared cost split
+
+**Visual states for an item row:**
+
+```
+┌────────────────────────────────────────────────┐
+│  Caesar Salad                          $12.00  │  ← unclaimed
+└────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────┐  ← claimed by me (highlighted)
+│ ✓ Caesar Salad                         $12.00  │
+│   You                                          │
+└────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────┐  ← shared (claimed by me + Alice)
+│ ✓ Caesar Salad                          $6.00  │  ← price shows my share
+│   You, Alice                                   │
+└────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────┐  ← claimed by Alice, not me
+│   Caesar Salad                         $12.00  │
+│   Alice                                        │
+└────────────────────────────────────────────────┘
+```
+
+**Touch target requirements (HIGH confidence — MDN, NN/G, WCAG 2.2):**
+- Minimum 48×48px tap target per WCAG 2.2 AA recommendation
+- Full row should be tappable, not just a checkbox
+- Rows should be at minimum 64px tall to be comfortable for large fingers
+- 8px vertical gap between rows to prevent accidental adjacent taps
+
+### Duplicate Item Handling
+
+Receipts show "Qty: 2 / Burger $9.00". This is the OCR output. At session creation, expand quantities into individual rows:
+
+```
+Before (OCR output):   Burger  qty:2  $9.00 each
+After (claimable rows):
+  Burger #1  $9.00  [unclaimed]
+  Burger #2  $9.00  [unclaimed]
+```
+
+**Why this approach:** Each person can claim "their" burger without needing to understand quantity math. Row expansion is invisible to participants — they just see two "Burger" items. Simple, unambiguous.
+
+**Alternative considered: qty stepper on claim** — allow participants to claim 1 of 2 from a qty:2 item. Rejected: creates race conditions (two people each try to claim "1 of 2"), requires conflict resolution logic, and is harder to explain without instruction.
+
+### Shared Item Handling
+
+Any item row can be claimed by multiple participants simultaneously. When multiple people tap the same row, each person's tap sends a `claim` WebSocket message. The server collects all claimants and broadcasts back. The item price is divided equally among all claimants.
+
+**Shared item discovery UX (the hard part):**
+
+The problem: participant A claims an item, then participant B realizes they also had it and taps to co-claim. Neither person sees the other's intent before they tap. This is fine — the real-time update shows the updated split immediately after both tap.
+
+There is no "request to share" flow needed — co-claiming is first-come-first-served, and the price split updates in real-time for everyone. Anyone can unclaim if they tap again.
+
+**Edge case: disputed items.** If Alice claims the last item and Bob wanted it too, they talk at the table. The app doesn't adjudicate disputes. This is the right scope boundary.
+
+---
+
+## Feature: Tax and Tip Distribution
+
+### Recommended Math: Proportional with Largest Remainder Rounding
+
+**Step 1: Calculate subtotals in integer cents (avoid floating-point errors)**
+
+```typescript
+// Store all prices as integer cents internally
+// Example: $12.50 → 1250 cents
+function splitBill(session: SessionState): Record<string, number> {
+  // Calculate each person's item subtotal (in cents)
+  const subtotalsCents: Record<string, number> = {}
+  for (const item of session.items) {
+    const claimants = session.claims[item.id] ?? []
+    if (claimants.length === 0) continue
+    const shareCents = Math.floor(item.priceCents / claimants.length)
+    const remainderCents = item.priceCents % claimants.length
+    claimants.forEach((name, i) => {
+      subtotalsCents[name] = (subtotalsCents[name] ?? 0) + shareCents
+      // Distribute remainder: first claimant(s) get the extra penny
+      if (i < remainderCents) subtotalsCents[name]++
+    })
+  }
+
+  // Total subtotal (in cents)
+  const totalSubtotalCents = Object.values(subtotalsCents).reduce((a, b) => a + b, 0)
+  if (totalSubtotalCents === 0) return {}
+
+  // Proportional tax and tip distribution (Largest Remainder Method)
+  const taxCents = session.taxCents
+  const tipCents = session.tipCents
+  const names = Object.keys(subtotalsCents)
+
+  // Calculate exact proportional shares (may be fractional)
+  const taxShares = names.map(name => (subtotalsCents[name] / totalSubtotalCents) * taxCents)
+  const tipShares = names.map(name => (subtotalsCents[name] / totalSubtotalCents) * tipCents)
+
+  // Floor all shares, then distribute remainders to those with largest fractional parts
+  const floorAndDistribute = (shares: number[], total: number): number[] => {
+    const floored = shares.map(Math.floor)
+    const remainder = total - floored.reduce((a, b) => a + b, 0)
+    const fractionals = shares.map((s, i) => ({ i, frac: s - floored[i] }))
+    fractionals.sort((a, b) => b.frac - a.frac)
+    for (let r = 0; r < remainder; r++) floored[fractionals[r].i]++
+    return floored
+  }
+
+  const taxSharesCents = floorAndDistribute(taxShares, taxCents)
+  const tipSharesCents = floorAndDistribute(tipShares, tipCents)
+
+  const totals: Record<string, number> = {}
+  names.forEach((name, i) => {
+    totals[name] = subtotalsCents[name] + taxSharesCents[i] + tipSharesCents[i]
+  })
+  return totals  // values are in cents; display as dollars by dividing by 100
+}
+```
+
+**Why Largest Remainder Method:** This is the standard algorithm for fair distribution of indivisible currency units (confirmed: Betterment engineering blog, POS bill-splitting research). It guarantees that all individual totals sum exactly to the grand total. No pennies disappear or appear.
+
+**Why integer cents:** Floating-point arithmetic in JavaScript (and most languages) produces rounding errors that accumulate across multiple proportional calculations. Storing prices as integer cents eliminates this entirely (confirmed: Bright Inventions POS blog, standard financial engineering practice).
+
+**Tax and tip editable by host:** The manual correction screen (see OCR section) allows the host to edit the detected tax and tip amounts. Some receipts show a suggested tip that wasn't actually paid; host sets the actual tip.
+
+**Tip not entered / $0 tip:** Fully supported — proportional distribution of $0 = $0 each. No special case needed.
+
+---
+
+## Feature: Mobile-First Touch UI Patterns
+
+### Design Principles (HIGH confidence — NN/G, WCAG, web.dev)
+
+**Touch targets:**
+- Minimum 48×48px per WCAG 2.2 Level AA
+- Full-row tappable areas for item rows (not tiny checkboxes)
+- 8px minimum gap between adjacent tap targets
+- Bottom-screen actions (session create, finalize) placed in thumb zone
+
+**Bottom thumb zone layout:**
+- Primary actions (Claim, Finalize) go in the bottom 1/3 of screen
+- Secondary actions (retake photo, edit) go higher where precision is easier
+- Bottom sheet modals for secondary flows (add item manually, name entry)
+
+**Safe areas (iOS, Android):**
+- Use `env(safe-area-inset-bottom)` in CSS to avoid content under home indicator on iPhone
+- Use `padding-bottom: max(16px, env(safe-area-inset-bottom))` on sticky footer bars
+
+**Touch feedback:**
+- Active press state: scale(0.97) + background color shift (instant, no animation lag)
+- Claim confirmation: brief green flash + checkmark on claimed row
+- Use `touch-action: manipulation` on interactive elements to disable 300ms tap delay
+
+**Prevent scroll-while-claiming:**
+- Item list can be long; use `overscroll-behavior: contain` on the list container
+- Sticky participant header above item list showing claimed count
+- Consider a progress bar: "You've claimed X of your items — does this look right?"
+
+**Typography for receipts:**
+- Item names: 16px minimum (WCAG mobile minimum)
+- Prices: 16px, monospace or tabular-nums to align decimal points
+- Participant name chips: 12px minimum with sufficient contrast
+
+**Color coding for claim states:**
+- Unclaimed: neutral (gray border, white background)
+- Claimed by me: brand color highlight (green/blue), left border accent
+- Shared: lighter highlight, multi-avatar display
+- Claimed by others: subtle gray tint with name(s) shown
+- No color as the ONLY indicator — always pair color with icon or text (accessibility)
+
+---
+
+## Feature: Final Summary
+
+### Host Summary (all participants visible)
+
+```
+┌──────────────────────────────────┐
+│  Final Tab                       │
+│                                  │
+│  Alice         $24.37            │
+│  Bob           $18.92            │
+│  Carol         $31.45            │
+│  Dave          $19.26            │
+│                                  │
+│  Total:        $94.00      ✓     │
+└──────────────────────────────────┘
+```
+
+### Participant Summary (individual view)
+
+Each participant sees their own total. The host can trigger "finalize" or the app can auto-finalize when all items are claimed.
+
+**Auto-finalize vs. host-finalize:**
+- Recommended: host-finalize button. Not all items may be claimed (host may have bought a round separately). Auto-finalize on "all items claimed" is an anti-pattern — it triggers at wrong moment if someone unclaims temporarily.
+- Show an indicator to the host: "All items claimed ✓ — ready to finalize"
+
+**Unclaimed items at finalize:**
+- If items remain unclaimed at finalize, host is prompted: "3 items unclaimed — split evenly among all, or add to host?"
+- Options: "Split among all" or "Host covers them"
+
+**Share individual total:**
+- "Share my total" button → native share sheet (`navigator.share()`) with message like "I owe $24.37 for dinner tonight" — works on mobile browsers, degrades to clipboard copy.
+
+---
+
+## Feature Dependencies
+
+```
+Camera capture → Image preview → OCR call → Item correction UI → Session creation
+Session creation → QR code display → Participant join flow → Claiming UI → Summary
+Claiming UI → WebSocket real-time sync → Live claim updates
+Item correction (qty expansion) → Duplicate item handling (no extra work needed)
+Shared item claiming → Tax/tip proportional math (requires claim counts per item)
+```
+
+**Critical path:**
+
+```
+OCR → Item correction → Session → Claiming → Summary
+```
+
+The WebSocket real-time layer is needed before claiming can be built. Everything else can be mocked or done in sequence.
+
+---
+
+## MVP Recommendation
+
+**Build in this order:**
+
+1. **Camera capture + image preview** — input type file with capture, preview step, retake button
+2. **OCR endpoint + item correction UI** — POST /api/ocr → correction screen with inline edit, qty stepper
+3. **Session creation + QR code + share link** — POST /api/sessions → QR code screen
+4. **Participant name entry + join** — /s/[id] route → name form → WebSocket connect
+5. **Item claiming UI (no real-time yet)** — tap to claim, own state only, no broadcast
+6. **Real-time WebSocket claim sync** — PartyKit room, broadcast state-update to all
+7. **Tax/tip proportional math + summary screen** — client-side calculation, per-person view
+8. **Manual "add item" + finalize flow** — host controls, unclaimed item handling
+
+**Defer to v2:**
+- Camera viewfinder with overlay (live crop guidance)
+- Gamification / progress indicators
+- PWA offline support
+- Native share integration (`navigator.share()`) — worth adding but not critical path
+- Item dispute / override by host
+
+---
+
+## Sources
+
+| Finding | Source | Confidence |
+|---------|--------|------------|
+| Tab target minimums (48×48px) | [web.dev accessible tap targets](https://web.dev/articles/accessible-tap-targets), [NN/G touch target size](https://www.nngroup.com/articles/touch-target-size/) | HIGH |
+| WCAG 2.2 Level AA: 24×24px minimum, 44×44px recommended | [Smashing Magazine accessible tap targets](https://www.smashingmagazine.com/2023/04/accessible-tap-target-sizes-rage-taps-clicks/) | HIGH |
+| 8px minimum gap between tap targets | [web.dev accessible tap targets](https://web.dev/articles/accessible-tap-targets) | HIGH |
+| Largest Remainder Method for cent distribution | [Betterment engineering: penny-precise allocation](https://www.betterment.com/engineering/penny-precise-allocation-functions) | HIGH |
+| Integer cents for bill splitting accuracy | [Bright Inventions: decimals in POS bill splitting](https://brightinventions.pl/blog/decimals-pos-bill-splitting-restaurants/) | HIGH |
+| Proportional tax/tip is fairer than equal split | [FormulaForge: splitting restaurant bills fairly](https://www.formulaforge.org/math/splitting-bills-fairly) | MEDIUM |
+| QR + link share, no app required for participants | [BillBob 2026 launch (Startup News)](https://startupnews.fyi/2026/01/23/billbob-launches-tackle-friendflation/) | MEDIUM |
+| Tab app item claiming UX | [Tab app website](https://www.tabapp.co/) | MEDIUM |
+| Real-time state sync on same page | Inferred from Nowa app real-time attendance, industry pattern | MEDIUM |
+| PartyKit room patterns, onConnect/onMessage/broadcast | [PartyKit official docs](https://docs.partykit.io/guides/) | HIGH |
+| Tesseract.js v7 release Dec 2025, no structured output | [Tesseract.js GitHub](https://github.com/naptha/tesseract.js) | HIGH |
+| Image review before OCR: retake pattern | [Scanbot SDK blog](https://scanbot.io/blog/mobile-ocr-receipt-scanner-for-businesses/) | MEDIUM |
+| Inline edit UX pattern for correction tables | [UX Design World: inline editing](https://uxdworld.com/2020/04/22/inline-editing-and-validation-in-tables/) | HIGH |
+| Tesseract + LLM post-processing for structured output | [Medium: Tesseract.js + AI](https://medium.com/@ivmarcos/building-a-browser-based-ocr-app-tesseract-js-ai-grok-3a11d9703e4d) | MEDIUM |
+| `<input capture="environment">` for rear camera | [MDN file input](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file) | HIGH |
+| `getUserMedia` HTTPS requirement | [MDN getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia) | HIGH |
+
+---
+
+*Features research for: Tab Splitter (mobile web restaurant bill splitter)*
+*Researched: 2026-02-20*
