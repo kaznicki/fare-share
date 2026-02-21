@@ -15,6 +15,7 @@ export default function OcrReview({ initial, onComplete }: Props) {
   const [tipCents, setTipCents] = useState(initial.tipCents)
   const [isPending, startTransition] = useTransition()
   const [sessionError, setSessionError] = useState<string | null>(null)
+  const [newItemId, setNewItemId] = useState<string | null>(null)
 
   // Immutable item mutations — never mutate array in place
   const updateItem = (id: string, patch: Partial<Item>) =>
@@ -23,13 +24,11 @@ export default function OcrReview({ initial, onComplete }: Props) {
   const deleteItem = (id: string) =>
     setItems(prev => prev.filter(it => it.id !== id))
 
-  const addItem = () =>
-    setItems(prev => [...prev, {
-      id: crypto.randomUUID(),
-      name: '',
-      priceCents: 0,
-      qty: 1,
-    }])
+  const addItem = () => {
+    const id = crypto.randomUUID()
+    setItems(prev => [...prev, { id, name: '', priceCents: 0, qty: 1 }])
+    setNewItemId(id)
+  }
 
   // SESS-01: POST to /api/sessions — server handles CORR-05 qty expansion
   const createSession = () => startTransition(async () => {
@@ -72,8 +71,12 @@ export default function OcrReview({ initial, onComplete }: Props) {
           <ItemRow
             key={item.id}
             item={item}
-            onChange={patch => updateItem(item.id, patch)}
+            onChange={patch => {
+              updateItem(item.id, patch)
+              if (item.id === newItemId) setNewItemId(null)
+            }}
             onDelete={() => deleteItem(item.id)}
+            autoFocusName={item.id === newItemId}
           />
         ))}
 

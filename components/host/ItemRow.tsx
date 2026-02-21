@@ -6,10 +6,13 @@ interface Props {
   item: Item
   onChange: (patch: Partial<Item>) => void
   onDelete: () => void
+  autoFocusName?: boolean
 }
 
-export default function ItemRow({ item, onChange, onDelete }: Props) {
-  const [editingField, setEditingField] = useState<'name' | 'price' | null>(null)
+export default function ItemRow({ item, onChange, onDelete, autoFocusName = false }: Props) {
+  const [editingField, setEditingField] = useState<'name' | 'price' | null>(
+    autoFocusName ? 'name' : null
+  )
 
   return (
     <div className="flex items-center gap-3 border-b py-3">
