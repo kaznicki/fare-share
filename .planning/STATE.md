@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Everyone pays exactly what they ordered (plus proportional tax and tip) without doing any mental math
-**Current focus:** Phase 2 (Host Flow) — Plans 01 and 03 complete, moving to remaining plans
+**Current focus:** Phase 3 (Real-Time Layer) — Plan 01 complete (join handler + session store fix), Plan 02 pending
 
 ## Current Position
 
-Phase: 2 of 5 (complete)
-Plan: 5 of 5 in current phase (complete — includes gap closure plan 02-05)
-Status: Phase complete — ready for Phase 3
-Last activity: 2026-02-21 — Plan 02-05 complete (Gap closure: OCR error banner + Add Item auto-focus)
+Phase: 3 of 5 (in progress)
+Plan: 1 of 2 in current phase (complete)
+Status: Phase 3 in progress — Plan 02 (participant page) is next
+Last activity: 2026-02-22 — Plan 03-01 complete (ws.on('message') join handler + globalThis session store fix)
 
-Progress: [████░░░░░░] 46% (6 of 13 total plans — gap closure plan is bonus, not counted in roadmap total)
+Progress: [████░░░░░░] 54% (7 of 13 total plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: ~3.0 min
-- Total execution time: ~13 min
+- Total plans completed: 6
+- Average duration: ~3.5 min
+- Total execution time: ~21 min
 
 **By Phase:**
 
@@ -29,15 +29,17 @@ Progress: [████░░░░░░] 46% (6 of 13 total plans — gap clos
 |-------|-------|-------|----------|
 | 1. Foundation | 3/3 | ~11 min | ~3.7 min |
 | 2. Host Flow | 4/4 | ~8 min | ~2.0 min |
+| 3. Real-Time Layer | 1/2 | ~8 min | ~8 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (2 min), 01-03 (4 min), 02-01 (2 min), 02-03 (1 min), 02-04 (5 min)
-- Trend: Fast and consistent
+- Last 5 plans: 02-01 (2 min), 02-03 (1 min), 02-04 (5 min), 02-05 (5 min), 03-01 (8 min)
+- Trend: Slightly longer — Phase 3 required diagnosing module isolation bug
 
 *Updated after each plan completion*
 | Phase 02-host-flow P02 | 2 | 2 tasks | 4 files |
 | Phase 02-host-flow P04 | 5 | 1 task | 0 files |
 | Phase 02-host-flow P05 (gap closure) | 5 | 2 tasks | 3 files |
+| Phase 03-real-time-layer P01 | 8 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -68,6 +70,7 @@ Progress: [████░░░░░░] 46% (6 of 13 total plans — gap clos
 - [Phase 02-host-flow]: Tap-to-edit pattern: editingField state in ItemRow, autoFocus input, onBlur commits; never contenteditable
 - [Phase 02-host-flow]: TaxTipFields uses key prop trick (key={taxCents/tipCents}) to reset defaultValue after blur — no controlled input needed
 - [Phase 02-host-flow gap closure]: autoFocusName prop + newItemId state pattern — parent tracks last-added item id, passes autoFocusName only to that row, clears on first onChange; avoids re-focus on blur/re-render
+- [Phase 03-real-time-layer]: globalThis singleton for session store: Next.js App Router module isolation requires globalThis.__tabSplitterSessionStore to share Map across route handlers and WebSocket server
 
 ### Pending Todos
 
@@ -80,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-21T18:10:00Z
-Stopped at: Completed 02-host-flow/02-05-PLAN.md — Gap closure: OCR error banner (OCR-04) and Add Item auto-focus (CORR-03). Phase 2 gap closure complete. Ready for Phase 3.
+Last session: 2026-02-22T00:26:37Z
+Stopped at: Completed 03-real-time-layer/03-01-PLAN.md — WebSocket join handler + session store globalThis fix. Phase 3 Plan 1 of 2 complete. Ready for Plan 03-02 (participant page).
 Resume file: None
