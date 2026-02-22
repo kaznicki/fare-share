@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Everyone pays exactly what they ordered (plus proportional tax and tip) without doing any mental math
-**Current focus:** Phase 3 (Real-Time Layer) — Plan 01 complete (join handler + session store fix), Plan 02 pending
+**Current focus:** Phase 3 (Real-Time Layer) — Plans 01 and 02 complete (join handler + participant page), Phase 3 complete
 
 ## Current Position
 
-Phase: 3 of 5 (in progress)
-Plan: 1 of 2 in current phase (complete)
-Status: Phase 3 in progress — Plan 02 (participant page) is next
-Last activity: 2026-02-22 — Plan 03-01 complete (ws.on('message') join handler + globalThis session store fix)
+Phase: 3 of 5 (complete)
+Plan: 2 of 2 in current phase (complete)
+Status: Phase 3 complete — both plans done (ws handler + participant page). Ready for Phase 4 (Claims).
+Last activity: 2026-02-22 — Plan 03-02 complete (JoinForm, SessionRoom, session/[id] page — full participant join flow)
 
-Progress: [████░░░░░░] 54% (7 of 13 total plans)
+Progress: [█████░░░░░] 62% (8 of 13 total plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: ~3.5 min
-- Total execution time: ~21 min
+- Total plans completed: 8
+- Average duration: ~3.4 min
+- Total execution time: ~25 min
 
 **By Phase:**
 
@@ -29,17 +29,18 @@ Progress: [████░░░░░░] 54% (7 of 13 total plans)
 |-------|-------|-------|----------|
 | 1. Foundation | 3/3 | ~11 min | ~3.7 min |
 | 2. Host Flow | 4/4 | ~8 min | ~2.0 min |
-| 3. Real-Time Layer | 1/2 | ~8 min | ~8 min |
+| 3. Real-Time Layer | 2/2 | ~12 min | ~6 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (2 min), 02-03 (1 min), 02-04 (5 min), 02-05 (5 min), 03-01 (8 min)
-- Trend: Slightly longer — Phase 3 required diagnosing module isolation bug
+- Last 5 plans: 02-04 (5 min), 02-05 (5 min), 03-01 (8 min), 03-02 (4 min)
+- Trend: Stable — Phase 3 plans averaged 6 min each
 
 *Updated after each plan completion*
 | Phase 02-host-flow P02 | 2 | 2 tasks | 4 files |
 | Phase 02-host-flow P04 | 5 | 1 task | 0 files |
 | Phase 02-host-flow P05 (gap closure) | 5 | 2 tasks | 3 files |
 | Phase 03-real-time-layer P01 | 8 | 1 tasks | 2 files |
+| Phase 03-real-time-layer P02 | 4 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Progress: [████░░░░░░] 54% (7 of 13 total plans)
 - [Phase 02-host-flow]: TaxTipFields uses key prop trick (key={taxCents/tipCents}) to reset defaultValue after blur — no controlled input needed
 - [Phase 02-host-flow gap closure]: autoFocusName prop + newItemId state pattern — parent tracks last-added item id, passes autoFocusName only to that row, clears on first onChange; avoids re-focus on blur/re-render
 - [Phase 03-real-time-layer]: globalThis singleton for session store: Next.js App Router module isolation requires globalThis.__tabSplitterSessionStore to share Map across route handlers and WebSocket server
+- [Phase 03-real-time-layer 03-02]: use(params) not async/await for dynamic params in Client Components — React.use() unwraps the Promise synchronously; async function is Server Component only
+- [Phase 03-real-time-layer 03-02]: WebSocket in useRef not useState — prevents re-renders when socket sends messages; only session data lives in state
+- [Phase 03-real-time-layer 03-02]: Two-screen state machine in page: page owns screen + participantName state; JoinForm and SessionRoom are pure components — same pattern as host/page.tsx
 
 ### Pending Todos
 
@@ -83,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-22T00:26:37Z
-Stopped at: Completed 03-real-time-layer/03-01-PLAN.md — WebSocket join handler + session store globalThis fix. Phase 3 Plan 1 of 2 complete. Ready for Plan 03-02 (participant page).
+Last session: 2026-02-22T00:33:47Z
+Stopped at: Completed 03-real-time-layer/03-02-PLAN.md — JoinForm + SessionRoom + session/[id] page. Phase 3 complete (2/2 plans). Ready for Phase 4 (Claims).
 Resume file: None

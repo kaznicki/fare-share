@@ -100,14 +100,14 @@
 | SESS-01 | Session creation | Phase 2 | COMPLETE (02-02) |
 | SESS-02 | QR code display | Phase 2 | COMPLETE (02-03) |
 | SESS-03 | Copy link fallback | Phase 2 | COMPLETE (02-03) |
-| JOIN-01 | Participant name entry + join | Phase 3 |
-| JOIN-02 | Participant joined broadcast | Phase 3 |
+| JOIN-01 | Participant name entry + join | Phase 3 | COMPLETE (03-02) |
+| JOIN-02 | Participant joined broadcast | Phase 3 | COMPLETE (03-02) |
 | CLAIM-01 | Tap to claim / unclaim | Phase 4 |
 | CLAIM-02 | Shared item split | Phase 4 |
 | CLAIM-03 | Duplicate item claiming | Phase 4 |
 | CLAIM-04 | Claim indicators visible to all | Phase 4 |
 | SYNC-01 | Real-time claim broadcast | Phase 4 |
-| SYNC-02 | Reconnect full-state snapshot | Phase 3 |
+| SYNC-02 | Reconnect full-state snapshot | Phase 3 | COMPLETE (03-02) |
 | MATH-01 | Proportional tax | Phase 5 |
 | MATH-02 | Proportional tip | Phase 5 |
 | MATH-03 | Totals sum exactly | Phase 5 |

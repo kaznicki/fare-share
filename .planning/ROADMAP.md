@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Custom server, session store, and OCR endpoint running and testable without a UI (completed 2026-02-21)
 - [x] **Phase 2: Host Flow** - Host can photograph a receipt, correct OCR output, and share a QR-code join link (completed 2026-02-21)
-- [ ] **Phase 3: Real-Time Layer** - Participants can join via the share URL and the WebSocket room broadcasts presence in real time
+- [x] **Phase 3: Real-Time Layer** - Participants can join via the share URL and the WebSocket room broadcasts presence in real time (completed 2026-02-22)
 - [ ] **Phase 4: Item Claiming** - Participants claim items on their phones; all screens update live; shared and duplicate items work correctly
 - [ ] **Phase 5: Summary and Finalization** - Host finalizes; every person sees their exact amount owed with proportional tax and tip
 
@@ -111,6 +111,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | --- | --- | --- | --- |
 | 1. Foundation | 3/3 | Complete | 2026-02-21 |
 | 2. Host Flow | 4/5 | Complete | 2026-02-21 |
-| 3. Real-Time Layer | 1/2 | In Progress |  |
+| 3. Real-Time Layer | 2/2 | Complete | 2026-02-22 |
 | 4. Item Claiming | 0/3 | Not started | - |
 | 5. Summary and Finalization | 0/2 | Not started | - |
