@@ -3,7 +3,7 @@ import { parse } from 'url'
 import next from 'next'
 import { WebSocketServer } from 'ws'
 import { sessionStore } from '@/lib/session-store'
-import type { SessionData } from '@/types'
+import type { SessionData, ClientMessage } from '@/types'
 
 const port = parseInt(process.env.PORT ?? '3000', 10)
 const dev = process.env.NODE_ENV !== 'production'
@@ -43,6 +43,32 @@ wss.on('connection', (ws, req) => {
   ws.on('error', (err) => {
     console.error(`WebSocket error for session ${sessionId}:`, err)
     sessionStore.removeSocket(sessionId, ws)
+  })
+
+  ws.on('message', (raw) => {
+    let msg: unknown
+    try { msg = JSON.parse(raw.toString()) } catch { return }
+
+    if (
+      typeof msg !== 'object' || msg === null ||
+      (msg as any).type !== 'join' ||
+      typeof (msg as any).participantName !== 'string'
+    ) return
+
+    const name = ((msg as any).participantName as string).trim()
+    if (!name) return
+
+    const session = sessionStore.get(sessionId!)
+    if (!session) return
+
+    if (!session.participants.includes(name)) {
+      session.participants.push(name)
+    }
+
+    const data = sessionStore.getData(sessionId!)
+    if (data) {
+      sessionStore.broadcast(sessionId!, { type: 'session-snapshot', data })
+    }
   })
 })
 

@@ -1,10 +1,20 @@
 import type { WebSocket } from 'ws'
 import type { Item, SessionState, SessionData } from '@/types'
 
-// Module singleton — one Map instance shared by all importers via Node.js module cache.
-// Both the REST Route Handlers and the WebSocket server import this module.
+// Global singleton — stored on globalThis to survive Next.js App Router module re-evaluation.
+// Next.js 13+ App Router compiles route handlers in a separate module context from server.ts,
+// causing a plain `const store = new Map()` to create two isolated Map instances.
+// Anchoring to globalThis ensures both the REST route handlers and the WebSocket server
+// share the same Map instance across all module contexts in the same Node.js process.
 // Use consistent @/ alias paths — never mix relative and alias imports of this file.
-const store = new Map<string, SessionState>()
+declare global {
+  // eslint-disable-next-line no-var
+  var __tabSplitterSessionStore: Map<string, SessionState> | undefined
+}
+if (!globalThis.__tabSplitterSessionStore) {
+  globalThis.__tabSplitterSessionStore = new Map<string, SessionState>()
+}
+const store = globalThis.__tabSplitterSessionStore
 
 const TTL_MS = 4 * 60 * 60 * 1000  // 4 hours
 
