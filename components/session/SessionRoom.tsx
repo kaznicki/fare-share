@@ -1,15 +1,18 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import type { SessionData, ServerMessage } from '@/types'
+import ClaimableItem from './ClaimableItem'
 
 interface Props {
   sessionId: string
   participantName: string
+  isHost?: boolean   // true when the participant viewing is the host — controls Finalize button visibility
 }
 
-export default function SessionRoom({ sessionId, participantName }: Props) {
+export default function SessionRoom({ sessionId, participantName, isHost }: Props) {
   const [session, setSession] = useState<SessionData | null>(null)
   const [connectionError, setConnectionError] = useState<string | null>(null)
+  const [reconnecting, setReconnecting] = useState(false)
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
@@ -27,12 +30,16 @@ export default function SessionRoom({ sessionId, participantName }: Props) {
       if (msg.type === 'session-snapshot') {
         setSession(msg.data)
         setConnectionError(null)
+        setReconnecting(false)
       }
     }
 
     ws.onclose = (event) => {
       if (event.code === 1008) {
         setConnectionError('Session not found or expired.')
+      } else {
+        // Unexpected disconnect — show reconnect banner
+        setReconnecting(true)
       }
     }
 
@@ -44,6 +51,22 @@ export default function SessionRoom({ sessionId, participantName }: Props) {
       ws.close()
     }
   }, [sessionId, participantName])
+
+  const sendClaim = (itemId: string) => {
+    wsRef.current?.send(JSON.stringify({ type: 'claim', sessionId, participantName, itemId }))
+  }
+
+  const sendUnclaim = (itemId: string) => {
+    wsRef.current?.send(JSON.stringify({ type: 'unclaim', sessionId, participantName, itemId }))
+  }
+
+  const myTotalCents = session
+    ? session.items.reduce((sum, item) => {
+        const claimants = session.claims[item.id] ?? []
+        if (!claimants.includes(participantName)) return sum
+        return sum + Math.round(item.priceCents / claimants.length)
+      }, 0)
+    : 0
 
   if (connectionError) {
     return (
@@ -64,20 +87,45 @@ export default function SessionRoom({ sessionId, participantName }: Props) {
 
   return (
     <div className="w-full max-w-sm mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Session items</h1>
+      <h1 className="text-2xl font-bold mb-2">Session items</h1>
 
-      <p className="text-sm text-gray-500 mb-4">
-        Joined: {session.participants.join(', ')}
+      <p className="text-xs text-gray-400 mb-3">
+        At the table: {session.participants.join(', ')}
       </p>
 
-      <ul className="divide-y divide-gray-100">
+      {reconnecting && (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm p-3 rounded-lg mb-4 text-center">
+          Reconnecting... Pull down to refresh if this persists.
+        </div>
+      )}
+
+      <ul className="divide-y divide-gray-100 mb-24">
         {session.items.map((item) => (
-          <li key={item.id} className="flex justify-between py-2 border-b border-gray-100">
-            <span className="text-gray-900">{item.name}</span>
-            <span className="text-gray-700">${(item.priceCents / 100).toFixed(2)}</span>
-          </li>
+          <ClaimableItem
+            key={item.id}
+            item={item}
+            claimants={session.claims[item.id] ?? []}
+            participantName={participantName}
+            onClaim={sendClaim}
+            onUnclaim={sendUnclaim}
+          />
         ))}
       </ul>
+
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex items-center justify-between">
+        <span className="text-lg font-semibold text-gray-900">
+          Your total: ${(myTotalCents / 100).toFixed(2)}
+        </span>
+        {isHost && (
+          <button
+            type="button"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            onClick={() => {/* Phase 5 will wire this */}}
+          >
+            Finalize
+          </button>
+        )}
+      </div>
     </div>
   )
 }
