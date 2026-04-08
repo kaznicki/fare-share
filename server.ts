@@ -49,25 +49,77 @@ wss.on('connection', (ws, req) => {
     let msg: unknown
     try { msg = JSON.parse(raw.toString()) } catch { return }
 
+    if (typeof msg !== 'object' || msg === null) return
+
+    // join branch
     if (
-      typeof msg !== 'object' || msg === null ||
-      (msg as any).type !== 'join' ||
-      typeof (msg as any).participantName !== 'string'
-    ) return
+      (msg as any).type === 'join' &&
+      typeof (msg as any).participantName === 'string'
+    ) {
+      const name = ((msg as any).participantName as string).trim()
+      if (!name) return
 
-    const name = ((msg as any).participantName as string).trim()
-    if (!name) return
+      const session = sessionStore.get(sessionId!)
+      if (!session) return
 
-    const session = sessionStore.get(sessionId!)
-    if (!session) return
+      if (!session.participants.includes(name)) {
+        session.participants.push(name)
+      }
 
-    if (!session.participants.includes(name)) {
-      session.participants.push(name)
+      const data = sessionStore.getData(sessionId!)
+      if (data) {
+        sessionStore.broadcast(sessionId!, { type: 'session-snapshot', data })
+      }
+      return
     }
 
-    const data = sessionStore.getData(sessionId!)
-    if (data) {
-      sessionStore.broadcast(sessionId!, { type: 'session-snapshot', data })
+    // claim branch
+    if (
+      (msg as any).type === 'claim' &&
+      typeof (msg as any).itemId === 'string' &&
+      typeof (msg as any).participantName === 'string'
+    ) {
+      const itemId = (msg as any).itemId as string
+      const name = ((msg as any).participantName as string).trim()
+      if (!name) return
+
+      const session = sessionStore.get(sessionId!)
+      if (!session) return
+
+      // Verify item exists in session (silent ignore if not)
+      if (!session.items.find(i => i.id === itemId)) return
+
+      // Append-only Set semantics: only add if not already claiming
+      if (!session.claims[itemId]) session.claims[itemId] = []
+      if (!session.claims[itemId].includes(name)) {
+        session.claims[itemId].push(name)
+      }
+
+      const data = sessionStore.getData(sessionId!)
+      if (data) sessionStore.broadcast(sessionId!, { type: 'session-snapshot', data })
+      return
+    }
+
+    // unclaim branch
+    if (
+      (msg as any).type === 'unclaim' &&
+      typeof (msg as any).itemId === 'string' &&
+      typeof (msg as any).participantName === 'string'
+    ) {
+      const itemId = (msg as any).itemId as string
+      const name = ((msg as any).participantName as string).trim()
+      if (!name) return
+
+      const session = sessionStore.get(sessionId!)
+      if (!session) return
+
+      if (session.claims[itemId]) {
+        session.claims[itemId] = session.claims[itemId].filter(n => n !== name)
+      }
+
+      const data = sessionStore.getData(sessionId!)
+      if (data) sessionStore.broadcast(sessionId!, { type: 'session-snapshot', data })
+      return
     }
   })
 })
