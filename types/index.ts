@@ -35,6 +35,9 @@ export interface OcrResult {
 export type ServerMessage =
   | { type: 'session-snapshot'; data: SessionData }
   | { type: 'session-expired' }
+  | { type: 'session-finalized' }
 
 export type ClientMessage =
   | { type: 'join'; sessionId: string; participantName: string }
+  | { type: 'claim'; sessionId: string; participantName: string; itemId: string }
+  | { type: 'unclaim'; sessionId: string; participantName: string; itemId: string }
