@@ -1,8 +1,9 @@
 ---
 phase: 05
 name: Summary and Finalization
-status: draft
+status: approved
 created: 2026-04-08
+reviewed_at: 2026-04-08
 ---
 
 # UI-SPEC: Phase 5 — Summary and Finalization
@@ -210,7 +211,7 @@ Established in Phase 4. Phase 5 adds:
 
 **Container:** `mt-6 w-full max-w-sm mx-auto px-4 pb-16`
 
-**Section heading:** `text-base font-bold text-gray-700 mb-3`
+**Section heading:** `text-base font-bold text-gray-700 mb-2`
 
 **Rows:** `flex justify-between items-center py-2 min-h-[44px] border-b border-gray-100 last:border-0`
 - Name: `text-gray-900` (font-normal, weight 400)
@@ -220,7 +221,7 @@ Established in Phase 4. Phase 5 adds:
 - Label: `text-gray-700 font-bold`
 - Amount: `text-gray-900 font-bold tabular-nums`
 
-> Fix applied: Container bottom padding changed from `pb-8` to match the screen bottom clearance of `pb-16` (64px). Row padding changed from `py-3` to `py-2 min-h-[44px]`. `font-semibold` replaced with `font-bold` throughout. Section heading changed from `font-semibold` to `font-bold`.
+> Fix applied: Container bottom padding changed from `pb-8` to match the screen bottom clearance of `pb-16` (64px). Row padding changed from `py-3` to `py-2 min-h-[44px]`. `font-semibold` replaced with `font-bold` throughout. Section heading changed from `font-semibold` to `font-bold`. Section heading margin changed from `mb-3` (12px — off-scale) to `mb-2` (8px).
 
 ---
 
