@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 05-summary-and-finalization
 source: 05-01-SUMMARY.md, 05-02-SUMMARY.md
 started: 2026-04-09T00:00:00Z
@@ -75,7 +75,13 @@ blocked: 0
   reason: "User reported: There is no Finalize button on the host screen after clicking 'I'll cover the rest'"
   severity: major
   test: 9
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "server.ts:140 uses case-sensitive strict equality (senderName !== session.hostName) to gate finalization. WR-03 fixed client-side isHost detection to be case-insensitive but left the server-side check unchanged. When participantName casing doesn't byte-match session.hostName the finalize message is silently dropped, no snapshot is broadcast, and the summary screen never appears."
+  artifacts:
+    - path: "server.ts"
+      issue: "Line ~140: senderName !== session.hostName — strict equality, no toLowerCase/trim normalization"
+    - path: "components/session/SessionRoom.tsx"
+      issue: "useEffect deps missing onFinalized and onSessionData — stale closure risk on finalization path"
+  missing:
+    - "Normalize server-side host identity check: senderName.toLowerCase().trim() !== session.hostName.toLowerCase().trim()"
+    - "Add onFinalized and onSessionData to SessionRoom useEffect dependency array (or stabilize with useCallback in parent)"
+  debug_session: ".planning/debug/host-cover-rest-broken.md"
