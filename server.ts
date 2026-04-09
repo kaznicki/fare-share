@@ -137,7 +137,7 @@ wss.on('connection', (ws, req) => {
       if (!session) return
 
       // Only host can finalize (T-5-01: elevation of privilege mitigation)
-      if (senderName !== session.hostName) return
+      if (senderName.trim().toLowerCase() !== session.hostName.trim().toLowerCase()) return
 
       // Idempotency guard — do not re-run if already finalized (T-5-03)
       if (session.finalized) return
