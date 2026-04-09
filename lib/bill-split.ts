@@ -67,7 +67,7 @@ function distributeProportionally(totalCents: number, subtotals: number[]): numb
  * Computes each participant's bill with cent-exact proportional tax and tip.
  *
  * Steps:
- *   1. Build per-participant subtotals from claimed items (shared items split via Math.round)
+ *   1. Build per-participant subtotals from claimed items (shared items split via LRM)
  *   2. Handle unclaimed items per `unclaimedHandling` policy
  *   3. Distribute tax proportionally (LRM)
  *   4. Distribute tip proportionally (LRM)
@@ -90,11 +90,16 @@ export function billSplit(params: BillSplitParams): BillSplitResult {
 
     claimedItemIds.add(item.id)
 
-    // Shared item: split cost via Math.round per claimant
-    const sharePerClaimant = Math.round(item.priceCents / claimants.length)
-    for (const name of claimants) {
+    // Shared item: split cost via LRM to avoid cent loss/gain from Math.round
+    const claimantCount = claimants.length
+    const base = Math.floor(item.priceCents / claimantCount)
+    const remainder = item.priceCents % claimantCount
+
+    // Give 1 extra cent to the first `remainder` claimants (stable order)
+    for (let k = 0; k < claimantCount; k++) {
+      const name = claimants[k]
       if (subtotals[name] !== undefined) {
-        subtotals[name] += sharePerClaimant
+        subtotals[name] += base + (k < remainder ? 1 : 0)
       }
     }
   }
