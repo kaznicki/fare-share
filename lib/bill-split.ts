@@ -74,7 +74,15 @@ function distributeProportionally(totalCents: number, subtotals: number[]): numb
  *   5. Return ParticipantBill[] with totalCents = subtotal + tax + tip
  */
 export function billSplit(params: BillSplitParams): BillSplitResult {
-  const { items, claims, participants, taxCents, tipCents, unclaimedHandling, hostName } = params
+  const { items, claims, taxCents, tipCents, unclaimedHandling, hostName } = params
+
+  // Ensure hostName is always in the participants list when host absorbs unclaimed costs.
+  // Without this, a host who never sent a WebSocket 'join' message would be absent from
+  // `participants`, causing their share of unclaimed items to be silently dropped.
+  let participants = params.participants
+  if (unclaimedHandling === 'host' && !participants.includes(hostName)) {
+    participants = [...participants, hostName]
+  }
 
   // Step 1: Build per-participant subtotals from claimed items
   const subtotals: Record<string, number> = {}
