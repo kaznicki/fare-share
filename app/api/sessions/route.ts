@@ -14,6 +14,7 @@ const CreateSessionSchema = z.object({
   items: z.array(ItemSchema).min(1, 'At least one item required'),
   taxCents: z.number().int().nonnegative(),
   tipCents: z.number().int().nonnegative(),
+  hostName: z.string().min(1).max(64),
 })
 
 export async function POST(req: NextRequest) {
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { items, taxCents, tipCents } = parsed.data
+    const { items, taxCents, tipCents, hostName } = parsed.data
 
     // CORR-05: Expand items with qty > 1 into separate claimable rows.
     // e.g. { name: 'Burger', qty: 2 } → two rows with qty: 1 and distinct IDs.
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
           }))
     )
 
-    const sessionId = sessionStore.create({ items: expandedItems, taxCents, tipCents })
+    const sessionId = sessionStore.create({ items: expandedItems, taxCents, tipCents, hostName })
 
     return NextResponse.json(
       {

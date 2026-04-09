@@ -1,5 +1,6 @@
 import type { WebSocket } from 'ws'
 import type { Item, SessionState, SessionData } from '@/types'
+import type { BillSplitResult } from '@/lib/bill-split'
 
 // Global singleton — stored on globalThis to survive Next.js App Router module re-evaluation.
 // Next.js 13+ App Router compiles route handlers in a separate module context from server.ts,
@@ -19,7 +20,7 @@ const store = globalThis.__tabSplitterSessionStore
 const TTL_MS = 4 * 60 * 60 * 1000  // 4 hours
 
 export const sessionStore = {
-  create(data: { items: Item[]; taxCents: number; tipCents: number }): string {
+  create(data: { items: Item[]; taxCents: number; tipCents: number; hostName: string }): string {
     const id = crypto.randomUUID()
     const now = Date.now()
 
@@ -47,6 +48,9 @@ export const sessionStore = {
       sockets: new Set(),
       createdAt: now,
       expiresAt: now + TTL_MS,
+      hostName: data.hostName,
+      finalized: false,
+      finalizedBill: null,
     }
 
     store.set(id, session)
@@ -90,6 +94,13 @@ export const sessionStore = {
 
   removeSocket(id: string, ws: WebSocket): void {
     store.get(id)?.sockets.delete(ws)
+  },
+
+  finalize(id: string, bill: BillSplitResult): void {
+    const session = store.get(id)
+    if (!session) return
+    session.finalized = true
+    session.finalizedBill = bill
   },
 
   // Broadcast a message to all open sockets in a session.

@@ -11,6 +11,7 @@ export default function HostPage() {
   const [screen, setScreen] = useState<Screen>('capture')
   const [ocrResult, setOcrResult] = useState<OcrResult | null>(null)
   const [sessionId, setSessionId] = useState<string | null>(null)
+  const [hostName, setHostName] = useState<string | null>(null)
 
   if (screen === 'capture') {
     return (
@@ -29,8 +30,9 @@ export default function HostPage() {
       <div className="min-h-screen flex flex-col items-center justify-start max-w-md mx-auto px-4 pt-safe pb-safe">
         <OcrReview
           initial={ocrResult!}
-          onComplete={(id) => {
+          onComplete={(id, name) => {
             setSessionId(id)
+            setHostName(name)
             setScreen('share')
           }}
         />
@@ -39,7 +41,7 @@ export default function HostPage() {
   }
   return (
     <div className="min-h-screen flex flex-col items-center justify-start max-w-md mx-auto px-4 pt-safe pb-safe">
-      <ShareScreen sessionId={sessionId!} />
+      <ShareScreen sessionId={sessionId!} hostName={hostName!} />
     </div>
   )
 }

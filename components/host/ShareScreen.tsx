@@ -4,6 +4,7 @@ import { QRCodeSVG } from 'qrcode.react'
 
 interface Props {
   sessionId: string
+  hostName: string
 }
 
 export default function ShareScreen({ sessionId }: Props) {

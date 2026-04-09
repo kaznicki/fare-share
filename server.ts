@@ -3,6 +3,7 @@ import { parse } from 'url'
 import next from 'next'
 import { WebSocketServer } from 'ws'
 import { sessionStore } from '@/lib/session-store'
+import { billSplit } from '@/lib/bill-split'
 import type { SessionData, ClientMessage } from '@/types'
 
 const port = parseInt(process.env.PORT ?? '3000', 10)
@@ -122,6 +123,45 @@ wss.on('connection', (ws, req) => {
 
       const data = sessionStore.getData(sessionId!)
       if (data) sessionStore.broadcast(sessionId!, { type: 'session-snapshot', data })
+      return
+    }
+
+    // finalize branch — only host can finalize (security: T-5-01)
+    if (
+      (msg as any).type === 'finalize' &&
+      typeof (msg as any).unclaimedHandling === 'string' &&
+      typeof (msg as any).participantName === 'string'
+    ) {
+      const senderName = ((msg as any).participantName as string).trim().slice(0, MAX_NAME_LEN)
+      const session = sessionStore.get(sessionId!)
+      if (!session) return
+
+      // Only host can finalize (T-5-01: elevation of privilege mitigation)
+      if (senderName !== session.hostName) return
+
+      // Idempotency guard — do not re-run if already finalized (T-5-03)
+      if (session.finalized) return
+
+      // Coerce unclaimedHandling to prevent tampering (T-5-02)
+      const handling = (msg as any).unclaimedHandling === 'host' ? 'host' : 'split'
+
+      const result = billSplit({
+        items: session.items,
+        claims: session.claims,
+        participants: session.participants,
+        taxCents: session.taxCents,
+        tipCents: session.tipCents,
+        unclaimedHandling: handling,
+        hostName: session.hostName,
+      })
+
+      sessionStore.finalize(sessionId!, result)
+
+      // Broadcast updated snapshot (now includes finalized: true and finalizedBill)
+      const data = sessionStore.getData(sessionId!)
+      if (data) {
+        sessionStore.broadcast(sessionId!, { type: 'session-snapshot', data })
+      }
       return
     }
   })

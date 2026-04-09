@@ -6,13 +6,14 @@ import TaxTipFields from '@/components/host/TaxTipFields'
 
 interface Props {
   initial: OcrResult
-  onComplete: (sessionId: string) => void
+  onComplete: (sessionId: string, hostName: string) => void
 }
 
 export default function OcrReview({ initial, onComplete }: Props) {
   const [items, setItems] = useState<Item[]>(initial.items)
   const [taxCents, setTaxCents] = useState(initial.taxCents)
   const [tipCents, setTipCents] = useState(initial.tipCents)
+  const [hostName, setHostName] = useState('')
   const [isPending, startTransition] = useTransition()
   const [sessionError, setSessionError] = useState<string | null>(null)
   const [newItemId, setNewItemId] = useState<string | null>(null)
@@ -37,11 +38,11 @@ export default function OcrReview({ initial, onComplete }: Props) {
       const res = await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, taxCents, tipCents }),
+        body: JSON.stringify({ items, taxCents, tipCents, hostName: hostName.trim() }),
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const { sessionId } = await res.json()
-      onComplete(sessionId)
+      onComplete(sessionId, hostName.trim())
     } catch {
       setSessionError('Could not create session. Please try again.')
     }
@@ -97,11 +98,21 @@ export default function OcrReview({ initial, onComplete }: Props) {
         onChangeTip={setTipCents}
       />
 
-      {/* Create Session button — disabled while pending to prevent double-submit */}
+      {/* Create Session button — disabled while pending or host name is empty */}
       <div className="px-4 pb-4 pt-2 bg-white">
+        <div className="mb-3">
+          <label className="block text-sm text-gray-600 mb-1">Your name</label>
+          <input
+            type="text"
+            placeholder="Enter your name"
+            value={hostName}
+            onChange={(e) => setHostName(e.target.value)}
+            className="w-full py-2 px-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
         <button
           onClick={createSession}
-          disabled={isPending}
+          disabled={isPending || !hostName.trim()}
           className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold rounded-xl transition-colors"
         >
           {isPending ? 'Creating...' : 'Create Session'}
