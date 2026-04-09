@@ -25,35 +25,38 @@ created: 2026-04-08
 | Token | Value | Use |
 |-------|-------|-----|
 | 1 | 4px | Icon gaps, tight label spacing |
-| 2 | 8px | Inline element separation |
-| 3 | 12px | Row internal padding (vertical) |
+| 2 | 8px | Inline element separation, row internal padding (vertical) |
 | 4 | 16px | Card/section internal padding, standard `p-4` |
 | 6 | 24px | Between sections within a screen |
 | 8 | 32px | Screen-level top/bottom margin |
-| 24 | 96px | Bottom scroll clearance (fixed footer height + buffer) |
+| 16 | 64px | Bottom scroll clearance (fixed footer height + buffer) |
 
-**Touch targets:** All interactive elements minimum 44px tall (`min-h-[44px]`). Modal buttons minimum `py-3` (48px effective).
+**Touch targets:** All interactive elements minimum 44px tall (`min-h-[44px]`). Modal buttons use `py-2` with `min-h-[44px]` enforced.
 
-> Source: established project pattern — `p-4`, `py-3`, `py-2` observed across SessionRoom, OcrReview, ClaimableItem.
+> Source: established project pattern — `p-4`, `py-2` observed across SessionRoom, OcrReview, ClaimableItem.
+> Fix applied: removed 12px (token 3) — not a valid 8-point scale value. Replaced 96px bottom clearance with 64px (`pb-16`).
 
 ---
 
 ## Typography
 
-Three sizes only. Two weights only.
+Four sizes. Two weights only.
 
 | Role | Size | Weight | Line-height | Class |
 |------|------|--------|-------------|-------|
-| Heading | 24px | 700 (bold) | 1.2 | `text-2xl font-bold` |
+| Heading / Total owed | 24px | 700 (bold) | 1.2 | `text-2xl font-bold` |
 | Body | 16px | 400 (normal) | 1.5 | `text-base` |
-| Label / secondary | 14px | 500 (medium) | 1.4 | `text-sm font-medium` |
+| Label / secondary | 14px | 400 (normal) | 1.4 | `text-sm` |
 | Caption / metadata | 12px | 400 (normal) | 1.4 | `text-xs` |
 
-**Total owed amount:** 24px, weight 700 — must match heading tier to draw the eye.
+**Two weights only: 400 (normal) and 700 (bold).** No 500 (medium) or 600 (semibold) anywhere in this phase.
 
-**Money amounts in summary rows:** 16px, weight 600 (`font-semibold`) — distinguishable from item name without a new size tier.
+**Total owed amount:** 24px, weight 700 (`text-2xl font-bold`) — matches heading tier to draw the eye.
 
-> Source: `text-2xl font-bold` (SessionRoom h1), `text-sm font-medium` (TaxTipFields), `text-xs text-gray-400` (ClaimableItem claimant names). Two weights (400 + semibold/bold) are the established pattern.
+**Money amounts in summary rows:** 16px, weight 700 (`text-base font-bold`) — distinguishable from item name without a new size tier.
+
+> Source: `text-2xl font-bold` (SessionRoom h1), `text-xs text-gray-400` (ClaimableItem claimant names).
+> Fix applied: removed 500 (medium) weight row. All `font-semibold` (600) instances replaced with `font-bold` (700). Label row now uses weight 400 to stay within the two-weight contract.
 
 ---
 
@@ -147,15 +150,17 @@ Established in Phase 4. Phase 5 adds:
 
 **Dimensions:** `max-w-sm mx-auto` card, `p-6` internal padding, `rounded-2xl shadow-lg`
 
-**Title:** `text-lg font-semibold text-gray-900`
+**Title:** `text-2xl font-bold text-gray-900`
 
 **Body text:** `text-sm text-gray-600` — explains the choice briefly (see Copywriting section)
 
-**Buttons:** stacked, `w-full`, `py-3`, `rounded-xl`
-- "Split among everyone": `bg-indigo-600 text-white font-semibold` (primary)
-- "I'll cover the rest": `border border-gray-300 text-gray-700 font-medium bg-white` (secondary)
+**Buttons:** stacked, `w-full`, `py-2 min-h-[44px]`, `rounded-xl`
+- "Split among everyone": `bg-indigo-600 text-white font-bold` (primary)
+- "I'll cover the rest": `border border-gray-300 text-gray-700 bg-white` (secondary)
 
 **No cancel / X button** — matches D-07 requirement for a forced choice.
+
+> Fix applied: Title changed from `text-lg font-semibold` to `text-2xl font-bold` — keeps within declared 4 sizes and 2 weights. Button padding changed from `py-3` to `py-2 min-h-[44px]`. Removed `font-semibold` and `font-medium` from button classes.
 
 ### Screen C: Participant Summary Screen (new)
 
@@ -178,11 +183,13 @@ Established in Phase 4. Phase 5 adds:
 
 **Card:** `bg-white border border-gray-200 rounded-2xl p-6`
 
-**Row pattern:** `flex justify-between items-center py-2` with a `border-t border-gray-100` before the Total owed row
+**Row pattern:** `flex justify-between items-center py-2 min-h-[44px]` with a `border-t border-gray-100` before the Total owed row
 
-**"Total owed" row:** `text-indigo-600 font-bold text-lg` for both label and amount — the only indigo text on screen
+**"Total owed" row:** `text-indigo-600 font-bold text-2xl` for both label and amount — the only indigo text on screen
 
 **Edge case — $0.00 total:** Render the same layout with `$0.00` — do not hide the breakdown. Add a caption below the total: `text-xs text-gray-400` reading "You didn't claim any items."
+
+> Fix applied: "Total owed" changed from `text-lg` (18px — undeclared) to `text-2xl font-bold` (24px — declared heading tier). Row padding changed from `py-3` to `py-2 min-h-[44px]`. Removed `font-semibold`.
 
 ### Screen D: Host Summary Table (new — host only, below Screen C card)
 
@@ -201,17 +208,19 @@ Established in Phase 4. Phase 5 adds:
 └─────────────────────────────────┘
 ```
 
-**Container:** `mt-6 w-full max-w-sm mx-auto px-4 pb-8`
+**Container:** `mt-6 w-full max-w-sm mx-auto px-4 pb-16`
 
-**Section heading:** `text-base font-semibold text-gray-700 mb-3`
+**Section heading:** `text-base font-bold text-gray-700 mb-3`
 
-**Rows:** `flex justify-between items-center py-3 border-b border-gray-100 last:border-0`
-- Name: `text-gray-900` (font-normal)
-- Amount: `text-gray-900 font-semibold tabular-nums` (right-aligned, monospace digits for alignment)
+**Rows:** `flex justify-between items-center py-2 min-h-[44px] border-b border-gray-100 last:border-0`
+- Name: `text-gray-900` (font-normal, weight 400)
+- Amount: `text-gray-900 font-bold tabular-nums` (right-aligned, monospace digits for alignment)
 
-**Total row:** `flex justify-between items-center pt-3 border-t border-gray-300`
-- Label: `text-gray-700 font-semibold`
+**Total row:** `flex justify-between items-center pt-2 min-h-[44px] border-t border-gray-300`
+- Label: `text-gray-700 font-bold`
 - Amount: `text-gray-900 font-bold tabular-nums`
+
+> Fix applied: Container bottom padding changed from `pb-8` to match the screen bottom clearance of `pb-16` (64px). Row padding changed from `py-3` to `py-2 min-h-[44px]`. `font-semibold` replaced with `font-bold` throughout. Section heading changed from `font-semibold` to `font-bold`.
 
 ---
 
@@ -221,8 +230,8 @@ Established in Phase 4. Phase 5 adds:
 
 | State | Class |
 |-------|-------|
-| Default | `bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium` |
-| Loading (after tap) | `bg-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed` |
+| Default | `bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold` |
+| Loading (after tap) | `bg-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-bold cursor-not-allowed` |
 | Not visible (non-host) | not rendered |
 
 Tap → count unclaimed items:
@@ -314,7 +323,7 @@ Phase 5 does not introduce new network-failure paths beyond what SessionRoom alr
 - Modal must trap focus: first focusable element is "Split among everyone" button; Tab cycles between the two buttons only while modal is open
 - Summary amounts use `tabular-nums` Tailwind class to ensure column alignment with monospace digits
 - "Total owed" is not hidden behind an expand — always visible without interaction
-- All interactive elements meet 44px minimum touch target
+- All interactive elements meet 44px minimum touch target (`min-h-[44px]` enforced)
 - Color is never the sole differentiator — amounts are always accompanied by labels
 
 ---
@@ -350,3 +359,14 @@ Per CONTEXT.md deferred section (none deferred) and requirements out-of-scope li
 | Modal positioning: centered (not bottom sheet) | Claude's discretion (CONTEXT.md) |
 | $0.00 edge case handling | Claude's discretion (CONTEXT.md) |
 | Unclaimed split method: proportional by food subtotal | Claude's discretion (CONTEXT.md) |
+
+## Checker Sign-Off
+
+- [ ] Dimension 1 Copywriting: PASS
+- [ ] Dimension 2 Visuals: PASS
+- [ ] Dimension 3 Color: PASS
+- [ ] Dimension 4 Typography: PASS
+- [ ] Dimension 5 Spacing: PASS
+- [ ] Dimension 6 Registry Safety: PASS
+
+**Approval:** pending
