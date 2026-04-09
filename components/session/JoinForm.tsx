@@ -3,10 +3,11 @@ import { useState } from 'react'
 
 interface Props {
   onSubmit: (name: string) => void
+  initialName?: string
 }
 
-export default function JoinForm({ onSubmit }: Props) {
-  const [name, setName] = useState('')
+export default function JoinForm({ onSubmit, initialName = '' }: Props) {
+  const [name, setName] = useState(initialName)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

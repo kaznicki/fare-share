@@ -1,18 +1,24 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import type { SessionData, ServerMessage } from '@/types'
+import type { BillSplitResult } from '@/lib/bill-split'
 import ClaimableItem from './ClaimableItem'
+import UnclaimedModal from './UnclaimedModal'
 
 interface Props {
   sessionId: string
   participantName: string
-  isHost?: boolean   // true when the participant viewing is the host — controls Finalize button visibility
+  isHost?: boolean
+  onFinalized?: (bill: BillSplitResult) => void
+  onSessionData?: (data: SessionData) => void
 }
 
-export default function SessionRoom({ sessionId, participantName, isHost }: Props) {
+export default function SessionRoom({ sessionId, participantName, isHost, onFinalized, onSessionData }: Props) {
   const [session, setSession] = useState<SessionData | null>(null)
   const [connectionError, setConnectionError] = useState<string | null>(null)
   const [reconnecting, setReconnecting] = useState(false)
+  const [showUnclaimedModal, setShowUnclaimedModal] = useState(false)
+  const [finalizeError, setFinalizeError] = useState<string | null>(null)
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
@@ -36,6 +42,10 @@ export default function SessionRoom({ sessionId, participantName, isHost }: Prop
         setSession(msg.data)
         setConnectionError(null)
         setReconnecting(false)
+        if (onSessionData) onSessionData(msg.data)
+        if (msg.data.finalized && msg.data.finalizedBill && onFinalized) {
+          onFinalized(msg.data.finalizedBill)
+        }
       }
     }
 
@@ -43,7 +53,6 @@ export default function SessionRoom({ sessionId, participantName, isHost }: Prop
       if (event.code === 1008) {
         setConnectionError('Session not found or expired.')
       } else {
-        // Unexpected disconnect — show reconnect banner
         setReconnecting(true)
       }
     }
@@ -69,6 +78,29 @@ export default function SessionRoom({ sessionId, participantName, isHost }: Prop
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: 'unclaim', sessionId, participantName, itemId }))
     }
+  }
+
+  const handleFinalizeClick = () => {
+    if (!session) return
+    setFinalizeError(null)
+    const unclaimedCount = session.items.filter(
+      item => (session.claims[item.id] ?? []).length === 0
+    ).length
+    if (unclaimedCount > 0) {
+      setShowUnclaimedModal(true)
+    } else {
+      sendFinalize('split')
+    }
+  }
+
+  const sendFinalize = (handling: 'split' | 'host') => {
+    const ws = wsRef.current
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'finalize', sessionId, participantName, unclaimedHandling: handling }))
+    } else {
+      setFinalizeError('Could not finalize. Check your connection and try again.')
+    }
+    setShowUnclaimedModal(false)
   }
 
   const myTotalCents = session
@@ -130,13 +162,27 @@ export default function SessionRoom({ sessionId, participantName, isHost }: Prop
         {isHost && (
           <button
             type="button"
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-            onClick={() => {/* Phase 5 will wire this */}}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold"
+            onClick={handleFinalizeClick}
           >
             Finalize
           </button>
         )}
       </div>
+
+      {finalizeError && (
+        <p className="text-sm text-red-600 mt-2 text-center">{finalizeError}</p>
+      )}
+
+      {showUnclaimedModal && session && (
+        <UnclaimedModal
+          unclaimedCount={session.items.filter(
+            item => (session.claims[item.id] ?? []).length === 0
+          ).length}
+          onSplit={() => sendFinalize('split')}
+          onHostAbsorb={() => sendFinalize('host')}
+        />
+      )}
     </div>
   )
 }

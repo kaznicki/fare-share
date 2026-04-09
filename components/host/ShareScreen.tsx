@@ -7,7 +7,7 @@ interface Props {
   hostName: string
 }
 
-export default function ShareScreen({ sessionId }: Props) {
+export default function ShareScreen({ sessionId, hostName }: Props) {
   // window.location.origin accessed inside function body — NOT at module level
   // (avoids SSR crash; see RESEARCH.md Pitfall 3)
   const joinUrl = `${window.location.origin}/session/${sessionId}`
@@ -63,6 +63,14 @@ export default function ShareScreen({ sessionId }: Props) {
       >
         {copied ? 'Copied!' : 'Copy link'}
       </button>
+
+      <a
+        href={`/session/${sessionId}?name=${encodeURIComponent(hostName)}`}
+        className="w-full py-3 px-4 rounded-xl bg-indigo-600 text-white font-medium text-center
+                   hover:bg-indigo-700 transition-colors"
+      >
+        Join as host
+      </a>
 
       <p className="text-xs text-gray-400">Link expires in ~4 hours</p>
     </div>

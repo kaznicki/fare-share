@@ -94,6 +94,7 @@ export default function OcrReview({ initial, onComplete }: Props) {
       <TaxTipFields
         taxCents={taxCents}
         tipCents={tipCents}
+        subtotalCents={items.reduce((sum, it) => sum + it.priceCents * it.qty, 0)}
         onChangeTax={setTaxCents}
         onChangeTip={setTipCents}
       />

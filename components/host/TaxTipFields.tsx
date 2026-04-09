@@ -1,13 +1,16 @@
 'use client'
 
+const TIP_PRESETS = [15, 18, 20]
+
 interface Props {
   taxCents: number
   tipCents: number
+  subtotalCents: number
   onChangeTax: (cents: number) => void
   onChangeTip: (cents: number) => void
 }
 
-export default function TaxTipFields({ taxCents, tipCents, onChangeTax, onChangeTip }: Props) {
+export default function TaxTipFields({ taxCents, tipCents, subtotalCents, onChangeTax, onChangeTip }: Props) {
   return (
     <div className="sticky bottom-0 bg-white border-t p-4">
       <div className="flex gap-4">
@@ -29,8 +32,20 @@ export default function TaxTipFields({ taxCents, tipCents, onChangeTax, onChange
           </div>
         </label>
 
-        <label className="flex-1 flex flex-col gap-1">
+        <div className="flex-1 flex flex-col gap-1">
           <span className="text-sm font-medium text-gray-600">Tip</span>
+          <div className="flex gap-1 mb-1">
+            {TIP_PRESETS.map(pct => (
+              <button
+                key={pct}
+                type="button"
+                onClick={() => onChangeTip(Math.round(subtotalCents * pct / 100))}
+                className="flex-1 py-1 text-xs font-medium border border-gray-300 rounded hover:bg-blue-50 hover:border-blue-400 hover:text-blue-700 transition-colors"
+              >
+                {pct}%
+              </button>
+            ))}
+          </div>
           <div className="relative">
             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500">$</span>
             <input
@@ -45,7 +60,7 @@ export default function TaxTipFields({ taxCents, tipCents, onChangeTax, onChange
               }}
             />
           </div>
-        </label>
+        </div>
       </div>
     </div>
   )
