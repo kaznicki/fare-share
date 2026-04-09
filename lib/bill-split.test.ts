@@ -119,8 +119,8 @@ describe('billSplit', () => {
   })
 
   describe('shared items', () => {
-    it('splits a shared item cost via Math.round between 2 claimants', () => {
-      // 1 item at $10.01 shared by 2 => each gets Math.round(1001/2) = 501 cents
+    it('splits a shared item cost via LRM between 2 claimants', () => {
+      // 1 item at $10.01 shared by 2 => LRM gives Alice 501 cents, Bob 500 cents
       const result = billSplit({
         items: [item('a', 1001)],
         claims: { a: ['Alice', 'Bob'] },
@@ -132,7 +132,7 @@ describe('billSplit', () => {
       })
       const byName = Object.fromEntries(result.participants.map(p => [p.name, p]))
       expect(byName['Alice'].subtotalCents).toBe(501)
-      expect(byName['Bob'].subtotalCents).toBe(501)
+      expect(byName['Bob'].subtotalCents).toBe(500)
     })
   })
 
