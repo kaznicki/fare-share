@@ -1,5 +1,6 @@
 // Canonical domain types for Tab Splitter.
 // All monetary values are integer cents. No floats for money.
+import type { BillSplitResult } from '@/lib/bill-split'
 
 export interface Item {
   id: string
@@ -19,6 +20,9 @@ export interface SessionState {
   sockets: Set<import('ws').WebSocket>
   createdAt: number
   expiresAt: number
+  hostName: string
+  finalized: boolean
+  finalizedBill: BillSplitResult | null
 }
 
 // Shape returned by GET /api/sessions/[id] (sockets excluded)
@@ -41,3 +45,4 @@ export type ClientMessage =
   | { type: 'join'; sessionId: string; participantName: string }
   | { type: 'claim'; sessionId: string; participantName: string; itemId: string }
   | { type: 'unclaim'; sessionId: string; participantName: string; itemId: string }
+  | { type: 'finalize'; sessionId: string; participantName: string; unclaimedHandling: 'split' | 'host' }
