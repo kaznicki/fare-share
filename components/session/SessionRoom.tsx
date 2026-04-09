@@ -22,6 +22,11 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
   const [retryCount, setRetryCount] = useState(0)
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const onFinalizedRef = useRef(onFinalized)
+  const onSessionDataRef = useRef(onSessionData)
+
+  onFinalizedRef.current = onFinalized
+  onSessionDataRef.current = onSessionData
 
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
@@ -44,9 +49,9 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
         setSession(msg.data)
         setConnectionError(null)
         setReconnecting(false)
-        if (onSessionData) onSessionData(msg.data)
-        if (msg.data.finalized && msg.data.finalizedBill && onFinalized) {
-          onFinalized(msg.data.finalizedBill)
+        if (onSessionDataRef.current) onSessionDataRef.current(msg.data)
+        if (msg.data.finalized && msg.data.finalizedBill && onFinalizedRef.current) {
+          onFinalizedRef.current(msg.data.finalizedBill)
         }
       }
     }
