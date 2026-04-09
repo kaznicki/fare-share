@@ -99,8 +99,8 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: Bill-splitting math — proportional tax/tip in integer cents, Largest Remainder Method, zero-subtotal guard
-- [ ] 05-02: Summary UI — per-person view, host summary table, unclaimed item handler, finalize trigger
+- [x] 05-01: Bill-splitting math — proportional tax/tip in integer cents, Largest Remainder Method, zero-subtotal guard
+- [x] 05-02: Summary UI — per-person view, host summary table, unclaimed item handler, finalize trigger
 
 ## Progress
 
