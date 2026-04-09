@@ -26,7 +26,12 @@ export default function SessionRoom({ sessionId, participantName, isHost }: Prop
     }
 
     ws.onmessage = (event) => {
-      const msg = JSON.parse(event.data) as ServerMessage
+      let msg: ServerMessage
+      try {
+        msg = JSON.parse(event.data) as ServerMessage
+      } catch {
+        return  // ignore non-JSON frames
+      }
       if (msg.type === 'session-snapshot') {
         setSession(msg.data)
         setConnectionError(null)
@@ -53,11 +58,17 @@ export default function SessionRoom({ sessionId, participantName, isHost }: Prop
   }, [sessionId, participantName])
 
   const sendClaim = (itemId: string) => {
-    wsRef.current?.send(JSON.stringify({ type: 'claim', sessionId, participantName, itemId }))
+    const ws = wsRef.current
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'claim', sessionId, participantName, itemId }))
+    }
   }
 
   const sendUnclaim = (itemId: string) => {
-    wsRef.current?.send(JSON.stringify({ type: 'unclaim', sessionId, participantName, itemId }))
+    const ws = wsRef.current
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'unclaim', sessionId, participantName, itemId }))
+    }
   }
 
   const myTotalCents = session
