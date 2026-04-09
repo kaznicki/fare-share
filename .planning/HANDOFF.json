@@ -1,32 +1,42 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-09T14:30:59.369Z",
+  "timestamp": "2026-04-09T22:58:35.212Z",
   "phase": "05",
   "phase_name": "summary-and-finalization",
   "phase_dir": ".planning/phases/05-summary-and-finalization",
-  "plan": 2,
-  "task": 3,
-  "total_tasks": 3,
+  "plan": 3,
+  "task": 2,
+  "total_tasks": 2,
   "status": "paused",
   "completed_tasks": [
-    {"id": "05-01-T1", "name": "Install Vitest, create billSplit() with TDD, extend types", "status": "done", "commit": "5c98c6b"},
-    {"id": "05-01-T2", "name": "Wire session store, API, host name capture, finalize handler", "status": "done", "commit": "f1553c9"},
-    {"id": "05-02-T1", "name": "Wire ShareScreen host URL, JoinForm pre-fill, create UnclaimedModal", "status": "done", "commit": "3d35677"},
-    {"id": "05-02-T2", "name": "Wire SessionRoom finalize flow, create SummaryScreen, update session page", "status": "done", "commit": "3d35677"},
-    {"id": "05-02-T3", "name": "UAT verification — all 5 tests passed after 3 bug fixes", "status": "done", "commit": "3d35677"},
-    {"id": "code-review", "name": "Code review (gsd-code-review 05)", "status": "done", "commit": "3671230"}
+    {"id": 1, "name": "WR-05 normalize server-side host identity check to case-insensitive", "status": "done", "commit": "a062429"},
+    {"id": 2, "name": "WR-06 stabilize onFinalized/onSessionData via callback refs in SessionRoom", "status": "done", "commit": "60cdc54"},
+    {"id": 3, "name": "Code review (05-REVIEW.md)", "status": "done", "commit": "52ef1c0"},
+    {"id": 4, "name": "WR-01 fix shared-item test assertion (Bob=500 not 501)", "status": "done", "commit": "2593574"},
+    {"id": 5, "name": "Phase verification (05-VERIFICATION.md)", "status": "done", "commit": "109b9fa"},
+    {"id": 6, "name": "Human UAT checklist (05-HUMAN-UAT.md)", "status": "done", "commit": "1129259"}
   ],
   "remaining_tasks": [
-    {"id": "verify", "name": "Phase verification (gsd-verify-work 05 or gsd-verifier)", "status": "not_started"},
-    {"id": "code-review-fix", "name": "Address code review warnings (optional — WR-01 through WR-04)", "status": "not_started"}
+    {"id": 7, "name": "Browser UAT — 4 tests in 05-HUMAN-UAT.md", "status": "not_started"},
+    {"id": 8, "name": "Record UAT results with /gsd-audit-uat 05", "status": "not_started"},
+    {"id": 9, "name": "Fix WR-02 finalizeError visibility with /gsd-code-review-fix 05", "status": "not_started"},
+    {"id": 10, "name": "Security review with /gsd-secure-phase 05", "status": "not_started"},
+    {"id": 11, "name": "Phase completion", "status": "not_started"}
   ],
-  "blockers": [],
-  "human_actions_pending": [],
+  "blockers": [
+    {"description": "4 UAT items require live browser testing with two-tab WebSocket sessions", "type": "human_action", "workaround": "none — must be done manually"},
+    {"description": "WR-02 finalizeError renders behind fixed bottom bar — host gets no feedback on finalize failure", "type": "technical", "workaround": "run /gsd-code-review-fix 05"}
+  ],
+  "human_actions_pending": [
+    {"action": "Run 4 UAT tests in 05-HUMAN-UAT.md using npm run dev with two browser tabs", "context": "Verifier marked status human_needed — multi-client WebSocket behavior cannot be auto-verified", "blocking": true},
+    {"action": "Run /gsd-secure-phase 05 before phase completion", "context": "Security enforcement enabled, no SECURITY.md yet", "blocking": true}
+  ],
   "decisions": [
-    {"decision": "Math.round for shared item split (not LRM)", "rationale": "Code review WR-01 flags this as dropping cents on shared items — LRM fix is recommended before ship", "phase": "05"},
-    {"decision": "isHost derived from session snapshot hostName match (case-sensitive)", "rationale": "Code review WR-03 flags potential name collision — low risk for v1 but noted", "phase": "05"}
+    {"decision": "WR-05 fix: normalize both sides of host identity check with .trim().toLowerCase()", "rationale": "Server gate was using strict byte equality; casing mismatch silently dropped finalize message", "phase": "05"},
+    {"decision": "WR-06 fix: callback refs (onFinalizedRef/onSessionDataRef) instead of adding deps to useEffect", "rationale": "Adding callbacks to deps would reconnect WebSocket on every parent re-render; refs give latest callbacks without triggering reconnect", "phase": "05"},
+    {"decision": "WR-01 fix: Bill-split test assertion Bob=500 (LRM) not 501 (Math.round)", "rationale": "Test was written for old Math.round implementation; LRM correctly gives Alice 501, Bob 500 for $10.01/2 split", "phase": "05"}
   ],
   "uncommitted_files": [],
-  "next_action": "Run /gsd-verify-work 05 to complete phase verification, then optionally /gsd-code-review-fix 05 to address the 4 code review warnings",
-  "context_notes": "Phase 05 execution is complete. Both plans done, UAT passed (3 bugs found+fixed during verification), code review done (4 warnings, 3 info). Only phase verification remains. The verifier agent was about to be spawned when pause was triggered. vitest had to be npm-installed in main worktree after worktree merge."
+  "next_action": "Run `npm run dev` and complete the 4 UAT tests in .planning/phases/05-summary-and-finalization/05-HUMAN-UAT.md, then run /gsd-audit-uat 05",
+  "context_notes": "All 3 plans in Phase 05 are complete with summaries. Verification passed 5/5 automated checks. 4 human UAT items remain. Code review has 1 outstanding warning (WR-02) and 3 info items. Security gate not yet run."
 }
