@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-04-09T02:17:52.183Z",
+  "phase": "04",
+  "phase_name": "item-claiming",
+  "phase_dir": ".planning/phases/04-item-claiming",
+  "plan": 3,
+  "task": 0,
+  "total_tasks": 0,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "04-01: claim/unclaim WebSocket handlers + types", "status": "done", "commit": "901b675"},
+    {"id": 2, "name": "04-02: ClaimableItem + interactive SessionRoom", "status": "done", "commit": "ee702ef"},
+    {"id": 3, "name": "04-03: human verification checkpoint", "status": "done", "commit": "5114cd1"},
+    {"id": 4, "name": "Code review (3 warnings fixed)", "status": "done", "commit": "f87700b"},
+    {"id": 5, "name": "UAT (8/8 passed)", "status": "done", "commit": "4b74c38"}
+  ],
+  "remaining_tasks": [],
+  "blockers": [],
+  "human_actions_pending": [
+    {
+      "action": "Run /gsd-secure-phase 4 before advancing to Phase 5",
+      "context": "security_enforcement=true in config, no SECURITY.md exists for phase 04",
+      "blocking": false
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "Finalize button host-wiring deferred to Phase 5",
+      "rationale": "No hostName field on SessionState; Phase 5 needs host identity for finalization anyway",
+      "phase": "04"
+    }
+  ],
+  "uncommitted_files": [
+    ".planning/ROADMAP.md",
+    ".planning/config.json",
+    ".planning/research/FEATURES.md",
+    "components/host/OcrReview.tsx",
+    "components/host/TaxTipFields.tsx"
+  ],
+  "next_action": "Run /gsd-secure-phase 4, then /gsd-plan-phase 5 (Summary and Finalization — host identity + finalize flow)",
+  "context_notes": "Phase 4 fully complete. All claiming mechanics work: claim/unclaim, shared splits, real-time sync, footer total, reconnect banner. Code review fixed 3 warnings (name length cap, ws.readyState guard, JSON.parse try/catch). UAT 8/8 pass. Only remaining gate is security review before Phase 5."
+}
