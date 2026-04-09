@@ -1,9 +1,11 @@
 ---
 phase: 05-summary-and-finalization
-reviewed: 2026-04-09T00:00:00Z
+reviewed: 2026-04-09T12:00:00Z
 depth: standard
-files_reviewed: 12
+files_reviewed: 15
 files_reviewed_list:
+  - app/api/sessions/route.ts
+  - app/host/page.tsx
   - app/session/[id]/page.tsx
   - components/host/OcrReview.tsx
   - components/host/ShareScreen.tsx
@@ -11,16 +13,17 @@ files_reviewed_list:
   - components/session/SessionRoom.tsx
   - components/session/SummaryScreen.tsx
   - components/session/UnclaimedModal.tsx
+  - lib/bill-split.test.ts
   - lib/bill-split.ts
   - lib/session-store.ts
-  - app/api/sessions/route.ts
   - server.ts
   - types/index.ts
+  - vitest.config.ts
 findings:
   critical: 0
-  warning: 4
-  info: 3
-  total: 7
+  warning: 2
+  info: 4
+  total: 6
 status: issues_found
 ---
 
@@ -28,165 +31,158 @@ status: issues_found
 
 **Reviewed:** 2026-04-09
 **Depth:** standard
-**Files Reviewed:** 12
+**Files Reviewed:** 15
 **Status:** issues_found
 
 ## Summary
 
-All twelve source files were reviewed at standard depth. The codebase is well-structured: input validation via Zod, integer-cents math throughout, server-side authorization on finalize, and the LRM for tax/tip distribution are all solid. The WebSocket broadcast-on-every-change pattern is clean and easy to reason about.
+All fifteen source files were reviewed at standard depth. The previous four warnings (Math.round shared-item split, host-absent unclaimed drop, case-sensitive isHost, missing WebSocket reconnect) have all been correctly resolved. The bill-splitting math engine is now rigorous: LRM is applied to shared items, unclaimed handling guards the host-absent edge case, and the WebSocket reconnect implements exponential backoff.
 
-Four warnings and three info items were found. No critical (security/crash) issues exist. The most important finding is a math correctness bug in `bill-split.ts`: `Math.round` is used for shared-item cost splitting, which can silently lose or gain cents when an item is claimed by two or more people. A related silent-data-loss path exists when `unclaimedHandling === 'host'` but the host has not yet joined the session. Both issues affect the correctness of bills shown to users.
+Two new warnings were found. The most impactful is a broken test assertion in `bill-split.test.ts` — it was written to verify the old `Math.round` behavior and will fail against the current correct LRM implementation, silently undermining CI confidence. The second is a UI layout bug in `SessionRoom.tsx` where the finalize error message renders behind the fixed bottom bar and is invisible to the user.
+
+Four info-level items are also noted: a missing client-side item-count guard in `OcrReview`, redundant non-null assertions in `server.ts`, an inaccurate inline comment in `ShareScreen`, and a stale test description string.
 
 ---
 
 ## Warnings
 
-### WR-01: Shared-item split uses `Math.round`, losing/gaining cents
+### WR-01: Broken test assertion for shared-item LRM split
 
-**File:** `lib/bill-split.ts:94`
+**File:** `lib/bill-split.test.ts:134-135`
 
-**Issue:** When an item is claimed by N people, each claimant's share is computed as `Math.round(item.priceCents / claimants.length)`. For any item whose price does not divide evenly by the number of claimants, cents are silently lost or gained. Example: a $1.00 item (100 cents) split among 3 people gives each person `Math.round(33.33) = 33` cents, so only 99 cents are collected — 1 cent disappears from every participant's subtotal. Tax and tip use the correct Largest Remainder Method, but the subtotal stage does not, so the per-person totals in `SummaryScreen` will not sum to the actual bill total when shared items are present.
-
-**Fix:** Apply LRM to the per-item share distribution, the same way tax and tip are handled:
+**Issue:** The test "splits a shared item cost via Math.round between 2 claimants" asserts that both Alice and Bob receive 501 cents for a $10.01 item:
 
 ```ts
-// Replace lines 93-99 with:
-const claimantCount = claimants.length
-const base = Math.floor(item.priceCents / claimantCount)
-const remainder = item.priceCents % claimantCount
+expect(byName['Alice'].subtotalCents).toBe(501)  // line 134
+expect(byName['Bob'].subtotalCents).toBe(501)    // line 135
+```
 
-// Give 1 extra cent to the first `remainder` claimants (stable order)
-for (let k = 0; k < claimantCount; k++) {
-  const name = claimants[k]
-  if (subtotals[name] !== undefined) {
-    subtotals[name] += base + (k < remainder ? 1 : 0)
-  }
-}
+The test description and assertion were written for the old `Math.round` implementation (501 + 501 = 1002 > 1001 — actually gains a cent). The current code correctly uses LRM: `Math.floor(1001 / 2) = 500`, remainder `1`. Alice (index 0) gets `501`; Bob (index 1) gets `500`. Bob's assertion will **fail**. Running `vitest` will report a failing test, making CI unreliable.
+
+**Fix:** Correct the assertion and description to match LRM behavior:
+
+```ts
+it('splits a shared item cost via LRM between 2 claimants', () => {
+  // 1 item at $10.01 (1001 cents) shared by 2:
+  // base = floor(1001/2) = 500, remainder = 1
+  // Alice (index 0) gets 501, Bob (index 1) gets 500 — sum = 1001 exactly
+  const result = billSplit({
+    items: [item('a', 1001)],
+    claims: { a: ['Alice', 'Bob'] },
+    participants: ['Alice', 'Bob'],
+    taxCents: 0,
+    tipCents: 0,
+    unclaimedHandling: 'split',
+    hostName: 'Alice',
+  })
+  const byName = Object.fromEntries(result.participants.map(p => [p.name, p]))
+  expect(byName['Alice'].subtotalCents).toBe(501)
+  expect(byName['Bob'].subtotalCents).toBe(500)
+  // Verify no cents are lost
+  expect(byName['Alice'].subtotalCents + byName['Bob'].subtotalCents).toBe(1001)
+})
 ```
 
 ---
 
-### WR-02: Unclaimed cost silently dropped when host has not joined the WebSocket
+### WR-02: `finalizeError` renders behind the fixed bottom bar
 
-**File:** `lib/bill-split.ts:107-110`
+**File:** `components/session/SessionRoom.tsx:189-191`
 
-**Issue:** When `unclaimedHandling === 'host'`, the unclaimed total is added to `subtotals[hostName]` only if `subtotals[hostName] !== undefined`. `subtotals` is built by iterating `participants`, which is the list of names that sent a `join` WebSocket message. If the host created the session but navigated away before joining as a participant (e.g., closed the tab after seeing the QR code), `hostName` is not in `participants`, so `subtotals[hostName]` is `undefined` and the entire unclaimed cost is silently dropped from the bill. Nobody pays for those items.
+**Issue:** The finalize error paragraph is rendered inside the scrollable content `div` (line 147), positioned after the item list `ul`:
 
-**Fix:** Ensure `hostName` is always included in participants when `unclaimedHandling === 'host'`, or pre-seed the subtotals map with the host:
-
-```ts
-// In billSplit(), before Step 1, ensure hostName is seeded if host-absorb is selected:
-if (unclaimedHandling === 'host' && !participants.includes(hostName)) {
-  // Treat host as a participant for accounting purposes
-  participants = [...participants, hostName]
-}
-// Then continue building subtotals as normal.
+```tsx
+{finalizeError && (
+  <p className="text-sm text-red-600 mt-2 text-center">{finalizeError}</p>
+)}
 ```
 
-Alternatively, guarantee the host is added to `session.participants` server-side when the session is created (in `session-store.ts`), so the host is always present in the participants list before any client connects.
+The fixed bottom bar at line 174 uses `position: fixed; bottom: 0` and sits over the page. The item list has `mb-24` (96 px) to ensure content is not obscured by the bar. However, `finalizeError` is rendered after the `ul` in normal flow, placing it in the ~96 px gap region directly behind the fixed bar. The error message is invisible to the user unless they scroll further, which is also unlikely since the fixed bar covers the bottom viewport. The host receives no feedback that finalization failed.
 
----
+**Fix:** Move the error message inside the fixed bottom bar `div`, adjacent to the Finalize button:
 
-### WR-03: `isHost` detection uses case-sensitive name comparison; any name collision grants host UI
-
-**File:** `app/session/[id]/page.tsx:42`
-
-**Issue:** Host status is determined client-side by comparing `data.hostName === participantName`. This comparison is case-sensitive and string-exact. Two distinct problems arise:
-1. If the host's name was typed with different casing in the QR link versus what the server stored, the host will not see the Finalize button at all.
-2. Any other participant who happens to enter the exact same name as the host (including capitalisation) will receive `isHost = true` and see the Finalize button.
-
-The server correctly gates the `finalize` WebSocket message on `senderName !== session.hostName`, so this is a UI-only issue — a non-host who triggers finalize will be silently rejected by the server. However, the misleading UI state is confusing and the UI guard should match the server guard.
-
-**Fix:** Pass `isHost` down from the server in the session snapshot rather than deriving it client-side:
-
-```ts
-// In server.ts join branch, send a per-socket isHost field:
-const isHostForSender = name === session.hostName
-ws.send(JSON.stringify({
-  type: 'session-snapshot',
-  data,
-  isHost: isHostForSender,   // add to ServerMessage union in types/index.ts
-}))
-```
-
-If changing the protocol is out of scope for Phase 5, the minimal fix is to trim and normalise case when comparing: `data.hostName.trim().toLowerCase() === participantName.trim().toLowerCase()` — but this must match the server's comparison logic in `server.ts:140`.
-
----
-
-### WR-04: WebSocket reconnect sets `reconnecting` state but never retries the connection
-
-**File:** `components/session/SessionRoom.tsx:52-58`
-
-**Issue:** When the WebSocket closes with a non-1008 code (network drop, server restart), `setReconnecting(true)` is called and the yellow "Reconnecting..." banner appears. However, no retry logic is implemented — the component never creates a new WebSocket. The banner stays visible indefinitely until the user manually refreshes the page. For a real-time bill-splitting flow this means a participant who loses connectivity mid-session appears stuck and cannot claim or unclaim items.
-
-**Fix:** Implement exponential backoff reconnect using a ref-based timeout:
-
-```ts
-const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-ws.onclose = (event) => {
-  sessionStore.removeSocket(sessionId, ws)   // server-side cleanup already handled
-  if (event.code === 1008) {
-    setConnectionError('Session not found or expired.')
-  } else {
-    setReconnecting(true)
-    reconnectTimeoutRef.current = setTimeout(() => {
-      // Re-run the effect by bumping a retryCount state variable
-      setRetryCount(c => c + 1)
-    }, 3000)
-  }
-}
-
-// Add retryCount to the useEffect dependency array so the effect re-runs on increment.
-// Clean up the timeout in the effect's return function.
+```tsx
+<div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+  <div className="flex items-center justify-between">
+    <span className="text-lg font-semibold text-gray-900">
+      Your total: ${(myTotalCents / 100).toFixed(2)}
+    </span>
+    {isHost && (
+      <button
+        type="button"
+        className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold"
+        onClick={handleFinalizeClick}
+      >
+        Finalize
+      </button>
+    )}
+  </div>
+  {finalizeError && (
+    <p className="text-sm text-red-600 mt-1 text-center">{finalizeError}</p>
+  )}
+</div>
 ```
 
 ---
 
 ## Info
 
-### IN-01: Unnecessary `sessionId!` non-null assertions inside the message handler
+### IN-01: No client-side guard when zero items exist in OcrReview
 
-**File:** `server.ts:66, 73, 75, 91, 102, 111, 122, 125, 135, 158, 161, 163`
+**File:** `components/host/OcrReview.tsx:114-120`
 
-**Issue:** `sessionId` is declared as `string | null` from `url.searchParams.get('session')`, and the connection handler immediately returns if it is null or the session does not exist (lines 22-25). Every subsequent use of `sessionId` inside the same handler scope is therefore guaranteed non-null, but the code uses `sessionId!` throughout. These assertions are not incorrect, but they add visual noise and would mask a future refactor that removes the early return.
+**Issue:** The "Create Session" button is disabled only when `isPending || !hostName.trim()`. If the host deletes all items, the button remains enabled. The POST to `/api/sessions` will be rejected with HTTP 400 (the Zod schema requires `items.min(1)`), and the user sees the generic "Could not create session. Please try again." banner instead of a specific message. The zero-item warning banner is shown correctly (line 56-60), but the button is not disabled.
 
-**Fix:** Narrow the type once at the top of the handler:
+**Fix:** Add `items.length === 0` to the disabled condition:
 
-```ts
-if (!sessionId || !sessionStore.has(sessionId)) {
-  ws.close(1008, 'Session not found')
-  return
-}
-// sessionId is narrowed to string here — no ! needed below.
-const safeSessionId: string = sessionId
+```tsx
+disabled={isPending || !hostName.trim() || items.length === 0}
 ```
 
-Then replace all `sessionId!` references with `safeSessionId`.
+Optionally, update the button label or error message to specifically call out the empty state.
 
 ---
 
-### IN-02: `grandTotal` in SummaryScreen sums `totalCents` rather than using a receipt-level total
+### IN-02: Redundant non-null assertions on `sessionId` in `server.ts`
 
-**File:** `components/session/SummaryScreen.tsx:16`
+**File:** `server.ts:66, 73, 74, 75, 91, 102, 111, 122, 125, 135, 158, 161, 163`
 
-**Issue:** `grandTotal` is computed as `bill.participants.reduce((s, p) => s + p.totalCents, 0)`. Because `bill-split.ts` uses `Math.round` for shared items (WR-01), this sum may not equal the actual receipt total (`itemsTotal + taxCents + tipCents`). The discrepancy will be visible to the host in the "Everyone's totals" table. This is a downstream symptom of WR-01; fixing WR-01 resolves this automatically. No standalone fix needed until WR-01 is addressed.
+**Issue:** `sessionId` is narrowed to be non-null by the early-return guard at line 22 (`if (!sessionId || !sessionStore.has(sessionId))`). Every subsequent use of `sessionId` inside the same closure is guaranteed non-null, but the code uses `sessionId!` throughout the message handler. These are not incorrect, but they add visual noise and would silently suppress a TypeScript error if the early-return guard were ever removed during a refactor.
+
+**Fix:** Narrow the type once after the guard:
+
+```ts
+// After line 25 (the early-return block):
+const safeSessionId = sessionId  // TypeScript infers string (non-null narrowed)
+```
+
+Then replace all `sessionId!` occurrences inside the handler with `safeSessionId`.
 
 ---
 
-### IN-03: `window.location.origin` comment overstates SSR safety rationale
+### IN-03: Inaccurate SSR-safety comment in `ShareScreen`
 
 **File:** `components/host/ShareScreen.tsx:11-13`
 
-**Issue:** The comment says `window.location.origin` is safe because it is "inside function body — NOT at module level". The actual protection is the `'use client'` directive on line 1, which prevents the component from executing during server-side rendering. Accessing `window` inside a function body at module level (e.g., `const x = () => window.location`) would still crash during SSR in a server component. The comment could mislead a future developer who copies the pattern into a server component.
+**Issue:** The comment states `window.location.origin` is safe because it is "inside function body — NOT at module level". This reasoning is incomplete. The actual protection is the `'use client'` directive, which prevents the component from running during SSR. A developer who copies this pattern into a server component based on the comment would produce an SSR crash, since the guard described ("function body, not module level") does not apply there.
 
-**Fix:** Update the comment to clarify the actual reason:
+**Fix:** Replace the comment to name the actual protection:
 
 ```ts
-// Safe to access window here because this is a 'use client' component —
-// it only renders in the browser, never during SSR.
+// Safe to access window here: 'use client' ensures this component only runs
+// in the browser, never during SSR. Remove 'use client' and this will crash.
 const joinUrl = `${window.location.origin}/session/${sessionId}`
 ```
+
+---
+
+### IN-04: Stale test description still references `Math.round`
+
+**File:** `lib/bill-split.test.ts:122`
+
+**Issue:** The `describe` block at line 121 and the test description at line 122 both say "splits a shared item cost via Math.round". The implementation was changed to LRM (the `Math.round` fix was part of WR-01 in the prior review). The description text is now misleading to anyone reading the test output or the file.
+
+**Fix:** Update the test description string (covered by the WR-01 fix above — this is the same test case).
 
 ---
 
