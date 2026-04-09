@@ -39,7 +39,7 @@ function SessionPageInner({ sessionId }: { sessionId: string }) {
             setScreen('summary')
           }}
           onSessionData={(data: SessionData) => {
-            if (!isHost && data.hostName === participantName) {
+            if (!isHost && data.hostName.trim().toLowerCase() === participantName.trim().toLowerCase()) {
               setIsHost(true)
             }
           }}
