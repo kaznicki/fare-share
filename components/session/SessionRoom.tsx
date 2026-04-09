@@ -19,7 +19,9 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
   const [reconnecting, setReconnecting] = useState(false)
   const [showUnclaimedModal, setShowUnclaimedModal] = useState(false)
   const [finalizeError, setFinalizeError] = useState<string | null>(null)
+  const [retryCount, setRetryCount] = useState(0)
   const wsRef = useRef<WebSocket | null>(null)
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
@@ -54,6 +56,11 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
         setConnectionError('Session not found or expired.')
       } else {
         setReconnecting(true)
+        // Schedule reconnect with exponential backoff (3 s, 6 s, 12 s, …, max 30 s)
+        const delay = Math.min(3000 * Math.pow(2, retryCount), 30000)
+        reconnectTimeoutRef.current = setTimeout(() => {
+          setRetryCount(c => c + 1)
+        }, delay)
       }
     }
 
@@ -62,9 +69,13 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
     }
 
     return () => {
+      if (reconnectTimeoutRef.current !== null) {
+        clearTimeout(reconnectTimeoutRef.current)
+        reconnectTimeoutRef.current = null
+      }
       ws.close()
     }
-  }, [sessionId, participantName])
+  }, [sessionId, participantName, retryCount])
 
   const sendClaim = (itemId: string) => {
     const ws = wsRef.current
