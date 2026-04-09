@@ -51,12 +51,15 @@ wss.on('connection', (ws, req) => {
 
     if (typeof msg !== 'object' || msg === null) return
 
+    const MAX_NAME_LEN = 64
+    const MAX_ID_LEN = 64
+
     // join branch
     if (
       (msg as any).type === 'join' &&
       typeof (msg as any).participantName === 'string'
     ) {
-      const name = ((msg as any).participantName as string).trim()
+      const name = ((msg as any).participantName as string).trim().slice(0, MAX_NAME_LEN)
       if (!name) return
 
       const session = sessionStore.get(sessionId!)
@@ -79,8 +82,8 @@ wss.on('connection', (ws, req) => {
       typeof (msg as any).itemId === 'string' &&
       typeof (msg as any).participantName === 'string'
     ) {
-      const itemId = (msg as any).itemId as string
-      const name = ((msg as any).participantName as string).trim()
+      const itemId = ((msg as any).itemId as string).slice(0, MAX_ID_LEN)
+      const name = ((msg as any).participantName as string).trim().slice(0, MAX_NAME_LEN)
       if (!name) return
 
       const session = sessionStore.get(sessionId!)
@@ -106,8 +109,8 @@ wss.on('connection', (ws, req) => {
       typeof (msg as any).itemId === 'string' &&
       typeof (msg as any).participantName === 'string'
     ) {
-      const itemId = (msg as any).itemId as string
-      const name = ((msg as any).participantName as string).trim()
+      const itemId = ((msg as any).itemId as string).slice(0, MAX_ID_LEN)
+      const name = ((msg as any).participantName as string).trim().slice(0, MAX_NAME_LEN)
       if (!name) return
 
       const session = sessionStore.get(sessionId!)
