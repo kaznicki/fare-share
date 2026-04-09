@@ -21,7 +21,7 @@ The STACK.md researcher recommends **Tesseract.js (client-side OCR)** while ARCH
 Features users expect from an item-level bill splitter. Missing any of these = product feels broken or unusable.
 
 | Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
+| --- | --- | --- | --- |
 | Receipt photo capture | Core premise of the product — no manual entry | Low | `<input type="file" capture="environment">` is sufficient; getUserMedia optional enhancement |
 | Automatic line item extraction (OCR) | The differentiating action that saves time vs. manual entry | Medium | Server-side Vision API for structured JSON; see OCR section |
 | Manual item correction | OCR is never 100%; users must be able to fix name/price/qty errors before claiming begins | Medium | Per-project requirement (explicitly requested). Inline edit UX |
@@ -41,7 +41,7 @@ Features users expect from an item-level bill splitter. Missing any of these = p
 Features that set Tab Splitter apart from generic bill splitters (Splitwise, Venmo, calculator). Not expected by everyone, but meaningfully valued.
 
 | Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
+| --- | --- | --- | --- |
 | Item-level OCR (not just total amount) | Splitwise splits the total; this splits by what you actually ate | High (OCR) | The core differentiator vs. all generic bill splitters |
 | Real-time collaborative claiming on individual phones | Vs. one person assigning everyone's items — participants own their own claims | Medium | Nowa and Tab apps use this model; builds trust |
 | No app download required for participants | Participants use a mobile browser; zero install friction | Low | Confirmed differentiator: BillBob explicitly markets "friends don't need the app" |
@@ -55,7 +55,7 @@ Features that set Tab Splitter apart from generic bill splitters (Splitwise, Ven
 Features to explicitly NOT build in v1. Each one either adds disproportionate complexity, contradicts the ephemeral design, or solves a problem the product doesn't have.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
+| --- | --- | --- |
 | User accounts / login | The product is explicitly ephemeral; accounts add sign-up friction that kills adoption at restaurants | Keep it anonymous with just a name field per session |
 | Payment processing (Venmo/PayPal integration) | Adds legal, compliance (PCI), and integration complexity; out of scope per project definition | Show totals only; let people pay each other externally |
 | Session history / receipt archive | Requires persistent storage (database), contradicts ephemeral design | Let session expire after 4 hours; done |
@@ -220,9 +220,9 @@ Each session is a PartyKit room. All participants connect to the same room. The 
 **Messages the WebSocket layer handles:**
 
 | Message Type | Direction | Payload | Effect |
-|-------------|-----------|---------|--------|
+| --- | --- | --- | --- |
 | `join` | Client → Server | `{ name: string }` | Register participant; broadcast `participant-joined` |
-| `claim` | Client → Server | `{ itemId: string, action: "add" \| "remove" }` | Update room state; broadcast `state-update` |
+| `claim` | Client → Server | `{ itemId: string, action: "add" \ | "remove" }` | Update room state; broadcast `state-update` |
 | `participant-joined` | Server → All | `{ name: string, participants: string[] }` | Refresh participant list |
 | `state-update` | Server → All | `{ claims: Record<itemId, string[]> }` | Re-render item list with claim indicators |
 | `session-finalized` | Server → All | `{ totals: Record<name, number> }` | Navigate to summary screen |
@@ -536,7 +536,7 @@ The WebSocket real-time layer is needed before claiming can be built. Everything
 ## Sources
 
 | Finding | Source | Confidence |
-|---------|--------|------------|
+| --- | --- | --- |
 | Tab target minimums (48×48px) | [web.dev accessible tap targets](https://web.dev/articles/accessible-tap-targets), [NN/G touch target size](https://www.nngroup.com/articles/touch-target-size/) | HIGH |
 | WCAG 2.2 Level AA: 24×24px minimum, 44×44px recommended | [Smashing Magazine accessible tap targets](https://www.smashingmagazine.com/2023/04/accessible-tap-target-sizes-rage-taps-clicks/) | HIGH |
 | 8px minimum gap between tap targets | [web.dev accessible tap targets](https://web.dev/articles/accessible-tap-targets) | HIGH |

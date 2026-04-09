@@ -82,9 +82,9 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 04-01: Claim WebSocket message handlers — append-only Set model, deduplication, full-state broadcast
-- [ ] 04-02: Item list UI with tap-to-claim, visual states (unclaimed / mine / shared / theirs), real-time price split display
-- [ ] 04-03: Zustand store wiring — WebSocket messages update store; components read from store (prevents React 19 state tearing)
+- [x] 04-01: Claim WebSocket message handlers — append-only Set model, deduplication, full-state broadcast
+- [x] 04-02: Item list UI with tap-to-claim, visual states (unclaimed / mine / shared / theirs), real-time price split display
+- [x] 04-03: Zustand store wiring — WebSocket messages update store; components read from store (prevents React 19 state tearing)
 
 ### Phase 5: Summary and Finalization
 **Goal**: Host can finalize the session and every participant immediately sees their exact total owed, calculated using proportional tax and tip with cent-accurate math that sums exactly to the receipt total
