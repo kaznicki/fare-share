@@ -1,0 +1,76 @@
+# Requirements: Tab Splitter v1.1
+
+## v1.1 Requirements
+
+### Real OCR — Live Receipt Processing
+
+**OCR-05** — Host can set a real `OPENAI_API_KEY` in `.env.local` and successfully process a photographed receipt through live GPT-4o Vision OCR (not mock mode).
+
+**OCR-06** — The app is validated against a set of real restaurant receipts — items, prices, and quantities extract with acceptable accuracy suitable for the correction-first workflow.
+
+**OCR-07** — The GPT-4o prompt is tuned (if needed) so common receipt patterns — grand total lines, tax lines, multi-item rows, and currency symbols — are correctly parsed and excluded or included appropriately.
+
+---
+
+### DISP — Display Improvements
+
+**DISP-01** — The OcrReview screen shows the bill total (sum of all item prices + tax + tip) before the host creates the session, so the host can verify the total matches the receipt.
+
+---
+
+### UX — UX Fixes
+
+**UX-01** — Tip selector buttons visually indicate the currently selected tip option (e.g., highlighted background or contrasting text) so the host can see which tip percentage is active.
+
+**UX-02** — Host can unfinalize a session from the summary screen and return to the claiming view with all existing claims preserved — no one needs to re-claim their items.
+
+---
+
+### VIS — Visual Polish
+
+**VIS-01** — Targeted visual polish is applied across all screens: spacing, colors, and typography are consistent and intentional without a full redesign.
+
+---
+
+## Coverage Summary
+
+| ID | Category | Phase |
+|----|----------|-------|
+| OCR-05 | Real OCR setup | TBD |
+| OCR-06 | Real receipt validation | TBD |
+| OCR-07 | Prompt tuning | TBD |
+| DISP-01 | Bill total display | TBD |
+| UX-01 | Tip selector fix | TBD |
+| UX-02 | Unfinalize flow | TBD |
+| VIS-01 | Visual polish | TBD |
+
+**Total v1.1 requirements: 7**
+**All mapped to a phase: pending roadmap**
+
+---
+
+## v2 Requirements (Deferred)
+
+- Live camera viewfinder with crop guidance overlay (getUserMedia + canvas)
+- Share individual total via native share sheet (`navigator.share()`)
+- PWA offline support / installable app
+- Session expiry countdown indicator
+- OCR confidence flagging — visually highlight low-confidence rows
+- Camera image quality guidance at capture time
+- Host item override after claiming has started
+- "Add to home screen" PWA install prompt
+
+---
+
+## Out of Scope
+
+- User accounts, login, or session history — sessions are ephemeral and anonymous
+- In-app payment processing — the app shows what each person owes; they settle externally
+- Even-split mode — this product is item-level splitting only
+- Custom tip percentage per person — tip is distributed proportionally
+- Editing item prices after claiming has started — items lock at session creation
+- Multi-currency support
+- In-app chat or dispute resolution
+- Native mobile app (iOS/Android) — mobile web browser only
+- Barcode or menu scanning — receipt splitting only
+- Session history or receipt archive — disposable sessions only
