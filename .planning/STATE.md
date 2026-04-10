@@ -1,92 +1,64 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: completed
+stopped_at: Completed 03-real-time-layer/03-02-PLAN.md — JoinForm + SessionRoom + session/[id] page. Phase 3 complete (2/2 plans). Ready for Phase 4 (Claims).
+last_updated: "2026-04-10T18:35:24.746Z"
+last_activity: 2026-04-10
+progress:
+  total_phases: 5
+  completed_phases: 5
+  total_plans: 16
+  completed_plans: 16
+  percent: 100
+---
+
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-20)
+See: .planning/PROJECT.md (updated 2026-04-10)
 
 **Core value:** Everyone pays exactly what they ordered (plus proportional tax and tip) without doing any mental math
-**Current focus:** Phase 3 (Real-Time Layer) — Plans 01 and 02 complete (join handler + participant page), Phase 3 complete
+**Current focus:** v1.0 milestone shipped — planning next milestone
 
 ## Current Position
 
-Phase: 3 of 5 (complete)
-Plan: 2 of 2 in current phase (complete)
-Status: Phase 3 complete — both plans done (ws handler + participant page). Ready for Phase 4 (Claims).
-Last activity: 2026-02-22 — Plan 03-02 complete (JoinForm, SessionRoom, session/[id] page — full participant join flow)
+Phase: 5 of 5 (complete — all phases done)
+Status: v1.0 milestone complete and archived
+Last activity: 2026-04-10
 
-Progress: [█████░░░░░] 62% (8 of 13 total plans)
-
-## Performance Metrics
-
-**Velocity:**
-- Total plans completed: 8
-- Average duration: ~3.4 min
-- Total execution time: ~25 min
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 1. Foundation | 3/3 | ~11 min | ~3.7 min |
-| 2. Host Flow | 4/4 | ~8 min | ~2.0 min |
-| 3. Real-Time Layer | 2/2 | ~12 min | ~6 min |
-
-**Recent Trend:**
-- Last 5 plans: 02-04 (5 min), 02-05 (5 min), 03-01 (8 min), 03-02 (4 min)
-- Trend: Stable — Phase 3 plans averaged 6 min each
-
-*Updated after each plan completion*
-| Phase 02-host-flow P02 | 2 | 2 tasks | 4 files |
-| Phase 02-host-flow P04 | 5 | 1 task | 0 files |
-| Phase 02-host-flow P05 (gap closure) | 5 | 2 tasks | 3 files |
-| Phase 03-real-time-layer P01 | 8 | 1 tasks | 2 files |
-| Phase 03-real-time-layer P02 | 4 | 2 tasks | 3 files |
+Progress: [██████████] 100% (16 of 16 total plans)
 
 ## Accumulated Context
 
 ### Decisions
 
-- **OCR engine:** Server-side GPT-4o Vision API (not Tesseract.js). Manual correction is an explicit v1 requirement, implying OCR must be good enough that corrections are occasional fixes — Tesseract on thermal receipt fonts produces too many errors. Server is already required for WebSockets so no extra infrastructure cost. If GPT-4o costs are unacceptable, the UI contract (`{ id, name, price, qty }`) is identical and the swap to Tesseract is isolated to `POST /api/ocr`.
-- **Real-time layer:** Custom `ws` WebSocket server attached to Next.js custom HTTP server (not PartyKit). Server-side OCR requires a server anyway; custom ws adds no extra infrastructure and avoids PartyKit's free-tier 10-project limit.
-- **Deployment target:** Railway, Fly.io, or Render — NOT Vercel. Vercel serverless does not support persistent WebSocket connections.
-- **Money math:** All prices stored as integer cents from day one. Floating-point arithmetic is never used for monetary values. Largest Remainder Method for shared item and tax/tip distribution.
-- **Claims model:** Append-only Set per item (`claims[itemId] = Set<participantName>`). No single-owner model. Full-state broadcast after every change. Full snapshot sent on every WebSocket connect (handles reconnects).
-- **WebSocket routing:** noServer: true mode — routes upgrade events manually; /ws goes to wss, /_next/webpack-hmr delegated to Next.js HMR handler, all other paths destroyed.
-- **Dev script:** tsx watch server.ts (not next dev) — bypasses Next.js built-in server to ensure custom server with WebSocket runs.
-- **getData() helper pattern:** Store exposes getData() to strip non-serializable fields (sockets Set) before JSON serialization — route handlers never destructure manually.
-- **Double validation (Zod + store boundary):** Zod rejects floats at API boundary; store's Number.isInteger check provides defense-in-depth for non-HTTP callers (WebSocket handlers, test scripts).
-- **No edge runtime:** Session store uses Map and setTimeout — incompatible with edge runtime. No `export const runtime = 'edge'` in session API routes.
-- **OCR: response_format json_object + Zod:** Used response_format: json_object + ReceiptSchema.parse() instead of zodResponseFormat for vision inputs — safer for probabilistic image understanding outputs.
-- **OCR lazy client:** getOpenAI() singleton prevents "No API key" error when module imported before app.prepare() loads .env.local.
-- **OCR math:** Math.round(dollars * 100) for cent conversion — ### Decisions
+Full decision log archived in `.planning/milestones/v1.0-ROADMAP.md` and PROJECT.md Key Decisions table.
 
-2.99 * 100 = 1298.9999... rounds to 1299 correctly; never Math.floor or parseInt.
-- **OCR mock mode:** USE_OCR_MOCK=true env var bypasses GPT-4o API, returns deterministic 4-item fixture for cost-free UI development.
-- **Three-screen host flow state machine:** app/host/page.tsx owns screen state ('capture' | 'reviewing' | 'share') via conditional rendering — no router navigation, keeps ephemeral OCR data in memory without URL serialization.
-- **OCR-04 error path (corrected in 02-05):** CameraCapture catch block calls only setError() — onComplete() is exclusively in the "Continue anyway" button onClick. This keeps the error banner visible until the host consciously chooses to proceed.
-- **Stub components without 'use client':** OcrReview.tsx and ShareScreen.tsx stubs intentionally omit 'use client' — Plans 02 and 03 own that directive when implementing the real components.
-- **ShareScreen QR card wrapper:** White card (`bg-white rounded-2xl shadow-md p-4`) wraps QRCodeSVG to ensure scan contrast against any page background. UI theme stays flexible.
-- **Clipboard copy pattern:** navigator.clipboard.writeText() + document.execCommand fallback — covers Safari and non-HTTPS localhost preview environments.
-- [Phase 02-host-flow]: qty expansion (CORR-05) in POST /api/sessions via flatMap — session store receives only qty:1 items
-- [Phase 02-host-flow]: Tap-to-edit pattern: editingField state in ItemRow, autoFocus input, onBlur commits; never contenteditable
-- [Phase 02-host-flow]: TaxTipFields uses key prop trick (key={taxCents/tipCents}) to reset defaultValue after blur — no controlled input needed
-- [Phase 02-host-flow gap closure]: autoFocusName prop + newItemId state pattern — parent tracks last-added item id, passes autoFocusName only to that row, clears on first onChange; avoids re-focus on blur/re-render
-- [Phase 03-real-time-layer]: globalThis singleton for session store: Next.js App Router module isolation requires globalThis.__tabSplitterSessionStore to share Map across route handlers and WebSocket server
-- [Phase 03-real-time-layer 03-02]: use(params) not async/await for dynamic params in Client Components — React.use() unwraps the Promise synchronously; async function is Server Component only
-- [Phase 03-real-time-layer 03-02]: WebSocket in useRef not useState — prevents re-renders when socket sends messages; only session data lives in state
-- [Phase 03-real-time-layer 03-02]: Two-screen state machine in page: page owns screen + participantName state; JoinForm and SessionRoom are pure components — same pattern as host/page.tsx
+Key architectural decisions for reference:
+- Integer cents throughout; Largest Remainder Method for all rounding
+- globalThis singleton for session store (Next.js App Router module isolation)
+- Callback ref pattern for stable WebSocket handlers (onFinalizedRef, onSessionDataRef)
+- Host identity always normalized via .trim().toLowerCase() on both sides
+- Full-state broadcast on every WebSocket message (enables reconnect for free)
+- Deployment: Railway/Fly.io/Render (not Vercel — persistent WebSocket required)
 
 ### Pending Todos
 
-None yet.
+See `.planning/todos/pending/` for 4 open items:
+- 001: Bill total display should include tax
+- 002: Unfinalize/go-back option
+- 003: Tip selector buttons not working
+- 004: Add visual design elements
 
 ### Blockers/Concerns
 
-- OCR accuracy on real restaurant receipts is unvalidated. Validate before building Phase 2 correction UI by photographing 5-10 real receipts. If accuracy is below 80%, the correction step becomes the primary workflow rather than a safety net — the product still functions but feels heavier.
-- OpenAI API key must be set in .env.local before real OCR testing. Mock mode (USE_OCR_MOCK=true) covers all UI development without the key.
+- OCR accuracy on real restaurant receipts unvalidated — real `OPENAI_API_KEY` needed; `USE_OCR_MOCK=true` still set
 
 ## Session Continuity
 
-Last session: 2026-02-22T00:33:47Z
-Stopped at: Completed 03-real-time-layer/03-02-PLAN.md — JoinForm + SessionRoom + session/[id] page. Phase 3 complete (2/2 plans). Ready for Phase 4 (Claims).
-Resume file: None
+Last session: 2026-04-10
+Stopped at: v1.0 milestone complete — archived to .planning/milestones/
+Resume with: /gsd-new-milestone to define v1.1 requirements
