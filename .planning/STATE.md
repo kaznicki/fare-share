@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: completed
-stopped_at: Completed 03-real-time-layer/03-02-PLAN.md — JoinForm + SessionRoom + session/[id] page. Phase 3 complete (2/2 plans). Ready for Phase 4 (Claims).
-last_updated: "2026-04-10T18:35:24.746Z"
+milestone: v1.1
+milestone_name: Real Receipts & Polish
+status: in_progress
+stopped_at: Roadmap created for v1.1 — Phases 6-8 defined, ready to plan Phase 6
+last_updated: "2026-04-10T00:00:00.000Z"
 last_activity: 2026-04-10
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 16
-  completed_plans: 16
-  percent: 100
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,24 +21,32 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-10)
 
 **Core value:** Everyone pays exactly what they ordered (plus proportional tax and tip) without doing any mental math
-**Current focus:** v1.0 milestone shipped — planning next milestone
+**Current focus:** v1.1 milestone — Live OCR validation, UX/display fixes, visual polish
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements for v1.1
-Last activity: 2026-04-10 — Milestone v1.1 started
+Phase: 6 — Live OCR
+Plan: — (not yet planned)
+Status: Ready to plan Phase 6
+Last activity: 2026-04-10 — v1.1 roadmap created
 
 Progress: [░░░░░░░░░░] 0% (0 of TBD plans)
+
+## v1.1 Phase Overview
+
+| Phase | Goal | Requirements | Status |
+|-------|------|--------------|--------|
+| 6. Live OCR | Real GPT-4o OCR validated on actual receipts | OCR-05, OCR-06, OCR-07 | Not started |
+| 7. UX & Display Fixes | Bill total on OcrReview, tip selected state, unfinalize flow | DISP-01, UX-01, UX-02 | Not started |
+| 8. Visual Polish | Consistent spacing, color, typography across all screens | VIS-01 | Not started |
 
 ## Accumulated Context
 
 ### Decisions
 
-Full decision log archived in `.planning/milestones/v1.0-ROADMAP.md` and PROJECT.md Key Decisions table.
+Full v1.0 decision log archived in `.planning/milestones/v1.0-ROADMAP.md` and PROJECT.md Key Decisions table.
 
-Key architectural decisions for reference:
+Key architectural decisions carried forward:
 - Integer cents throughout; Largest Remainder Method for all rounding
 - globalThis singleton for session store (Next.js App Router module isolation)
 - Callback ref pattern for stable WebSocket handlers (onFinalizedRef, onSessionDataRef)
@@ -46,20 +54,19 @@ Key architectural decisions for reference:
 - Full-state broadcast on every WebSocket message (enables reconnect for free)
 - Deployment: Railway/Fly.io/Render (not Vercel — persistent WebSocket required)
 
-### Pending Todos
+### v1.0 Todos Carried Into v1.1
 
-See `.planning/todos/pending/` for 4 open items:
-- 001: Bill total display should include tax
-- 002: Unfinalize/go-back option
-- 003: Tip selector buttons not working
-- 004: Add visual design elements
+- 001: Bill total display should include tax → DISP-01 (Phase 7)
+- 002: Unfinalize/go-back option → UX-02 (Phase 7)
+- 003: Tip selector buttons not working → UX-01 (Phase 7)
+- 004: Add visual design elements → VIS-01 (Phase 8)
 
 ### Blockers/Concerns
 
-- OCR accuracy on real restaurant receipts unvalidated — real `OPENAI_API_KEY` needed; `USE_OCR_MOCK=true` still set
+- OCR accuracy on real restaurant receipts unvalidated — real `OPENAI_API_KEY` needed; `USE_OCR_MOCK=true` still set in `.env.local`
 
 ## Session Continuity
 
 Last session: 2026-04-10
-Stopped at: v1.0 milestone complete — archived to .planning/milestones/
-Resume with: /gsd-new-milestone to define v1.1 requirements
+Stopped at: v1.1 roadmap created — Phases 6, 7, 8 defined
+Resume with: `/gsd-plan-phase 6` to plan Live OCR phase

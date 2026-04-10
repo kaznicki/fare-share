@@ -36,16 +36,16 @@
 
 | ID | Category | Phase |
 |----|----------|-------|
-| OCR-05 | Real OCR setup | TBD |
-| OCR-06 | Real receipt validation | TBD |
-| OCR-07 | Prompt tuning | TBD |
-| DISP-01 | Bill total display | TBD |
-| UX-01 | Tip selector fix | TBD |
-| UX-02 | Unfinalize flow | TBD |
-| VIS-01 | Visual polish | TBD |
+| OCR-05 | Real OCR setup | Phase 6 |
+| OCR-06 | Real receipt validation | Phase 6 |
+| OCR-07 | Prompt tuning | Phase 6 |
+| DISP-01 | Bill total display | Phase 7 |
+| UX-01 | Tip selector fix | Phase 7 |
+| UX-02 | Unfinalize flow | Phase 7 |
+| VIS-01 | Visual polish | Phase 8 |
 
 **Total v1.1 requirements: 7**
-**All mapped to a phase: pending roadmap**
+**All mapped to a phase: 7/7 ✓**
 
 ---
 

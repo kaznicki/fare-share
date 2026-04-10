@@ -3,6 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 MVP** — Phases 1–5 (shipped 2026-04-10)
+- [ ] **v1.1 Real Receipts & Polish** — Phases 6–8 (in progress)
 
 ## Phases
 
@@ -19,6 +20,46 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 
 </details>
 
+### v1.1 Real Receipts & Polish (Phases 6–8)
+
+- [ ] **Phase 6: Live OCR** — Real API key wired, prompt tuned, validated on actual restaurant receipts
+- [ ] **Phase 7: UX & Display Fixes** — Bill total on OcrReview, tip selector selected state, unfinalize flow
+- [ ] **Phase 8: Visual Polish** — Consistent spacing, color, and typography across all screens
+
+## Phase Details
+
+### Phase 6: Live OCR
+**Goal**: The app processes real restaurant receipts through live GPT-4o Vision OCR with acceptable accuracy
+**Depends on**: Phase 5 (v1.0 complete)
+**Requirements**: OCR-05, OCR-06, OCR-07
+**Success Criteria** (what must be TRUE):
+  1. Host sets a real `OPENAI_API_KEY` in `.env.local`, disables mock mode, photographs a receipt, and items appear on the OcrReview screen — no mock data
+  2. At least 3 distinct real restaurant receipts are tested and produce item lists accurate enough for the correction-first workflow (items, prices, and quantities roughly correct)
+  3. Grand total lines, tax lines, and currency symbols are excluded from the item list; actual ordered items are included
+**Plans**: TBD
+
+### Phase 7: UX & Display Fixes
+**Goal**: Hosts can verify the bill total before creating a session, see which tip is selected, and recover from an accidental finalize without losing claims
+**Depends on**: Phase 5
+**Requirements**: DISP-01, UX-01, UX-02
+**Success Criteria** (what must be TRUE):
+  1. The OcrReview screen shows a running bill total (items + tax + tip) that updates as the host adjusts items, tax, and tip — before the session is created
+  2. The tip selector visually shows which percentage is currently active (highlighted or contrasting style) so there is no ambiguity
+  3. After finalizing, the host can press an Unfinalize button, return to the claiming screen, and all prior claims are still present — no one needs to re-claim
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 8: Visual Polish
+**Goal**: All screens have consistent, intentional spacing, color, and typography — the app looks considered, not cobbled
+**Depends on**: Phase 7
+**Requirements**: VIS-01
+**Success Criteria** (what must be TRUE):
+  1. Spacing, padding, and font sizing are consistent across the capture, review, share, join, claiming, and summary screens — no screen looks noticeably rougher than the others
+  2. Color usage (backgrounds, text, buttons, accents) follows a coherent palette throughout the app
+  3. A first-time user testing the app on a phone would describe the visual design as polished rather than unfinished
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -28,3 +69,6 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 | 3. Real-Time Layer | v1.0 | 2/2 | Complete | 2026-02-22 |
 | 4. Item Claiming | v1.0 | 3/3 | Complete | 2026-04-08 |
 | 5. Summary and Finalization | v1.0 | 3/3 | Complete | 2026-04-10 |
+| 6. Live OCR | v1.1 | 0/? | Not started | - |
+| 7. UX & Display Fixes | v1.1 | 0/? | Not started | - |
+| 8. Visual Polish | v1.1 | 0/? | Not started | - |
