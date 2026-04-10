@@ -1,5 +1,18 @@
 # Tab Splitter
 
+## Current Milestone: v1.1 Real Receipts & Polish
+
+**Goal:** Enable real OCR with a live API key, validate it works on actual restaurant receipts, and close 4 v1.0 todos.
+
+**Target features:**
+- Real OCR — wire OPENAI_API_KEY, tune GPT-4o prompt if needed, validate on real receipts
+- Bill total on OcrReview screen (items + tax + tip) before session creation
+- Tip selector selected-state visual fix
+- Unfinalize — host returns to claiming with claims intact
+- Targeted visual polish across all screens
+
+---
+
 ## What This Is
 
 A mobile web app for splitting restaurant bills at the item level. One person photographs the receipt, the app extracts line items via GPT-4o Vision OCR, and each person at the table claims what they ordered — including shared items and duplicates — before seeing their individual total with proportional tax and tip.
@@ -22,7 +35,11 @@ Everyone pays exactly what they ordered (plus their proportional share of tax an
 
 ### Active
 
-(None — all v1 requirements shipped. See `/gsd-new-milestone` to define v1.1 requirements.)
+- [ ] Real OCR enabled and validated on actual restaurant receipts
+- [ ] Bill total (items + tax + tip) displayed on the OcrReview screen before session creation
+- [ ] Tip selector buttons visually indicate selected state
+- [ ] Host can unfinalize and return to claiming view with claims intact
+- [ ] Targeted visual polish applied across all screens
 
 ### Out of Scope
 
@@ -42,13 +59,7 @@ Tech stack: Next.js 15, custom WebSocket server (ws), GPT-4o Vision, Zustand, Ta
 
 Session flow: host scans receipt → OCR extracts items → host reviews/corrects → host creates session (QR/link generated) → participants join by name → participants claim items with real-time sync → host finalizes → all participants see exact amounts owed.
 
-OCR is mock-mode capable (`USE_OCR_MOCK=true`). Real GPT-4o Vision requires `OPENAI_API_KEY` in `.env.local`. Accuracy on real receipts unvalidated — manual correction UI is a first-class feature.
-
-Known todos (captured in `.planning/todos/pending/`):
-- Bill total should include tax (display issue)
-- Unfinalize/go-back option
-- Tip selector buttons not working
-- Add visual design elements
+OCR is mock-mode capable (`USE_OCR_MOCK=true`). Real GPT-4o Vision requires `OPENAI_API_KEY` in `.env.local`. v1.0 used mock only — v1.1 validates real receipt accuracy.
 
 ## Constraints
 
@@ -70,5 +81,22 @@ Known todos (captured in `.planning/todos/pending/`):
 | Largest Remainder Method | Guaranteed exact sum even with cent-level rounding | ✓ Good — 13/13 Vitest tests pass |
 | globalThis singleton for session store | Next.js App Router module isolation breaks shared Map | ✓ Good — required pattern for this architecture |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-04-10 after v1.0 milestone*
+*Last updated: 2026-04-10 — v1.1 Real Receipts & Polish milestone started*
