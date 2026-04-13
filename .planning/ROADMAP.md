@@ -36,7 +36,9 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
   1. Host sets a real `OPENAI_API_KEY` in `.env.local`, disables mock mode, photographs a receipt, and items appear on the OcrReview screen — no mock data
   2. At least 3 distinct real restaurant receipts are tested and produce item lists accurate enough for the correction-first workflow (items, prices, and quantities roughly correct)
   3. Grand total lines, tax lines, and currency symbols are excluded from the item list; actual ordered items are included
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 06-01-PLAN.md — Wire live OCR: source 3 test receipts + flip .env.local to live mode (OCR-05)
+- [ ] 06-02-PLAN.md — Validate 3 receipts through live GPT-4o + targeted OCR_PROMPT tuning (OCR-06, OCR-07)
 
 ### Phase 7: UX & Display Fixes
 **Goal**: Hosts can verify the bill total before creating a session, see which tip is selected, and recover from an accidental finalize without losing claims
@@ -69,6 +71,6 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 | 3. Real-Time Layer | v1.0 | 2/2 | Complete | 2026-02-22 |
 | 4. Item Claiming | v1.0 | 3/3 | Complete | 2026-04-08 |
 | 5. Summary and Finalization | v1.0 | 3/3 | Complete | 2026-04-10 |
-| 6. Live OCR | v1.1 | 0/? | Not started | - |
+| 6. Live OCR | v1.1 | 0/2 | Not started | - |
 | 7. UX & Display Fixes | v1.1 | 0/? | Not started | - |
 | 8. Visual Polish | v1.1 | 0/? | Not started | - |
