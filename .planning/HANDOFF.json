@@ -1,37 +1,56 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-10T21:33:13.609Z",
-  "phase": null,
-  "phase_name": null,
-  "phase_dir": null,
-  "plan": null,
-  "task": null,
-  "total_tasks": null,
+  "timestamp": "2026-04-13T02:48:31.250Z",
+  "phase": "06",
+  "phase_name": "live-ocr",
+  "phase_dir": ".planning/phases/06-live-ocr",
+  "plan": 1,
+  "task": 2,
+  "total_tasks": 2,
   "status": "paused",
   "completed_tasks": [
-    {"id": 1, "name": "Complete v1.0 milestone — archive, tag v1.0, commit", "status": "done", "commit": "e459258"},
-    {"id": 2, "name": "Initialize v1.1 milestone — questioning, requirements, roadmap", "status": "done", "commit": "13d87bc"}
+    {
+      "id": 1,
+      "name": "Source and commit 3-receipt test set with README catalog",
+      "status": "done",
+      "commit": "a57da63"
+    }
   ],
   "remaining_tasks": [
-    {"id": 3, "name": "Plan Phase 6: Live OCR", "status": "not_started"}
+    {
+      "id": 2,
+      "name": "User inserts real OPENAI_API_KEY and flips USE_OCR_MOCK in .env.local",
+      "status": "blocked",
+      "progress": "USE_OCR_MOCK=false already set; user must replace sk-replace-with-real-key placeholder with real key"
+    }
   ],
-  "blockers": [],
+  "blockers": [
+    {
+      "description": "Real OpenAI API key required in .env.local",
+      "type": "human_action",
+      "workaround": "USE_OCR_MOCK=false already in .env.local; user only needs to replace OPENAI_API_KEY placeholder and restart dev server"
+    }
+  ],
   "human_actions_pending": [
     {
-      "action": "Set real OPENAI_API_KEY in .env.local before Phase 6 execution",
-      "context": "Phase 6 (Live OCR) requires a real API key to test actual receipt processing. Currently USE_OCR_MOCK=true and the key is a placeholder.",
+      "action": "Replace OPENAI_API_KEY=sk-replace-with-real-key in .env.local with real key from platform.openai.com/api-keys (needs gpt-4o access)",
+      "context": "Claude cannot obtain an OpenAI secret key. USE_OCR_MOCK=false is already set. After editing: restart dev server (npm run dev), upload receipt-01-sitdown.jpg via the app UI, confirm OcrReview shows real Sidecar items (Oysters, Smelts, Duck Terrine, etc.) NOT mock fixture.",
       "blocking": true
     }
   ],
   "decisions": [
-    {"decision": "v1.1 scoped to: real OCR validation (OCR-05/06/07), bill total display (DISP-01), tip selector fix (UX-01), unfinalize flow (UX-02), visual polish (VIS-01)", "rationale": "All v1.0 todos plus OCR real-receipt validation", "phase": "v1.1"},
-    {"decision": "Phase numbering continues from 5 → v1.1 starts at Phase 6", "rationale": "Consistent history across milestones", "phase": "v1.1"},
-    {"decision": "OCR accuracy strategy: tune GPT-4o prompt only (not heavy post-processing)", "rationale": "User selected — fast, likely sufficient given model quality", "phase": "6"}
+    {
+      "decision": "receipt-02-bar.jpg = ExpressExpense SRD file 1143-receipt.jpg (Arthurs, Hoboken NJ)",
+      "rationale": "Highest proportion of bar/drink items found in 70+ sampled SRD images: 3 named beers out of 7 items; explicit Bar section header",
+      "phase": "06"
+    },
+    {
+      "decision": "receipt-03-long.jpg = ExpressExpense SRD file 1029-receipt.jpg (Rincon Mexicano, Somerville MA)",
+      "rationale": "Exactly 10 distinct food/drink line items — meets D-08 threshold; clear item names and quantity notation",
+      "phase": "06"
+    }
   ],
-  "uncommitted_files": [
-    ".planning/phases/ — all v1.0 phase directories deleted by 'phases clear' but not yet committed",
-    "components/session/SessionRoom.tsx — modified (pre-existing, not from this session)"
-  ],
-  "next_action": "Run /gsd-plan-phase 6 to plan the Live OCR phase. Ensure real OPENAI_API_KEY is set in .env.local before execution begins.",
-  "context_notes": "Just completed full v1.0 milestone close and v1.1 initialization in one session. v1.0 tagged and archived. v1.1 has 3 phases (6=OCR, 7=UX fixes, 8=visual polish), requirements committed, roadmap committed. Phase 6 is the logical next step."
+  "uncommitted_files": [],
+  "next_action": "After user types 'approved' (live smoke test passed on receipt-01-sitdown.jpg showing real Sidecar items): write Plan 06-01 SUMMARY.md, then execute Plan 06-02 (validate all 3 receipts through live OCR, tune OCR_PROMPT if needed, human-verify).",
+  "context_notes": "Phase 6 execution started. Wave 1 Plan 06-01 Task 1 complete and merged into master (a57da63). Task 2 is a human-action checkpoint — user must supply real API key. .env.local already has USE_OCR_MOCK=false (set by the executor worktree, persisted because .env.local is gitignored/local). Worktree cleaned up. Wave 2 (Plan 06-02) has not started."
 }
