@@ -401,22 +401,25 @@ No new security controls needed for this phase.
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Real API key availability**
    - What we know: `.env.local` has a placeholder key `sk-replace-with-real-key`
    - What's unclear: Whether the user has a real OpenAI API key available and is ready to insert it
    - Recommendation: The plan must include a user-action step (Wave 0 or pre-flight) to insert the real key. The plan cannot assume this is done. If no key is available, Phase 6 cannot proceed.
+   - RESOLVED: Plan 06-01 Task 2 is a `checkpoint:human-action` that explicitly gates on the user inserting a real key, with `user_setup` frontmatter and a full `<how-to-verify>` block.
 
 2. **receipt.jpg age and readability**
    - What we know: receipt.jpg is from 2011, shows a clear printed receipt, is readable as an image
    - What's unclear: Whether the GPT-4o OCR handles older thermal-print style fonts without issues
    - Recommendation: Test receipt.jpg first. If results are poor, substitute with a cleaner image from the ExpressExpense SRD.
+   - RESOLVED: Plan 06-02 Task 1 tests receipt-01 (receipt.jpg) first; if results are poor, the round-based iteration in Task 2 handles substitution.
 
 3. **ExpressExpense SRD receipt variety**
    - What we know: Dataset contains 200 restaurant receipt images, MIT licensed
    - What's unclear: Whether it contains a clear bar/drinks-only receipt and a 10+ item receipt
    - Recommendation: Download the zip and select appropriate images. If bar receipt is unavailable, use a second sit-down receipt with different characteristics.
+   - RESOLVED: Plan 06-01 Task 1 Step 4 includes explicit fallback logic — if no pure-bar receipt is found, use the receipt with the highest proportion of drink items and note the deviation.
 
 ---
 
