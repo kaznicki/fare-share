@@ -13,7 +13,7 @@ interface Props {
 export default function TaxTipFields({ taxCents, tipCents, subtotalCents, onChangeTax, onChangeTip }: Props) {
   const totalCents = subtotalCents + taxCents + tipCents
   return (
-    <div className="sticky bottom-0 bg-white border-t p-4">
+    <div className="bg-white border-t p-4">
       <div className="flex gap-4">
         <label className="flex-1 flex flex-col gap-1">
           <span className="text-sm font-medium text-gray-600">Tax</span>
