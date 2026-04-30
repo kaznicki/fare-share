@@ -55,7 +55,7 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 - [x] 07-02-PLAN.md — Unfinalize backend: types union, session-store method, server.ts WS handler, REST route (UX-02)
 
 **Wave 2** *(blocked on Wave 1 — 07-02 completion)*
-- [ ] 07-03-PLAN.md — Unfinalize frontend: SessionRoom callback, SummaryScreen button, page.tsx always-mounted wiring (UX-02)
+- [x] 07-03-PLAN.md — Unfinalize frontend: SessionRoom callback, SummaryScreen button, page.tsx always-mounted wiring (UX-02)
 
 **Cross-cutting constraints:**
 - Integer cents throughout — `totalCents = subtotalCents + taxCents + tipCents` (no floats)
@@ -83,5 +83,5 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 | 4. Item Claiming | v1.0 | 3/3 | Complete | 2026-04-08 |
 | 5. Summary and Finalization | v1.0 | 3/3 | Complete | 2026-04-10 |
 | 6. Live OCR | v1.1 | 0/2 | Not started | - |
-| 7. UX & Display Fixes | v1.1 | 2/3 | In Progress | - |
+| 7. UX & Display Fixes | v1.1 | 3/3 | Verifying | - |
 | 8. Visual Polish | v1.1 | 0/? | Not started | - |
