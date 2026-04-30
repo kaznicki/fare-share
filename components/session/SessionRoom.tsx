@@ -11,9 +11,10 @@ interface Props {
   isHost?: boolean
   onFinalized?: (bill: BillSplitResult) => void
   onSessionData?: (data: SessionData) => void
+  onUnfinalized?: () => void
 }
 
-export default function SessionRoom({ sessionId, participantName, isHost, onFinalized, onSessionData }: Props) {
+export default function SessionRoom({ sessionId, participantName, isHost, onFinalized, onSessionData, onUnfinalized }: Props) {
   const [session, setSession] = useState<SessionData | null>(null)
   const [connectionError, setConnectionError] = useState<string | null>(null)
   const [reconnecting, setReconnecting] = useState(false)
@@ -27,6 +28,11 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
 
   onFinalizedRef.current = onFinalized
   onSessionDataRef.current = onSessionData
+
+  const onUnfinalizedRef = useRef(onUnfinalized)
+  onUnfinalizedRef.current = onUnfinalized
+
+  const prevFinalizedRef = useRef(false)
 
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
@@ -53,6 +59,11 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
         if (msg.data.finalized && msg.data.finalizedBill && onFinalizedRef.current) {
           onFinalizedRef.current(msg.data.finalizedBill)
         }
+        // Detect finalized → unfinalized transition (D-05)
+        if (prevFinalizedRef.current && !msg.data.finalized) {
+          onUnfinalizedRef.current?.()
+        }
+        prevFinalizedRef.current = msg.data.finalized
       }
     }
 

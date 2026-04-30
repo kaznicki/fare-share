@@ -29,27 +29,39 @@ function SessionPageInner({ sessionId }: { sessionId: string }) {
           }}
         />
       )}
-      {screen === 'session' && (
-        <SessionRoom
-          sessionId={sessionId}
-          participantName={participantName}
-          isHost={isHost}
-          onFinalized={(bill: BillSplitResult) => {
-            setFinalBill(bill)
-            setScreen('summary')
-          }}
-          onSessionData={(data: SessionData) => {
-            if (!isHost && data.hostName.trim().toLowerCase() === participantName.trim().toLowerCase()) {
-              setIsHost(true)
-            }
-          }}
-        />
+      {screen !== 'joining' && (
+        <div className={screen === 'session' ? '' : 'hidden'}>
+          <SessionRoom
+            sessionId={sessionId}
+            participantName={participantName}
+            isHost={isHost}
+            onFinalized={(bill: BillSplitResult) => {
+              setFinalBill(bill)
+              setScreen('summary')
+            }}
+            onSessionData={(data: SessionData) => {
+              if (!isHost && data.hostName.trim().toLowerCase() === participantName.trim().toLowerCase()) {
+                setIsHost(true)
+              }
+            }}
+            onUnfinalized={() => {
+              setScreen('session')
+            }}
+          />
+        </div>
       )}
       {screen === 'summary' && finalBill && (
         <SummaryScreen
           bill={finalBill}
           participantName={participantName}
           isHost={isHost}
+          onUnfinalize={async () => {
+            await fetch(`/api/sessions/${sessionId}/unfinalize`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ hostName: participantName }),
+            })
+          }}
         />
       )}
     </main>
