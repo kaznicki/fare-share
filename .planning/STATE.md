@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Real Receipts & Polish
-status: executing
-stopped_at: Phase 08 planned — ready to execute
-last_updated: "2026-04-30T00:00:00.000Z"
-last_activity: 2026-04-30 -- Phase 08 planned (VIS-01, 1 plan)
+status: complete
+stopped_at: Phase 08 complete — all v1.1 plans executed
+last_updated: "2026-04-30T19:06:00.000Z"
+last_activity: 2026-04-30 -- Phase 08 plan 08-01 executed — v1.1 milestone complete
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 2
-  percent: 40
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-10)
 
 **Core value:** Everyone pays exactly what they ordered (plus proportional tax and tip) without doing any mental math
-**Current focus:** Phase 08 — visual-polish
+**Current focus:** v1.1 complete — ready for milestone close
 
 ## Current Position
 
-Phase: 08 (visual-polish) — READY TO EXECUTE
-Plan: 08-01
-Status: Phase 08 planned (1 plan, 1 wave); ready to execute
-Last activity: 2026-04-30 -- Phase 08 planned (VIS-01, 1 plan)
+Phase: 08 (visual-polish) — COMPLETE
+Plan: 08-01 — COMPLETE
+Status: All v1.1 phases complete (6/6 plans)
+Last activity: 2026-04-30 -- Phase 08 plan 08-01 executed (Arial removed, heading unified, card shadows added, color audit passed)
 
-Progress: [███░░░░░░░] 33% (1 of 3 phases complete)
+Progress: [██████████] 100% (3 of 3 phases complete)
 
 ## v1.1 Phase Overview
 
@@ -38,7 +38,7 @@ Progress: [███░░░░░░░] 33% (1 of 3 phases complete)
 |-------|------|--------------|--------|
 | 6. Live OCR | Real GPT-4o OCR validated on actual receipts | OCR-05, OCR-06, OCR-07 | ✅ Complete (2026-04-29) |
 | 7. UX & Display Fixes | Bill total on OcrReview, tip selected state, unfinalize flow | DISP-01, UX-01, UX-02 | ✅ Complete (2026-04-30) |
-| 8. Visual Polish | Consistent spacing, color, typography across all screens | VIS-01 | Ready to execute (1 plan) |
+| 8. Visual Polish | Consistent spacing, color, typography across all screens | VIS-01 | ✅ Complete (2026-04-30) |
 
 ## Accumulated Context
 
@@ -62,12 +62,17 @@ Key architectural decisions carried forward:
 - 003: Tip selector buttons not working → UX-01 (Phase 7)
 - 004: Add visual design elements → VIS-01 (Phase 8)
 
+### Phase 08 Decisions
+
+- Removed `font-family: Arial` body override from `app/globals.css` — Geist Sans activates via `--font-sans: var(--font-geist-sans)` in `@theme` block
+- OcrReview Fix 4 implemented as new outer wrapper div (not class addition to existing inner div) — unifies TaxTipFields and name/button area into one card region
+
 ### Blockers/Concerns
 
-- None. Phase 06 complete. Live OCR validated on 3 receipts.
+- None. All v1.1 phases complete.
 
 ## Session Continuity
 
 Last session: 2026-04-30
-Stopped at: Phase 08 planning complete — 1 plan created (08-01)
-Resume with: `/gsd-execute-phase 8` to execute Visual Polish
+Stopped at: Phase 08 complete — 08-01-PLAN.md executed
+Resume with: `/gsd-complete-milestone` to close v1.1

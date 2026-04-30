@@ -42,10 +42,11 @@
 | DISP-01 | Bill total display | Phase 7 |
 | UX-01 | Tip selector fix | Phase 7 |
 | UX-02 | Unfinalize flow | Phase 7 |
-| VIS-01 | Visual polish | Phase 8 |
+| VIS-01 | Visual polish | Phase 8 | ✅ 2026-04-30 |
 
 **Total v1.1 requirements: 7**
 **All mapped to a phase: 7/7 ✓**
+**All requirements completed: 7/7 ✓ (2026-04-30)**
 
 ---
 

@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 MVP** — Phases 1–5 (shipped 2026-04-10)
-- [ ] **v1.1 Real Receipts & Polish** — Phases 6–8 (in progress)
+- [ ] **v1.1 Real Receipts & Polish** — Phases 6–8 (all phases executed — ready for milestone close)
 
 ## Phases
 
@@ -24,7 +24,7 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 
 - [x] **Phase 6: Live OCR** — Real API key wired, prompt tuned, validated on actual restaurant receipts — completed 2026-04-29
 - [x] **Phase 7: UX & Display Fixes** — Bill total on OcrReview, tip selector selected state, unfinalize flow — completed 2026-04-30
-- [ ] **Phase 8: Visual Polish** — Consistent spacing, color, and typography across all screens
+- [x] **Phase 8: Visual Polish** — Consistent spacing, color, and typography across all screens — completed 2026-04-30
 
 ## Phase Details
 
@@ -71,7 +71,7 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
   2. Color usage (backgrounds, text, buttons, accents) follows a coherent palette throughout the app
   3. A first-time user testing the app on a phone would describe the visual design as polished rather than unfinished
 **Plans**: 1 plan
-- [ ] 08-01-PLAN.md — Font override removal, heading unification, card shadows, color audit (VIS-01)
+- [x] 08-01-PLAN.md — Font override removal, heading unification, card shadows, color audit (VIS-01)
 
 ## Progress
 
@@ -82,6 +82,6 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 | 3. Real-Time Layer | v1.0 | 2/2 | Complete | 2026-02-22 |
 | 4. Item Claiming | v1.0 | 3/3 | Complete | 2026-04-08 |
 | 5. Summary and Finalization | v1.0 | 3/3 | Complete | 2026-04-10 |
-| 6. Live OCR | v1.1 | 0/2 | Not started | - |
+| 6. Live OCR | v1.1 | 2/2 | Complete | 2026-04-29 |
 | 7. UX & Display Fixes | v1.1 | 3/3 | Complete | 2026-04-30 |
-| 8. Visual Polish | v1.1 | 0/1 | Not started | - |
+| 8. Visual Polish | v1.1 | 1/1 | Complete | 2026-04-30 |
