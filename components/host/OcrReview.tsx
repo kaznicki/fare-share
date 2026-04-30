@@ -50,7 +50,7 @@ export default function OcrReview({ initial, onComplete }: Props) {
 
   return (
     <div className="w-full flex flex-col min-h-0">
-      <h1 className="text-xl font-semibold mb-4">Review Receipt</h1>
+      <h1 className="text-2xl font-bold mb-4">Review Receipt</h1>
 
       {/* Zero-item banner */}
       {items.length === 0 && (
