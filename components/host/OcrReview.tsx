@@ -91,7 +91,7 @@ export default function OcrReview({ initial, onComplete }: Props) {
       </div>
 
       {/* Sticky footer card — TaxTipFields + name input + Create Session */}
-      <div className="bg-white rounded-2xl shadow-md">
+      <div className="bg-white rounded-2xl shadow-md overflow-hidden">
         <TaxTipFields
           taxCents={taxCents}
           tipCents={tipCents}
