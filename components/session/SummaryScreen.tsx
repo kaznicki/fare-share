@@ -5,13 +5,14 @@ interface Props {
   bill: BillSplitResult
   participantName: string
   isHost: boolean
+  onUnfinalize?: () => void
 }
 
 function formatCents(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`
 }
 
-export default function SummaryScreen({ bill, participantName, isHost }: Props) {
+export default function SummaryScreen({ bill, participantName, isHost, onUnfinalize }: Props) {
   const myBill = bill.participants.find(p => p.name === participantName)
   const grandTotal = bill.participants.reduce((s, p) => s + p.totalCents, 0)
 
@@ -82,6 +83,15 @@ export default function SummaryScreen({ bill, participantName, isHost }: Props) 
             <span className="text-gray-700 font-bold">Total</span>
             <span className="text-gray-900 font-bold tabular-nums">{formatCents(grandTotal)}</span>
           </div>
+          {onUnfinalize && (
+            <button
+              type="button"
+              onClick={onUnfinalize}
+              className="mt-4 w-full py-3 border border-gray-300 rounded-xl text-gray-700 font-normal hover:bg-gray-50 transition-colors"
+            >
+              Go back to claiming
+            </button>
+          )}
         </div>
       )}
     </div>
