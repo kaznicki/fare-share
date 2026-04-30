@@ -164,6 +164,30 @@ wss.on('connection', (ws, req) => {
       }
       return
     }
+
+    // unfinalize branch — host-only, idempotency guard
+    if (
+      (msg as any).type === 'unfinalize' &&
+      typeof (msg as any).participantName === 'string'
+    ) {
+      const senderName = ((msg as any).participantName as string).trim().slice(0, MAX_NAME_LEN)
+      const session = sessionStore.get(sessionId!)
+      if (!session) return
+
+      // Only host can unfinalize (T-07-02-03)
+      if (senderName.trim().toLowerCase() !== session.hostName.trim().toLowerCase()) return
+
+      // Idempotency guard — already unfinalized, no-op (T-07-02-04)
+      if (!session.finalized) return
+
+      sessionStore.unfinalize(sessionId!)
+
+      const data = sessionStore.getData(sessionId!)
+      if (data) {
+        sessionStore.broadcast(sessionId!, { type: 'session-snapshot', data })
+      }
+      return
+    }
   })
 })
 

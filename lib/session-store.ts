@@ -103,6 +103,14 @@ export const sessionStore = {
     session.finalizedBill = bill
   },
 
+  unfinalize(id: string): void {
+    const session = store.get(id)
+    if (!session) return
+    session.finalized = false
+    session.finalizedBill = null
+    // claims are intentionally untouched — D-06
+  },
+
   // Broadcast a message to all open sockets in a session.
   // Per STATE.md locked decision: full-state broadcast after every change.
   // optionally exclude the originating socket.
