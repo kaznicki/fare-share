@@ -46,3 +46,4 @@ export type ClientMessage =
   | { type: 'claim'; sessionId: string; participantName: string; itemId: string }
   | { type: 'unclaim'; sessionId: string; participantName: string; itemId: string }
   | { type: 'finalize'; sessionId: string; participantName: string; unclaimedHandling: 'split' | 'host' }
+  | { type: 'unfinalize'; sessionId: string; participantName: string }
