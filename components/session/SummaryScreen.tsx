@@ -21,7 +21,7 @@ export default function SummaryScreen({ bill, participantName, isHost, onUnfinal
       <h1 className="text-2xl font-bold mb-6">Summary</h1>
 
       {/* Personal breakdown card */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
         {myBill && myBill.subtotalCents > 0 ? (
           <>
             <div className="flex justify-between items-center py-2 min-h-[44px]">

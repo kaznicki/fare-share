@@ -90,34 +90,36 @@ export default function OcrReview({ initial, onComplete }: Props) {
         </button>
       </div>
 
-      {/* Tax and Tip inputs */}
-      <TaxTipFields
-        taxCents={taxCents}
-        tipCents={tipCents}
-        subtotalCents={items.reduce((sum, it) => sum + it.priceCents * it.qty, 0)}
-        onChangeTax={setTaxCents}
-        onChangeTip={setTipCents}
-      />
+      {/* Sticky footer card — TaxTipFields + name input + Create Session */}
+      <div className="bg-white rounded-2xl shadow-md">
+        <TaxTipFields
+          taxCents={taxCents}
+          tipCents={tipCents}
+          subtotalCents={items.reduce((sum, it) => sum + it.priceCents * it.qty, 0)}
+          onChangeTax={setTaxCents}
+          onChangeTip={setTipCents}
+        />
 
-      {/* Create Session button — disabled while pending or host name is empty */}
-      <div className="px-4 pb-4 pt-2 bg-white">
-        <div className="mb-3">
-          <label className="block text-sm text-gray-600 mb-1">Your name</label>
-          <input
-            type="text"
-            placeholder="Enter your name"
-            value={hostName}
-            onChange={(e) => setHostName(e.target.value)}
-            className="w-full py-2 px-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        {/* Create Session button — disabled while pending or host name is empty */}
+        <div className="px-4 pb-4 pt-2 bg-white">
+          <div className="mb-3">
+            <label className="block text-sm text-gray-600 mb-1">Your name</label>
+            <input
+              type="text"
+              placeholder="Enter your name"
+              value={hostName}
+              onChange={(e) => setHostName(e.target.value)}
+              className="w-full py-2 px-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            onClick={createSession}
+            disabled={isPending || !hostName.trim()}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold rounded-xl transition-colors"
+          >
+            {isPending ? 'Creating...' : 'Create Session'}
+          </button>
         </div>
-        <button
-          onClick={createSession}
-          disabled={isPending || !hostName.trim()}
-          className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold rounded-xl transition-colors"
-        >
-          {isPending ? 'Creating...' : 'Create Session'}
-        </button>
       </div>
     </div>
   )
