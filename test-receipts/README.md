@@ -35,6 +35,74 @@ Prices can be slightly off — price accuracy is not a pass/fail criterion (D-05
 
 | Receipt | Round | Pass/Fail | Failure Mode (if any) | Prompt Patch (if any) |
 |---------|-------|-----------|-----------------------|-----------------------|
-| receipt-01-sitdown.jpg | 1 | | | |
-| receipt-02-bar.jpg | 1 | | | |
-| receipt-03-long.jpg | 1 | | | |
+| receipt-01-sitdown.jpg | 1 | PASS | — | — |
+| receipt-02-bar.jpg | 1 | PASS | — | — |
+| receipt-03-long.jpg | 1 | PASS | — | — |
+
+**Final status:** All 3 receipts passed round 1 with the existing OCR_PROMPT unchanged. Per decision D-03, the prompt ships as-is. No `lib/ocr.ts` changes required.
+
+## Round 1 Raw Results
+
+### receipt-01-sitdown.jpg (Sidecar Bar & Grill, Toronto)
+
+```json
+{
+  "items": [
+    { "name": "Oysters",      "priceCents": 600,  "qty": 1 },
+    { "name": "Smelts",       "priceCents": 1200, "qty": 1 },
+    { "name": "Duck Terrine", "priceCents": 1400, "qty": 1 },
+    { "name": "Pork Dessert", "priceCents": 1200, "qty": 1 },
+    { "name": "AG Malbec",    "priceCents": 2500, "qty": 1 },
+    { "name": "Soup",         "priceCents": 800,  "qty": 1 },
+    { "name": "Tagliatelle",  "priceCents": 2000, "qty": 1 },
+    { "name": "DBS Bronte",   "priceCents": 300,  "qty": 1 }
+  ],
+  "taxCents": 1170,
+  "tipCents": 0
+}
+```
+
+D-04: 8/8 visible items extracted (names approximate but recognizable). D-06: no junk lines. **PASS**
+
+### receipt-02-bar.jpg (Arthurs, Hoboken NJ)
+
+```json
+{
+  "items": [
+    { "name": "Arthur's Burger *ChsBleu", "priceCents": 1395, "qty": 1 },
+    { "name": "Our Burger **Avocado",     "priceCents": 1595, "qty": 1 },
+    { "name": "Loaded Nachos",            "priceCents": 1295, "qty": 1 },
+    { "name": "Pint Boston Lager",        "priceCents": 600,  "qty": 1 },
+    { "name": "Pint Yeungling",           "priceCents": 1200, "qty": 2 },
+    { "name": "Kona Longboard",           "priceCents": 600,  "qty": 1 },
+    { "name": "Quesadilla",               "priceCents": 1395, "qty": 1 }
+  ],
+  "taxCents": 398,
+  "tipCents": 0
+}
+```
+
+D-04: 7/7 items extracted including all 3 named beers; "2 Pint Yeungling" correctly extracted as qty=2. D-06: no auto-grat, no service charge, no tax/total leakage. **PASS**
+
+### receipt-03-long.jpg (Rincon Mexicano, Somerville MA)
+
+```json
+{
+  "items": [
+    { "name": "Arroz",              "priceCents": 300, "qty": 2 },
+    { "name": "Taco De Pescado",    "priceCents": 700, "qty": 2 },
+    { "name": "Taco Tuesday Pollo", "priceCents": 200, "qty": 1 },
+    { "name": "Taco D Carne Asada", "priceCents": 299, "qty": 1 },
+    { "name": "Taco D Chorizo",     "priceCents": 299, "qty": 1 },
+    { "name": "Taco Tuesday Pastor","priceCents": 100, "qty": 1 },
+    { "name": "Horchata",           "priceCents": 299, "qty": 1 },
+    { "name": "Taco Tuesday Pollo", "priceCents": 100, "qty": 1 },
+    { "name": "Taco D Cochinita",   "priceCents": 299, "qty": 1 },
+    { "name": "Taco D Carnitas",    "priceCents": 299, "qty": 1 }
+  ],
+  "taxCents": 203,
+  "tipCents": 0
+}
+```
+
+D-04: 10/10 items extracted including quantity notation (Arroz qty=2, Taco De Pescado qty=2). D-06: no junk lines. **PASS**
