@@ -11,6 +11,7 @@ interface Props {
 }
 
 export default function TaxTipFields({ taxCents, tipCents, subtotalCents, onChangeTax, onChangeTip }: Props) {
+  const totalCents = subtotalCents + taxCents + tipCents
   return (
     <div className="sticky bottom-0 bg-white border-t p-4">
       <div className="flex gap-4">
@@ -35,16 +36,23 @@ export default function TaxTipFields({ taxCents, tipCents, subtotalCents, onChan
         <div className="flex-1 flex flex-col gap-1">
           <span className="text-sm font-medium text-gray-600">Tip</span>
           <div className="flex gap-1 mb-1">
-            {TIP_PRESETS.map(pct => (
-              <button
-                key={pct}
-                type="button"
-                onClick={() => onChangeTip(Math.round(subtotalCents * pct / 100))}
-                className="flex-1 py-1 text-xs font-medium border border-gray-300 rounded hover:bg-blue-50 hover:border-blue-400 hover:text-blue-700 transition-colors"
-              >
-                {pct}%
-              </button>
-            ))}
+            {TIP_PRESETS.map(pct => {
+              const isActive = tipCents === Math.round(subtotalCents * pct / 100)
+              return (
+                <button
+                  key={pct}
+                  type="button"
+                  onClick={() => onChangeTip(Math.round(subtotalCents * pct / 100))}
+                  className={
+                    isActive
+                      ? "flex-1 py-1 text-xs font-normal border rounded transition-colors bg-blue-600 text-white border-blue-600"
+                      : "flex-1 py-1 text-xs font-normal border border-gray-300 rounded hover:bg-blue-50 hover:border-blue-400 hover:text-blue-700 transition-colors"
+                  }
+                >
+                  {pct}%
+                </button>
+              )
+            })}
           </div>
           <div className="relative">
             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500">$</span>
@@ -61,6 +69,10 @@ export default function TaxTipFields({ taxCents, tipCents, subtotalCents, onChan
             />
           </div>
         </div>
+      </div>
+      <div className="mt-3 flex justify-between items-center text-sm font-bold text-gray-900">
+        <span>Total</span>
+        <span className="tabular-nums">${(totalCents / 100).toFixed(2)}</span>
       </div>
     </div>
   )
