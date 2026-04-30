@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Real Receipts & Polish
 status: executing
-stopped_at: Phase 07 planned — 3 plans ready to execute
+stopped_at: Phase 07 executing — Wave 2 in progress
 last_updated: "2026-04-30T00:00:00.000Z"
-last_activity: 2026-04-30 -- Phase 07 planned (DISP-01, UX-01, UX-02)
+last_activity: 2026-04-30 -- Phase 07 Wave 1 complete (07-01, 07-02); Wave 2 starting (07-03)
 progress:
   total_phases: 3
   completed_phases: 1
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-10)
 
 ## Current Position
 
-Phase: 07 (ux-display-fixes) — READY TO EXECUTE
-Plan: —
-Status: Phase 06 complete; Phase 07 planned (3 plans, 2 waves)
-Last activity: 2026-04-30 -- Phase 07 planning complete (DISP-01, UX-01, UX-02)
+Phase: 07 (ux-display-fixes) — EXECUTING
+Plan: Wave 2 — 07-03
+Status: Wave 1 complete (07-01 ✓, 07-02 ✓); Wave 2 in progress
+Last activity: 2026-04-30 -- Wave 1 merged; Wave 2 spawned (07-03 unfinalize frontend)
 
 Progress: [███░░░░░░░] 33% (1 of 3 phases complete)
 
@@ -37,7 +37,7 @@ Progress: [███░░░░░░░] 33% (1 of 3 phases complete)
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
 | 6. Live OCR | Real GPT-4o OCR validated on actual receipts | OCR-05, OCR-06, OCR-07 | ✅ Complete (2026-04-29) |
-| 7. UX & Display Fixes | Bill total on OcrReview, tip selected state, unfinalize flow | DISP-01, UX-01, UX-02 | Ready to execute (3 plans) |
+| 7. UX & Display Fixes | Bill total on OcrReview, tip selected state, unfinalize flow | DISP-01, UX-01, UX-02 | Executing (0/3 plans complete) |
 | 8. Visual Polish | Consistent spacing, color, typography across all screens | VIS-01 | Not started |
 
 ## Accumulated Context
