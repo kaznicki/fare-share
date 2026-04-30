@@ -22,7 +22,7 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 
 ### v1.1 Real Receipts & Polish (Phases 6–8)
 
-- [ ] **Phase 6: Live OCR** — Real API key wired, prompt tuned, validated on actual restaurant receipts
+- [x] **Phase 6: Live OCR** — Real API key wired, prompt tuned, validated on actual restaurant receipts — completed 2026-04-29
 - [ ] **Phase 7: UX & Display Fixes** — Bill total on OcrReview, tip selector selected state, unfinalize flow
 - [ ] **Phase 8: Visual Polish** — Consistent spacing, color, and typography across all screens
 
@@ -37,7 +37,7 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
   2. At least 3 distinct real restaurant receipts are tested and produce item lists accurate enough for the correction-first workflow (items, prices, and quantities roughly correct)
   3. Grand total lines, tax lines, and currency symbols are excluded from the item list; actual ordered items are included
 **Plans**: 2 plans
-- [ ] 06-01-PLAN.md — Wire live OCR: source 3 test receipts + flip .env.local to live mode (OCR-05)
+- [x] 06-01-PLAN.md — Wire live OCR: source 3 test receipts + flip .env.local to live mode (OCR-05)
 - [ ] 06-02-PLAN.md — Validate 3 receipts through live GPT-4o + targeted OCR_PROMPT tuning (OCR-06, OCR-07)
 
 ### Phase 7: UX & Display Fixes

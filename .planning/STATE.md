@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Real Receipts & Polish
-status: in_progress
-stopped_at: Roadmap created for v1.1 — Phases 6-8 defined, ready to plan Phase 6
-last_updated: "2026-04-10T00:00:00.000Z"
-last_activity: 2026-04-10
+status: executing
+stopped_at: v1.1 roadmap created — Phases 6, 7, 8 defined
+last_updated: "2026-04-14T18:02:46.535Z"
+last_activity: 2026-04-14 -- Phase 06 execution started
 progress:
   total_phases: 3
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 2
+  completed_plans: 1
+  percent: 50
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-10)
 
 **Core value:** Everyone pays exactly what they ordered (plus proportional tax and tip) without doing any mental math
-**Current focus:** v1.1 milestone — Live OCR validation, UX/display fixes, visual polish
+**Current focus:** Phase 06 — live-ocr
 
 ## Current Position
 
-Phase: 6 — Live OCR
-Plan: — (not yet planned)
-Status: Ready to plan Phase 6
-Last activity: 2026-04-10 — v1.1 roadmap created
+Phase: 07 (ux-display-fixes) — READY TO PLAN
+Plan: —
+Status: Phase 06 complete; Phase 07 not yet planned
+Last activity: 2026-04-29 -- Phase 06 complete (OCR-05, OCR-06, OCR-07 satisfied)
 
-Progress: [░░░░░░░░░░] 0% (0 of TBD plans)
+Progress: [███░░░░░░░] 33% (1 of 3 phases complete)
 
 ## v1.1 Phase Overview
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| 6. Live OCR | Real GPT-4o OCR validated on actual receipts | OCR-05, OCR-06, OCR-07 | Not started |
+| 6. Live OCR | Real GPT-4o OCR validated on actual receipts | OCR-05, OCR-06, OCR-07 | ✅ Complete (2026-04-29) |
 | 7. UX & Display Fixes | Bill total on OcrReview, tip selected state, unfinalize flow | DISP-01, UX-01, UX-02 | Not started |
 | 8. Visual Polish | Consistent spacing, color, typography across all screens | VIS-01 | Not started |
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0% (0 of TBD plans)
 Full v1.0 decision log archived in `.planning/milestones/v1.0-ROADMAP.md` and PROJECT.md Key Decisions table.
 
 Key architectural decisions carried forward:
+
 - Integer cents throughout; Largest Remainder Method for all rounding
 - globalThis singleton for session store (Next.js App Router module isolation)
 - Callback ref pattern for stable WebSocket handlers (onFinalizedRef, onSessionDataRef)
@@ -63,10 +64,10 @@ Key architectural decisions carried forward:
 
 ### Blockers/Concerns
 
-- OCR accuracy on real restaurant receipts unvalidated — real `OPENAI_API_KEY` needed; `USE_OCR_MOCK=true` still set in `.env.local`
+- None. Phase 06 complete. Live OCR validated on 3 receipts.
 
 ## Session Continuity
 
-Last session: 2026-04-10
-Stopped at: v1.1 roadmap created — Phases 6, 7, 8 defined
-Resume with: `/gsd-plan-phase 6` to plan Live OCR phase
+Last session: 2026-04-29
+Stopped at: Phase 06 complete — all 3 requirements satisfied (OCR-05, OCR-06, OCR-07)
+Resume with: `/gsd-plan-phase 7` to plan UX & Display Fixes
