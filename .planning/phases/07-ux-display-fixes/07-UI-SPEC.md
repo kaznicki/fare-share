@@ -44,6 +44,7 @@ Declared values (must be multiples of 4):
 Exceptions:
 - Touch targets: `min-h-[44px]` on all interactive rows (established pattern — SummaryScreen, ClaimableItem). Apply to "Go back to claiming" button row area as well.
 - Sticky footer: `p-4` (16px) — preserve existing `TaxTipFields` padding for the total line addition.
+- spacing-3: 12px — fine-grained intra-component vertical rhythm (total divider, button padding). Used as `mt-3`, `pt-3`, `py-3` in TaxTipFields total row and "Go back to claiming" button.
 
 *Source: codebase read — TaxTipFields.tsx, SummaryScreen.tsx*
 
@@ -54,16 +55,16 @@ Exceptions:
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 16px (`text-base`) | 400 regular | 1.5 |
-| Label / Small | 14px (`text-sm`) | 500 medium | 1.5 |
+| Label / Small | 14px (`text-sm`) | 400 regular | 1.5 |
 | Subheading | 16px (`text-base`) | 700 bold | 1.2 |
 | Heading | 28px (`text-2xl`) | 700 bold | 1.2 |
 
 Notes:
-- Tip preset buttons: 12px (`text-xs`) at weight 500 medium — existing pattern, preserve.
-- Total line in TaxTipFields: 14px (`text-sm`) at weight 600 semibold — matches the existing "Total" row style in SummaryScreen host section.
-- "Go back to claiming" button: 16px (`text-base`) at weight 500 medium.
+- Tip preset buttons: 12px (`text-xs`) at weight 400 regular (`font-normal`) — existing pattern, preserve with weight updated to match 2-weight constraint.
+- Total line in TaxTipFields: 14px (`text-sm`) at weight 700 bold (`font-bold`) — emphasis weight for the total row.
+- "Go back to claiming" button: 16px (`text-base`) at weight 400 regular (`font-normal`).
 
-*Source: codebase read — TaxTipFields.tsx (text-xs, font-medium), SummaryScreen.tsx (text-base, text-2xl, font-bold)*
+*Source: codebase read — TaxTipFields.tsx (text-xs), SummaryScreen.tsx (text-base, text-2xl, font-bold)*
 
 ---
 
@@ -82,7 +83,7 @@ Accent reserved for:
 
 Accent must NOT be used for:
 - "Go back to claiming" button — use neutral style: `border border-gray-300 text-gray-700 hover:bg-gray-50`
-- The total display line — use `text-gray-900` at semibold weight
+- The total display line — use `text-gray-900` at bold weight
 
 Additional color tokens in use (established — do not change):
 - `text-gray-600` — field labels ("Tax", "Tip")
@@ -127,12 +128,12 @@ Changes are surgical edits to three existing components. No new components creat
 
 Active button className:
 ```
-flex-1 py-1 text-xs font-medium border rounded transition-colors bg-blue-600 text-white border-blue-600
+flex-1 py-1 text-xs font-normal border rounded transition-colors bg-blue-600 text-white border-blue-600
 ```
 
-Inactive button className (existing — preserve exactly):
+Inactive button className (existing — preserve exactly, weight updated to font-normal):
 ```
-flex-1 py-1 text-xs font-medium border border-gray-300 rounded hover:bg-blue-50 hover:border-blue-400 hover:text-blue-700 transition-colors
+flex-1 py-1 text-xs font-normal border border-gray-300 rounded hover:bg-blue-50 hover:border-blue-400 hover:text-blue-700 transition-colors
 ```
 
 Detection expression: `tipCents === Math.round(subtotalCents * pct / 100)`
@@ -144,7 +145,7 @@ Placement: below the tip input `<div>`, still inside the outer sticky `<div>`, a
 
 Total display className:
 ```
-mt-3 flex justify-between items-center text-sm font-semibold text-gray-900
+mt-3 flex justify-between items-center text-sm font-bold text-gray-900
 ```
 
 Left span: `Total`
@@ -160,7 +161,7 @@ Placement: After the grand total row (line 82), still inside `{isHost && (...)}`
 
 Button className:
 ```
-mt-4 w-full py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors
+mt-4 w-full py-3 border border-gray-300 rounded-xl text-gray-700 font-normal hover:bg-gray-50 transition-colors
 ```
 
 Button type: `type="button"` (never submit)
