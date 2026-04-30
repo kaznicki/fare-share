@@ -14,7 +14,9 @@ function formatCents(cents: number): string {
 
 export default function SummaryScreen({ bill, participantName, isHost, onUnfinalize }: Props) {
   const myBill = bill.participants.find(p => p.name === participantName)
-  const grandTotal = bill.participants.reduce((s, p) => s + p.totalCents, 0)
+  const grandTotal = isHost
+    ? bill.participants.reduce((s, p) => s + p.totalCents, 0)
+    : 0
 
   return (
     <div className="w-full max-w-sm mx-auto p-4">
