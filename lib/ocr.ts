@@ -46,7 +46,7 @@ Rules:
 - items array: food and drink items only
 - Exclude subtotal, tax, tip, service charge, and discount lines from items array
 - price is in dollars (e.g., 12.99 for $12.99)
-- qty defaults to 1 if not shown on receipt
+- qty: if the receipt shows a quantity column, "2x ITEM", "ITEM x2", or "2 @ $7.00", extract that quantity and set price to the unit price (not the extended line total); if no quantity is shown, default qty to 1
 - If a line cannot be identified as a food or drink item, omit it
 - Return 0 for tax or tip if not present on receipt`
 

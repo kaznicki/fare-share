@@ -37,9 +37,10 @@ Prices can be slightly off — price accuracy is not a pass/fail criterion (D-05
 |---------|-------|-----------|-----------------------|-----------------------|
 | receipt-01-sitdown.jpg | 1 | PASS | — | — |
 | receipt-02-bar.jpg | 1 | PASS | — | — |
-| receipt-03-long.jpg | 1 | PASS | — | — |
+| receipt-03-long.jpg | 1 | PASS | qty note: "2 Taco Tuesday Pollo" (line 3 on receipt) extracted as qty=1 price=$2.00 instead of qty=2 price=$1.00 — item present per D-04 | — |
+| receipt-03-long.jpg | 2 | PASS | Pitfall 3 patch applied; GPT-4o at temperature=0 returned identical result — qty=1 persists. Accepted per D-05: item is present; host corrects qty in the correction-first UI before splitting. | Added multi-quantity extraction instruction to OCR_PROMPT (Pitfall 3) |
 
-**Final status:** All 3 receipts passed round 1 with the existing OCR_PROMPT unchanged. Per decision D-03, the prompt ships as-is. No `lib/ocr.ts` changes required.
+**Final status:** All 3 receipts PASS. Pitfall 3 patch applied to OCR_PROMPT after observing qty under-extraction on the "2 Taco Tuesday Pollo" line; the model returned the same result at temperature=0 (deterministic). Qty inaccuracy accepted per D-05 — the correction-first workflow handles it. OCR_PROMPT now includes the multi-quantity instruction for future receipts.
 
 ## Round 1 Raw Results
 
