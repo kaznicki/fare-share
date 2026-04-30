@@ -23,7 +23,7 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 ### v1.1 Real Receipts & Polish (Phases 6–8)
 
 - [x] **Phase 6: Live OCR** — Real API key wired, prompt tuned, validated on actual restaurant receipts — completed 2026-04-29
-- [ ] **Phase 7: UX & Display Fixes** — Bill total on OcrReview, tip selector selected state, unfinalize flow
+- [x] **Phase 7: UX & Display Fixes** — Bill total on OcrReview, tip selector selected state, unfinalize flow — completed 2026-04-30
 - [ ] **Phase 8: Visual Polish** — Consistent spacing, color, and typography across all screens
 
 ## Phase Details
@@ -83,5 +83,5 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 | 4. Item Claiming | v1.0 | 3/3 | Complete | 2026-04-08 |
 | 5. Summary and Finalization | v1.0 | 3/3 | Complete | 2026-04-10 |
 | 6. Live OCR | v1.1 | 0/2 | Not started | - |
-| 7. UX & Display Fixes | v1.1 | 3/3 | Verifying | - |
+| 7. UX & Display Fixes | v1.1 | 3/3 | Complete | 2026-04-30 |
 | 8. Visual Polish | v1.1 | 0/? | Not started | - |
