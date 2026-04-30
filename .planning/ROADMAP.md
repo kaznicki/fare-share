@@ -48,8 +48,10 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
   1. The OcrReview screen shows a running bill total (items + tax + tip) that updates as the host adjusts items, tax, and tip — before the session is created
   2. The tip selector visually shows which percentage is currently active (highlighted or contrasting style) so there is no ambiguity
   3. After finalizing, the host can press an Unfinalize button, return to the claiming screen, and all prior claims are still present — no one needs to re-claim
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 3 plans
+- [ ] 07-01-PLAN.md — Add bill total row and active tip preset state to TaxTipFields (DISP-01, UX-01)
+- [ ] 07-02-PLAN.md — Unfinalize backend: types union, session-store method, server.ts WS handler, REST route (UX-02)
+- [ ] 07-03-PLAN.md — Unfinalize frontend: SessionRoom callback, SummaryScreen button, page.tsx always-mounted wiring (UX-02)
 
 ### Phase 8: Visual Polish
 **Goal**: All screens have consistent, intentional spacing, color, and typography — the app looks considered, not cobbled
@@ -72,5 +74,5 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 | 4. Item Claiming | v1.0 | 3/3 | Complete | 2026-04-08 |
 | 5. Summary and Finalization | v1.0 | 3/3 | Complete | 2026-04-10 |
 | 6. Live OCR | v1.1 | 0/2 | Not started | - |
-| 7. UX & Display Fixes | v1.1 | 0/? | Not started | - |
+| 7. UX & Display Fixes | v1.1 | 0/3 | Not started | - |
 | 8. Visual Polish | v1.1 | 0/? | Not started | - |
