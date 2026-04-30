@@ -70,8 +70,8 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
   1. Spacing, padding, and font sizing are consistent across the capture, review, share, join, claiming, and summary screens — no screen looks noticeably rougher than the others
   2. Color usage (backgrounds, text, buttons, accents) follows a coherent palette throughout the app
   3. A first-time user testing the app on a phone would describe the visual design as polished rather than unfinished
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 1 plan
+- [ ] 08-01-PLAN.md — Font override removal, heading unification, card shadows, color audit (VIS-01)
 
 ## Progress
 
@@ -84,4 +84,4 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 | 5. Summary and Finalization | v1.0 | 3/3 | Complete | 2026-04-10 |
 | 6. Live OCR | v1.1 | 0/2 | Not started | - |
 | 7. UX & Display Fixes | v1.1 | 3/3 | Complete | 2026-04-30 |
-| 8. Visual Polish | v1.1 | 0/? | Not started | - |
+| 8. Visual Polish | v1.1 | 0/1 | Not started | - |
