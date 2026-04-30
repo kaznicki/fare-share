@@ -49,9 +49,18 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
   2. The tip selector visually shows which percentage is currently active (highlighted or contrasting style) so there is no ambiguity
   3. After finalizing, the host can press an Unfinalize button, return to the claiming screen, and all prior claims are still present — no one needs to re-claim
 **Plans**: 3 plans
+
+**Wave 1** *(parallel — no file overlap)*
 - [ ] 07-01-PLAN.md — Add bill total row and active tip preset state to TaxTipFields (DISP-01, UX-01)
 - [ ] 07-02-PLAN.md — Unfinalize backend: types union, session-store method, server.ts WS handler, REST route (UX-02)
+
+**Wave 2** *(blocked on Wave 1 — 07-02 completion)*
 - [ ] 07-03-PLAN.md — Unfinalize frontend: SessionRoom callback, SummaryScreen button, page.tsx always-mounted wiring (UX-02)
+
+**Cross-cutting constraints:**
+- Integer cents throughout — `totalCents = subtotalCents + taxCents + tipCents` (no floats)
+- Host identity normalized via `.trim().toLowerCase()` on all sides (REST + WS)
+- Full-state broadcast after every session mutation
 
 ### Phase 8: Visual Polish
 **Goal**: All screens have consistent, intentional spacing, color, and typography — the app looks considered, not cobbled
