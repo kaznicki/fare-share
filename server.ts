@@ -2,9 +2,9 @@ import { createServer } from 'http'
 import { parse } from 'url'
 import next from 'next'
 import { WebSocketServer } from 'ws'
-import { sessionStore } from '@/lib/session-store'
-import { billSplit } from '@/lib/bill-split'
-import type { SessionData, ClientMessage } from '@/types'
+import { sessionStore } from './lib/session-store'
+import { billSplit } from './lib/bill-split'
+import type { SessionData, ClientMessage } from './types'
 
 const port = parseInt(process.env.PORT ?? '3000', 10)
 const dev = process.env.NODE_ENV !== 'production'
