@@ -1,15 +1,10 @@
 # Tab Splitter
 
-## Current Milestone: v1.1 Real Receipts & Polish
+## Current State
 
-**Goal:** Enable real OCR with a live API key, validate it works on actual restaurant receipts, and close 4 v1.0 todos.
+**Shipped:** v1.1 Real Receipts & Polish (2026-04-30)
 
-**Target features:**
-- Real OCR — wire OPENAI_API_KEY, tune GPT-4o prompt if needed, validate on real receipts
-- Bill total on OcrReview screen (items + tax + tip) before session creation
-- Tip selector selected-state visual fix
-- Unfinalize — host returns to claiming with claims intact
-- Targeted visual polish across all screens
+v1.1 closed all 4 v1.0 todos: live OCR validated on real receipts, bill total displayed before session creation, tip selector shows selected state, unfinalize flow preserves claims, and consistent visual polish applied across all screens.
 
 ---
 
@@ -32,14 +27,15 @@ Everyone pays exactly what they ordered (plus their proportional share of tax an
 - ✓ Shared items can be claimed by multiple people and the cost split among them — v1.0
 - ✓ Tax and tip are distributed proportionally based on each person's subtotal — v1.0
 - ✓ Each person sees their final amount owed at the end — v1.0
+- ✓ Real OCR enabled and validated on 3 actual restaurant receipts — v1.1
+- ✓ Bill total (items + tax + tip) displayed on the OcrReview screen before session creation — v1.1
+- ✓ Tip selector buttons visually indicate selected state — v1.1
+- ✓ Host can unfinalize and return to claiming view with all claims intact — v1.1
+- ✓ Targeted visual polish applied across all screens — v1.1
 
 ### Active
 
-- [ ] Real OCR enabled and validated on actual restaurant receipts
-- [ ] Bill total (items + tax + tip) displayed on the OcrReview screen before session creation
-- [ ] Tip selector buttons visually indicate selected state
-- [ ] Host can unfinalize and return to claiming view with claims intact
-- [ ] Targeted visual polish applied across all screens
+*(None — v1.1 complete. Next milestone requirements TBD via /gsd-new-milestone)*
 
 ### Out of Scope
 
@@ -48,18 +44,20 @@ Everyone pays exactly what they ordered (plus their proportional share of tax an
 - Saving session history — sessions are disposable
 - Native mobile app — mobile web browser only
 - Even-split mode — item-level splitting is the product
-- Live camera viewfinder (getUserMedia) — native camera picker used instead
+- Live camera viewfinder (getUserMedia) — native camera picker used instead; PWA option deferred to v2
 - PWA offline support — sessions require live WebSocket
 
 ## Context
 
-Shipped v1.0 with ~24,000 LOC TypeScript/TSX across 105 files.
+Shipped v1.1 with ~24,000 LOC TypeScript/TSX across ~112 files.
 
 Tech stack: Next.js 15, custom WebSocket server (ws), GPT-4o Vision, Zustand, Tailwind v4, Vitest.
 
 Session flow: host scans receipt → OCR extracts items → host reviews/corrects → host creates session (QR/link generated) → participants join by name → participants claim items with real-time sync → host finalizes → all participants see exact amounts owed.
 
-OCR is mock-mode capable (`USE_OCR_MOCK=true`). Real GPT-4o Vision requires `OPENAI_API_KEY` in `.env.local`. v1.0 used mock only — v1.1 validates real receipt accuracy.
+OCR is mock-mode capable (`USE_OCR_MOCK=true`). Real GPT-4o Vision requires `OPENAI_API_KEY` in `.env.local`. v1.1 validated real receipt accuracy on 3 restaurant types.
+
+Real receipt testing notes: GPT-4o handles most receipt formats well. Known edge case: quantity-prefixed items like "2 Taco Tuesday Pollo $2.00" may be extracted as qty=1 at the extended price — correctable via the correction-first UI.
 
 ## Constraints
 
@@ -75,11 +73,14 @@ OCR is mock-mode capable (`USE_OCR_MOCK=true`). Real GPT-4o Vision requires `OPE
 | No accounts | Lower friction, fits one-off restaurant use case | ✓ Good — no friction complaints in UAT |
 | Proportional tax/tip | Fairer than equal split when orders vary in price | ✓ Good — LRM ensures exact cent accuracy |
 | Browser camera (not native app) | Faster to build, no app store | ✓ Good — works on all mobile browsers |
-| GPT-4o Vision for OCR | Manual correction is v1 requirement; needs to be good enough to correct, not rebuild | — Pending real-receipt validation |
+| GPT-4o Vision for OCR | Manual correction is v1 requirement; needs to be good enough to correct, not rebuild | ✓ Good — validated on 3 receipt types; correction-first handles edge cases |
 | Custom ws server (not PartyKit) | Server required anyway; avoids 10-project free-tier limit | ✓ Good — clean integration |
 | Integer cents throughout | Eliminates float rounding bugs | ✓ Good — LRM passes all edge-case tests |
 | Largest Remainder Method | Guaranteed exact sum even with cent-level rounding | ✓ Good — 13/13 Vitest tests pass |
 | globalThis singleton for session store | Next.js App Router module isolation breaks shared Map | ✓ Good — required pattern for this architecture |
+| CSS hidden pattern for SessionRoom | Conditional render disconnects WebSocket; all participants need broadcast | ✓ Good — unfinalize broadcast works for all tabs |
+| totalCents derived from existing props | No interface change; subtotalCents/taxCents/tipCents already in TaxTipFields | ✓ Good — zero prop proliferation |
+| isActive formula mirrors click handler | Guarantees exact match on preset detection | ✓ Good — no off-by-one issues |
 
 ## Evolution
 
@@ -99,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 — v1.1 Real Receipts & Polish milestone started*
+*Last updated: 2026-04-30 after v1.1 milestone*

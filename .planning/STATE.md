@@ -2,35 +2,26 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Real Receipts & Polish
-status: complete
-stopped_at: Phase 08 complete — all v1.1 plans executed
-last_updated: "2026-04-30T19:06:00.000Z"
-last_activity: 2026-04-30 -- Phase 08 plan 08-01 executed — v1.1 milestone complete
-progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+status: shipped
+stopped_at: v1.1 milestone closed 2026-04-30
+last_updated: "2026-04-30T00:00:00.000Z"
+last_activity: 2026-04-30 -- v1.1 milestone archived, tagged v1.1
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-10)
+See: .planning/PROJECT.md (updated 2026-04-30)
 
 **Core value:** Everyone pays exactly what they ordered (plus proportional tax and tip) without doing any mental math
-**Current focus:** v1.1 complete — ready for milestone close
+**Current focus:** v1.1 shipped — planning next milestone
 
 ## Current Position
 
-Phase: 08 (visual-polish) — COMPLETE
-Plan: 08-01 — COMPLETE
-Status: All v1.1 phases complete (6/6 plans)
-Last activity: 2026-04-30 -- Phase 08 plan 08-01 executed (Arial removed, heading unified, card shadows added, color audit passed)
-
-Progress: [██████████] 100% (3 of 3 phases complete)
+Milestone: v1.1 — SHIPPED
+All phases complete (8/8 total, phases 6–8 in this milestone)
+All requirements validated (7/7 v1.1, 12/12 total)
 
 ## v1.1 Phase Overview
 
@@ -42,37 +33,18 @@ Progress: [██████████] 100% (3 of 3 phases complete)
 
 ## Accumulated Context
 
-### Decisions
-
-Full v1.0 decision log archived in `.planning/milestones/v1.0-ROADMAP.md` and PROJECT.md Key Decisions table.
-
-Key architectural decisions carried forward:
+### Architecture (carried forward)
 
 - Integer cents throughout; Largest Remainder Method for all rounding
 - globalThis singleton for session store (Next.js App Router module isolation)
-- Callback ref pattern for stable WebSocket handlers (onFinalizedRef, onSessionDataRef)
+- Callback ref pattern for stable WebSocket handlers (onFinalizedRef, onSessionDataRef, onUnfinalizedRef)
 - Host identity always normalized via .trim().toLowerCase() on both sides
 - Full-state broadcast on every WebSocket message (enables reconnect for free)
+- CSS hidden pattern for always-mounted components (keeps WebSocket open across screen transitions)
 - Deployment: Railway/Fly.io/Render (not Vercel — persistent WebSocket required)
 
-### v1.0 Todos Carried Into v1.1
-
-- 001: Bill total display should include tax → DISP-01 (Phase 7)
-- 002: Unfinalize/go-back option → UX-02 (Phase 7)
-- 003: Tip selector buttons not working → UX-01 (Phase 7)
-- 004: Add visual design elements → VIS-01 (Phase 8)
-
-### Phase 08 Decisions
-
-- Removed `font-family: Arial` body override from `app/globals.css` — Geist Sans activates via `--font-sans: var(--font-geist-sans)` in `@theme` block
-- OcrReview Fix 4 implemented as new outer wrapper div (not class addition to existing inner div) — unifies TaxTipFields and name/button area into one card region
-
-### Blockers/Concerns
-
-- None. All v1.1 phases complete.
-
-## Session Continuity
+### Session Continuity
 
 Last session: 2026-04-30
-Stopped at: Phase 08 complete — 08-01-PLAN.md executed
-Resume with: `/gsd-complete-milestone` to close v1.1
+Stopped at: v1.1 milestone closed
+Resume with: `/gsd-new-milestone` to start v1.2 or v2.0

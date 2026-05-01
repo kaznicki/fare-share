@@ -18,3 +18,21 @@
 - Two-screen participant page (JoinForm + SessionRoom) with WebSocket presence sync — scan QR, enter name, see items and all joined participants in real time
 
 ---
+
+## v1.1 Real Receipts & Polish (Shipped: 2026-04-30)
+
+**Phases completed:** 3 phases (6–8), 6 plans, 59 commits
+**Timeline:** 2026-04-10 → 2026-04-30 (20 days)
+**Files changed:** 112 (+7,246 / −11,530 lines)
+
+**Key accomplishments:**
+
+- Live GPT-4o Vision OCR wired end-to-end — real API key path functional, smoke-tested on Sidecar Bar & Grill receipt with real items returned
+- 3 restaurant receipts (sit-down, bar, long) validated through live OCR pipeline — all items extracted with accuracy suitable for the correction-first workflow
+- OCR_PROMPT Pitfall 3 patch applied for quantity handling — junk lines excluded across all receipt types
+- Bill total row (items + tax + tip) added to TaxTipFields sticky footer using inline integer arithmetic; active tip preset highlighted blue via isActive detection (DISP-01, UX-01)
+- Unfinalize backend: session-store method, WebSocket handler, REST route — all with host-only guard, idempotency, broadcast (UX-02)
+- Unfinalize frontend: always-mounted SessionRoom (CSS hidden) keeps WebSocket open; prevFinalizedRef transition detection fires host callback; all participants route back to claiming (UX-02)
+- Four surgical CSS fixes: Arial override removed (Geist Sans active), OcrReview heading unified, card shadows on SummaryScreen and OcrReview footer, two-accent color split verified (VIS-01)
+
+---

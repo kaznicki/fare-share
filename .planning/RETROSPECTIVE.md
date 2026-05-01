@@ -56,21 +56,69 @@
 
 ---
 
+---
+
+## Milestone: v1.1 — Real Receipts & Polish
+
+**Shipped:** 2026-04-30
+**Phases:** 3 (6–8) | **Plans:** 6 | **Duration:** 20 days (2026-04-10 → 2026-04-30)
+
+### What Was Built
+
+- Live GPT-4o Vision OCR wired and validated on 3 real restaurant receipts (sit-down, bar, long)
+- OCR_PROMPT Pitfall 3 patch for quantity-prefixed line items
+- Bill total row (items + tax + tip) in TaxTipFields sticky footer with inline integer arithmetic
+- Active tip preset highlight (blue) via isActive detection matching click handler formula exactly
+- Unfinalize backend: session-store method, WS handler, REST route — host guard, idempotency, broadcast
+- Unfinalize frontend: always-mounted SessionRoom (CSS hidden), prevFinalizedRef transition detection
+- Four surgical CSS fixes: Geist Sans active, OcrReview heading unified, card shadows added, two-accent color split verified
+
+### What Worked
+
+- **Short plans executed fast.** Plans 07-01, 07-02, 07-03, 08-01 each completed in 1–2 minutes. Fine-grained plan decomposition paid off.
+- **TDD pattern carried forward cleanly.** RED/GREEN commits in 07-01 and 07-02 made requirements traceability obvious.
+- **Wave decomposition for Phase 7.** Running 07-01 and 07-02 in parallel (no file overlap) kept the timeline tight.
+- **OCR validation structure.** D-04/D-06 acceptance criteria gave clear pass/fail signal — no ambiguity about whether receipts passed.
+- **Correction-first philosophy.** Accepting qty edge cases as correctable kept OCR scope bounded and shipping-focused.
+
+### What Was Inefficient
+
+- **Receipt sourcing took manual effort.** The ExpressExpense SRD is fast-food biased; finding a bar receipt required sampling 70+ images.
+- **4 v1.0 todos sat in "pending" through all of v1.1.** They were all addressed as requirements but the todo files were never closed — required cleanup at milestone close.
+
+### Patterns Established
+
+- **CSS hidden for always-mounted WebSocket components** — wrap in `div className={isHidden ? 'hidden' : ''}` to keep connection alive across screen transitions
+- **prevFinalizedRef transition detection** — compare ref to incoming snapshot value, fire callback on true→false, update ref AFTER check (initial false→false mount is a no-op)
+- **Card elevation standard** — `bg-white rounded-2xl shadow-md` for all elevated surfaces
+- **Two-accent split** — indigo-600 for financial/session-entry moments, blue-600 for action buttons
+
+### Key Lessons
+
+1. **OCR determinism at temperature=0** means prompt patches won't change results for already-tested images — test patches on new images to verify
+2. **Always-mounted patterns (CSS hidden) should be default** when a component holds a WebSocket connection — conditional render disconnects the socket
+3. **Close todos when their requirement is created**, not at milestone close — stale "pending" files are noise
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
 
-| Milestone | Duration | Phases | Key Change |
-|-----------|----------|--------|------------|
-| v1.0 MVP | 55 days | 5 | Initial build — established all core patterns |
+| Milestone | Duration | Phases | Plans | Key Change |
+|-----------|----------|--------|-------|------------|
+| v1.0 MVP | 55 days | 5 | 16 | Initial build — established all core patterns |
+| v1.1 Polish | 20 days | 3 | 6 | Plans executing in 1–2 min as patterns solidified |
 
 ### Cumulative Quality
 
 | Milestone | Tests | Zero-Dep Bugs Shipped |
 |-----------|-------|-----------------------|
 | v1.0 MVP | 13 Vitest (bill-split unit) + 4 human UAT | 0 critical (2 warnings deferred as todos) |
+| v1.1 Polish | 26 Vitest (bill-split + OCR validation + tax-tip formulas) + UAT | 0 critical |
 
 ### Top Lessons (Verified Across Milestones)
 
 1. Behavior-level success criteria prevent gap-closure plans
 2. Human UAT at phase boundaries is cheaper than post-hoc gap closure
+3. Patterns documented in CONTEXT.md/PATTERNS.md pay off at execution time — v1.1 plans wrote themselves
