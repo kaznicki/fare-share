@@ -8,7 +8,8 @@ import type { SessionData, ClientMessage } from '@/types'
 
 const port = parseInt(process.env.PORT ?? '3000', 10)
 const dev = process.env.NODE_ENV !== 'production'
-const app = next({ dev, hostname: 'localhost', port })
+const hostname = dev ? 'localhost' : '0.0.0.0'
+const app = next({ dev, hostname, port })
 const handle = app.getRequestHandler()
 
 // WebSocket server — noServer mode; we route upgrade events manually.
