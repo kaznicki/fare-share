@@ -221,7 +221,7 @@ app.prepare().then(() => {
     }
   })
 
-  httpServer.listen(port, () => {
+  httpServer.listen(port, '0.0.0.0', () => {
     console.log(`> Tab Splitter ready on http://localhost:${port}`)
     console.log(`> WebSocket server on ws://localhost:${port}/ws`)
     console.log(`> Environment: ${dev ? 'development' : 'production'}`)
