@@ -3,8 +3,25 @@
 ## Current State
 
 **Shipped:** v1.1 Real Receipts & Polish (2026-04-30)
+**Active:** v1.2.1 Fare Share Rebrand & Guest Onboarding
 
 v1.1 closed all 4 v1.0 todos: live OCR validated on real receipts, bill total displayed before session creation, tip selector shows selected state, unfinalize flow preserves claims, and consistent visual polish applied across all screens.
+
+---
+
+## Current Milestone: v1.2.1 Fare Share Rebrand & Guest Onboarding
+
+**Goal:** Rebrand the app from "Tab Splitter" to "Fare Share" everywhere it surfaces to users, give it a logo, and onboard guests on the join page with an app description and usage instructions.
+
+**Target features:**
+- Full rename to "Fare Share" — page titles, metadata, README, package.json name, all user-visible "Tab Splitter" strings
+- Simple logo (visual mark) used on both start pages
+- "Fare Share" title at the top of the host start page (`/host`)
+- "Fare Share" title at the top of the guest join page
+- App description on the guest join page
+- Usage instructions for guests on the join page
+
+Note: "Fare Share" uses the food sense of "fare". Host start page already has instructions — left as-is. The two start pages remain separate (no merged landing screen).
 
 ---
 
@@ -35,7 +52,14 @@ Everyone pays exactly what they ordered (plus their proportional share of tax an
 
 ### Active
 
-*(None — v1.1 complete. Next milestone requirements TBD via /gsd-new-milestone)*
+**v1.2.1 — Fare Share Rebrand & Guest Onboarding** (see `.planning/REQUIREMENTS.md`)
+
+- BRAND-01: All user-visible "Tab Splitter" strings replaced with "Fare Share"
+- BRAND-02: Simple logo (visual mark) exists and is referenced from both start pages
+- ONBOARD-01: "Fare Share" title (with logo) appears at top of host start page (`/host`)
+- ONBOARD-02: "Fare Share" title (with logo) appears at top of guest join page
+- ONBOARD-03: Guest join page shows a brief app description explaining what Fare Share does
+- ONBOARD-04: Guest join page shows usage instructions for how to claim items
 
 ### Out of Scope
 
@@ -100,4 +124,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-30 after v1.1 milestone*
+*Last updated: 2026-05-02 — v1.2.1 milestone started*
