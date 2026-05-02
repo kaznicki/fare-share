@@ -36,16 +36,20 @@ See `.planning/milestones/v1.1-ROADMAP.md` for full phase details.
 
 ### Phase 9: Fare Share Rebrand & Guest Onboarding
 
-**Goal:** Replace all user-visible "Tab Splitter" strings with "Fare Share", add a simple logo, and onboard guests on the join page with title, description, and usage instructions.
+**Goal:** Adopt the complete Fare Share brand system delivered by Claude Design (logo + design tokens + typography + repaint), rename all user-visible "Tab Splitter" strings, and onboard guests on the join page with hero, description, and usage instructions.
 
-**Requirements:** BRAND-01, BRAND-02, ONBOARD-01, ONBOARD-02, ONBOARD-03, ONBOARD-04
+**Canonical refs:** `design_handoff_logo/README.md`, `design_handoff_logo/assets/`
+
+**Requirements:** BRAND-01, BRAND-02, BRAND-03, BRAND-04, BRAND-05, BRAND-06, ONBOARD-01, ONBOARD-02, ONBOARD-03, ONBOARD-04, ONBOARD-05
 
 **Success criteria:**
-1. Loading the app in a browser shows "Fare Share" in the tab title and any visible heading — no remaining user-facing "Tab Splitter" strings
-2. The host start page (`/host`) renders the Fare Share logo + title at the top
-3. The guest join page renders the Fare Share logo + title at the top
-4. A first-time guest can read the join page and understand (a) what Fare Share is and (b) how to claim items, before entering their name
-5. README and `package.json` reflect the new name
+1. Loading the app shows "Fare Share" in tab title, header bar, and all visible headings — no remaining user-facing "Tab Splitter" strings; `app/layout.tsx` "Create Next App" defaults are also fixed
+2. Every screen (host capture, OCR review, share, join, session, summary) shows a persistent header bar with the Fare Share lockup
+3. Host start page (`/host`) and guest join page show a hero lockup at the top; "Photograph Receipt" h1 is demoted to a smaller subhead under the host hero
+4. Guest join page shows the locked app description plus the four-step instruction list above the name input
+5. App is repainted to the warm ink / paper / copper palette (CTAs are copper, no remaining `bg-blue-600`); typography is Plus Jakarta Sans (with Instrument Serif and JetBrains Mono available); design tokens defined as CSS custom properties + Tailwind v4 `@theme`
+6. `apple-touch-icon-180.png`, `favicon-32.png`, `favicon-16.png` exist and are referenced from `app/layout.tsx`; PWA installability remains deferred
+7. Logo geometry, stroke weights, color values, and typography reproduce `design_handoff_logo/README.md` exactly — no creative variations
 
 ---
 

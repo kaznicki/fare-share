@@ -11,17 +11,20 @@ v1.1 closed all 4 v1.0 todos: live OCR validated on real receipts, bill total di
 
 ## Current Milestone: v1.2.1 Fare Share Rebrand & Guest Onboarding
 
-**Goal:** Rebrand the app from "Tab Splitter" to "Fare Share" everywhere it surfaces to users, give it a logo, and onboard guests on the join page with an app description and usage instructions.
+**Goal:** Rebrand from "Tab Splitter" to "Fare Share" by adopting the complete brand system delivered by Claude Design (`design_handoff_logo/`) — logo + design tokens + typography + component repaint — and onboard guests on the join page with an app description and usage instructions.
 
 **Target features:**
-- Full rename to "Fare Share" — page titles, metadata, README, package.json name, all user-visible "Tab Splitter" strings
-- Simple logo (visual mark) used on both start pages
-- "Fare Share" title at the top of the host start page (`/host`)
-- "Fare Share" title at the top of the guest join page
-- App description on the guest join page
-- Usage instructions for guests on the join page
+- Full rename: page titles, metadata, README, `package.json` name, all user-visible "Tab Splitter" strings → "Fare Share"
+- "Receipt Fold" logo system integrated (6 SVG variants from `design_handoff_logo/assets/`)
+- CSS design tokens (ink / paper / copper accent palette) replacing the current blue + amber system
+- Typography swap: Geist Sans → Plus Jakarta Sans (UI/wordmark), with Instrument Serif and JetBrains Mono added
+- Existing components re-skinned to the new palette
+- Persistent header bar with the Fare Share lockup on every screen
+- Hero lockup treatment at the top of host start page (`/host`) and guest join page
+- App description and four-step usage instructions on the guest join page
+- Raster icon variants (apple-touch-icon, favicon PNG fallbacks)
 
-Note: "Fare Share" uses the food sense of "fare". Host start page already has instructions — left as-is. The two start pages remain separate (no merged landing screen).
+Note: "Fare Share" uses the food sense of "fare". Brand system specified by Claude Design — reproduce exactly, no creative variations. Host start page already has instructions — kept, but its `<h1>` is demoted under the new hero. PWA installability remains deferred (sessions require live WebSocket).
 
 ---
 
@@ -55,11 +58,16 @@ Everyone pays exactly what they ordered (plus their proportional share of tax an
 **v1.2.1 — Fare Share Rebrand & Guest Onboarding** (see `.planning/REQUIREMENTS.md`)
 
 - BRAND-01: All user-visible "Tab Splitter" strings replaced with "Fare Share"
-- BRAND-02: Simple logo (visual mark) exists and is referenced from both start pages
-- ONBOARD-01: "Fare Share" title (with logo) appears at top of host start page (`/host`)
-- ONBOARD-02: "Fare Share" title (with logo) appears at top of guest join page
-- ONBOARD-03: Guest join page shows a brief app description explaining what Fare Share does
-- ONBOARD-04: Guest join page shows usage instructions for how to claim items
+- BRAND-02: 6 brand SVG assets integrated from `design_handoff_logo/`
+- BRAND-03: CSS design tokens introduced (ink / paper / copper palette)
+- BRAND-04: Plus Jakarta Sans + Instrument Serif + JetBrains Mono replace Geist Sans
+- BRAND-05: Existing components re-skinned to new palette
+- BRAND-06: Raster icon variants generated (apple-touch-icon, favicon fallbacks)
+- ONBOARD-01: Hero Fare Share lockup at top of host start page; "Photograph Receipt" demoted
+- ONBOARD-02: Hero Fare Share lockup at top of guest join page
+- ONBOARD-03: App description on guest join page
+- ONBOARD-04: Four-step guest usage instructions
+- ONBOARD-05: Persistent header bar with Fare Share lockup on every screen
 
 ### Out of Scope
 
