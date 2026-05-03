@@ -1,10 +1,11 @@
 ---
 phase: 9
 slug: fare-share-rebrand-onboarding
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-05-03
+reviewed_at: 2026-05-03
 ---
 
 # Phase 9 — UI Design Contract
@@ -387,11 +388,11 @@ git grep "Create Next App" app/layout.tsx              # expected: empty
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS (n/a — no registries)
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS (4 weights — locked by design handoff)
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS (n/a — no registries)
 
-**Approval:** pending
+**Approval:** APPROVED — 2026-05-03
