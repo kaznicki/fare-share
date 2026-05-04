@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="120" viewBox="0 0 420 120" fill="none">
+  <g transform="translate(8 12)">
+    <path d="M22 10 L22 78 L28 74 L34 78 L40 74 L46 78 L52 74 L58 78 L64 74 L70 78 L70 10 Z" fill="#FAF7F2" stroke="#1A1714" stroke-width="3" stroke-linejoin="round"></path>
+    <path d="M46 6 L46 82" stroke="#2D6BD9" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 4"></path>
+    <path d="M28 24 L40 24 M52 24 L64 24" stroke="#1A1714" stroke-width="2" stroke-linecap="round"></path>
+    <path d="M28 34 L42 34 M52 34 L62 34" stroke="#1A1714" stroke-width="2" stroke-linecap="round"></path>
+    <path d="M28 44 L38 44 M52 44 L64 44" stroke="#1A1714" stroke-width="2" stroke-linecap="round"></path>
+    <path d="M28 58 L42 58 M52 58 L64 58" stroke="#2D6BD9" stroke-width="3" stroke-linecap="round"></path>
+  </g>
+  <text x="120" y="78" font-family="Plus Jakarta Sans, system-ui, sans-serif" font-size="48" font-weight="700" letter-spacing="-1" fill="#1A1714">Fare Share</text>
+</svg>

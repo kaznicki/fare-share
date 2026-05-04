@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Fare Share — Logo Concepts</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #f0eee9; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #1A1714; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="logo-marks.jsx"></script>
+
+<script type="text/babel">
+const { useState } = React;
+
+const concepts = [
+  {
+    id: 'receipt-fold',
+    title: 'Receipt Fold',
+    blurb: 'A receipt with a perforated fold down the middle — the visual act of splitting the bill. The dashed seam reads as both a tear-line and a divider. Approachable, literal, instantly readable at favicon size.',
+    Mark: window.MarkReceiptFold,
+    wordmark: 'sans',
+  },
+  {
+    id: 'split-plate',
+    title: 'Split Plate',
+    blurb: 'A plate that doubles as a pie chart — equal quarters with one filled wedge to represent a single guest\u2019s share. Sits comfortably between restaurant and fintech worlds.',
+    Mark: window.MarkSplitPlate,
+    wordmark: 'serif',
+  },
+  {
+    id: 'ligature',
+    title: 'ƒ/s Ligature',
+    blurb: 'A typographic monogram: italic ƒ for fare, lowercase s for share, joined by a slash that reads as a fraction. Feels editorial, calm, and works beautifully as an app icon.',
+    Mark: window.MarkLigature,
+    wordmark: 'serif',
+  },
+  {
+    id: 'qr-receipt',
+    title: 'QR Receipt',
+    blurb: 'A torn-edge receipt overlaid with a QR finder pattern — directly references the share-by-link/QR mechanic. A little more product-feature-forward.',
+    Mark: window.MarkQRReceipt,
+    wordmark: 'mono',
+  },
+  {
+    id: 'equal-share',
+    title: 'Equal Share Bars',
+    blurb: 'Each bar is a line item; the colored fill is one guest\u2019s portion. The mark literally illustrates the math the app does. Clean, mark-y, and scales well to small sizes.',
+    Mark: window.MarkEqualShare,
+    wordmark: 'sans',
+  },
+  {
+    id: 'slash',
+    title: 'Slash Mark',
+    blurb: 'The fraction slash IS the logo — F over S inside a circle. The most abstract option; works hard when paired with the typographic Fare/Share lockup.',
+    Mark: window.MarkSlash,
+    wordmark: 'slash',
+  },
+];
+
+function App() {
+  const { DesignCanvas, DCSection, DCArtboard } = window;
+
+  return (
+    <DesignCanvas
+      title="Fare Share — Logo Concepts"
+      subtitle="Six directions · primary lockup, app icon, monochrome, and reverse"
+    >
+      <DCSection
+        id="hero"
+        title="Brand at a glance"
+        subtitle="Type: Plus Jakarta Sans + Instrument Serif · Accent: warm terracotta oklch(64% 0.17 35)"
+      >
+        <DCArtboard id="brand-overview" label="System overview" width={920} height={420}>
+          <BrandOverview />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="concepts"
+        title="Six concepts"
+        subtitle="Each shown as primary lockup, app icon, monochrome, and reverse"
+      >
+        {concepts.map((c, i) => (
+          <DCArtboard
+            key={c.id}
+            id={c.id}
+            label={`0${i + 1} · ${c.title}`}
+            width={920}
+            height={820}
+          >
+            <window.ConceptCard
+              index={i + 1}
+              title={c.title}
+              blurb={c.blurb}
+              Mark={c.Mark}
+              wordmark={c.wordmark}
+            />
+          </DCArtboard>
+        ))}
+      </DCSection>
+
+      <DCSection
+        id="favicons"
+        title="Favicons & small sizes"
+        subtitle="Stress-testing each mark at 32 / 48 / 64 px"
+      >
+        <DCArtboard id="favicon-grid" label="Favicon stress test" width={920} height={300}>
+          <FaviconGrid />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+function BrandOverview() {
+  const C = window.C;
+  return (
+    <div
+      style={{
+        width: 920,
+        background: C.paper,
+        border: `1px solid ${C.rule}`,
+        borderRadius: 4,
+        padding: 48,
+        display: 'grid',
+        gridTemplateColumns: '1.2fr 1fr',
+        gap: 40,
+        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+      }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted }}>
+          The brief
+        </span>
+        <h2 style={{ margin: 0, fontSize: 38, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+          A logo for splitting the check, the easy way.
+        </h2>
+        <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: C.ink2, maxWidth: 460 }}>
+          Fare Share turns a photo of a restaurant bill into a shared, claimable list. The mark needs to feel
+          warm enough for the dinner table and crisp enough for an app icon. Approachable, not finance-y.
+        </p>
+        <div style={{ display: 'flex', gap: 10, marginTop: 8, flexWrap: 'wrap' }}>
+          {['Receipt', 'Share', 'Split', 'Plate', 'QR', 'Fraction'].map((t) => (
+            <span
+              key={t}
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11,
+                padding: '5px 10px',
+                border: `1px solid ${C.rule}`,
+                borderRadius: 999,
+                color: C.ink2,
+                background: C.paperDeep,
+              }}
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted }}>
+          Palette
+        </span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+          <Swatch name="Ink" hex="#1A1714" bg="#1A1714" fg="#FAF7F2" />
+          <Swatch name="Paper" hex="#FAF7F2" bg="#FAF7F2" fg="#1A1714" border />
+          <Swatch name="Persimmon" hex="oklch(64% .17 35)" bg="oklch(64% 0.17 35)" fg="#FAF7F2" />
+          <Swatch name="Sage" hex="oklch(64% .13 155)" bg="oklch(64% 0.13 155)" fg="#FAF7F2" />
+        </div>
+
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted, marginTop: 8 }}>
+          Type
+        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: 14, background: C.paperDeep, borderRadius: 2 }}>
+          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 26, letterSpacing: '-0.02em' }}>
+            Plus Jakarta Sans · 700
+          </span>
+          <span style={{ fontFamily: "'Instrument Serif', serif", fontStyle: 'italic', fontSize: 26 }}>
+            Instrument Serif · italic
+          </span>
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, color: C.ink2 }}>
+            JetBrains Mono · receipt details
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Swatch({ name, hex, bg, fg, border }) {
+  return (
+    <div
+      style={{
+        background: bg,
+        color: fg,
+        borderRadius: 2,
+        padding: 12,
+        height: 88,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        border: border ? '1px solid #E6DFD2' : 'none',
+        fontFamily: "'JetBrains Mono', monospace",
+        fontSize: 10,
+      }}
+    >
+      <span style={{ fontWeight: 600, fontSize: 12, letterSpacing: '0.02em' }}>{name}</span>
+      <span style={{ opacity: 0.8 }}>{hex}</span>
+    </div>
+  );
+}
+
+function FaviconGrid() {
+  const C = window.C;
+  const items = [
+    { name: 'Receipt Fold', M: window.MarkReceiptFold },
+    { name: 'Split Plate', M: window.MarkSplitPlate },
+    { name: 'ƒ/s Ligature', M: window.MarkLigature },
+    { name: 'QR Receipt', M: window.MarkQRReceipt },
+    { name: 'Equal Share', M: window.MarkEqualShare },
+    { name: 'Slash', M: window.MarkSlash },
+  ];
+  return (
+    <div
+      style={{
+        width: 920,
+        background: C.paper,
+        border: `1px solid ${C.rule}`,
+        borderRadius: 4,
+        padding: 36,
+        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          gap: 18,
+        }}
+      >
+        {items.map(({ name, M }) => (
+          <div key={name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 10px', background: C.paperDeep, borderRadius: 2, width: '100%', justifyContent: 'center' }}>
+              <M size={64} />
+              <M size={48} />
+              <M size={32} />
+            </div>
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: C.muted }}>
+              {name}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
