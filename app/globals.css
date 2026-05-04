@@ -1,25 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand tokens — verbatim from design_handoff_logo/README.md */
+  --ink: #1A1714;
+  --ink-2: #3A332D;
+  --paper: #FAF7F2;
+  --paper-deep: #F2ECE2;
+  --rule: #E6DFD2;
+  --muted: #8A8175;
+  --accent: oklch(64% 0.17 35);       /* fallback: #C75B3D */
+  --accent-deep: oklch(52% 0.17 35);  /* fallback: #A04425 */
+
+  /* Semantic mapping — preserve existing names so no global rename of bg-background/foreground is needed */
+  --background: var(--paper);
+  --foreground: var(--ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-rule: var(--rule);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-jakarta);
+  --font-serif: var(--font-instrument);
+  --font-mono: var(--font-jetbrains);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans);
 }
