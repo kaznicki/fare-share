@@ -182,24 +182,26 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
         ))}
       </ul>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex items-center justify-between">
-        <span className="text-lg font-semibold text-gray-900">
-          Your total: ${(myTotalCents / 100).toFixed(2)}
-        </span>
-        {isHost && (
-          <button
-            type="button"
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold"
-            onClick={handleFinalizeClick}
-          >
-            Finalize
-          </button>
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        {finalizeError && (
+          <p className="text-sm text-red-600 mb-2 text-center">{finalizeError}</p>
         )}
+        <div className="flex items-center justify-between">
+          <span className="text-lg font-semibold text-gray-900">
+            Your total: ${(myTotalCents / 100).toFixed(2)}
+          </span>
+          {isHost && (
+            <button
+              type="button"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold disabled:opacity-50"
+              onClick={handleFinalizeClick}
+              disabled={reconnecting}
+            >
+              Finalize
+            </button>
+          )}
+        </div>
       </div>
-
-      {finalizeError && (
-        <p className="text-sm text-red-600 mt-2 text-center">{finalizeError}</p>
-      )}
 
       {showUnclaimedModal && session && (
         <UnclaimedModal
