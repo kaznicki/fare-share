@@ -65,4 +65,4 @@ See `.planning/milestones/v1.1-ROADMAP.md` for full phase details.
 | 6. Live OCR | v1.1 | 2/2 | Complete | 2026-04-29 |
 | 7. UX & Display Fixes | v1.1 | 3/3 | Complete | 2026-04-30 |
 | 8. Visual Polish | v1.1 | 1/1 | Complete | 2026-04-30 |
-| 9. Fare Share Rebrand & Guest Onboarding | v1.2.1 | 0/0 | Not started | — |
+| 9. Fare Share Rebrand & Guest Onboarding | v1.2.1 | 2/4 | In progress (Wave 1 done) | — |
