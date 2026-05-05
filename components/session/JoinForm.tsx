@@ -22,7 +22,18 @@ export default function JoinForm({ onSubmit, initialName = '' }: Props) {
         <img src="/logo-lockup.svg" alt="Fare Share" className="h-16 w-auto" />
       </div>
 
-      {/* Plan 09-04 inserts the app description <p> and the 4-step <ol> here, between the hero and the card. Do not place anything else in this slot. */}
+      {/* App description — ONBOARD-03 (verbatim per UI-SPEC) */}
+      <p className="text-center text-ink-2 text-base mb-4">
+        Fare Share splits a restaurant bill by the items each person ordered.
+      </p>
+
+      {/* Usage instructions — ONBOARD-04 (verbatim per UI-SPEC) */}
+      <ol className="text-sm text-ink-2 mb-6 space-y-2 list-decimal list-inside">
+        <li>Enter your name to join.</li>
+        <li>Tap any item you ordered.</li>
+        <li>Tap shared items to split them with others.</li>
+        <li>When the host finalizes, you&apos;ll see exactly what you owe.</li>
+      </ol>
 
       <div className="bg-paper-deep rounded-2xl shadow-md p-6 flex flex-col gap-4">
         <h1 className="text-2xl font-bold text-center text-ink">Join the table</h1>
