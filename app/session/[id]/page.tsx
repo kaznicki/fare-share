@@ -75,7 +75,7 @@ interface Props {
 export default function SessionPage({ params }: Props) {
   const { id } = use(params)
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center p-4"><p className="text-gray-400">Loading...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center p-4"><p className="text-ink-2">Loading...</p></div>}>
       <SessionPageInner sessionId={id} />
     </Suspense>
   )

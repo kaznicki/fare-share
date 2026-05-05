@@ -36,10 +36,10 @@ export default function ShareScreen({ sessionId, hostName }: Props) {
     <div className="flex flex-col items-center gap-6 w-full max-w-sm py-8">
       <h1 className="text-2xl font-bold text-center">Share with your table</h1>
 
-      <p className="text-gray-500 text-center">Scan to join</p>
+      <p className="text-ink-2 text-center">Scan to join</p>
 
-      {/* QR code wrapped in a white card so it scans cleanly against any background */}
-      <div className="bg-white rounded-2xl shadow-md p-4">
+      {/* QR code wrapped in a paper card so it scans cleanly against any background */}
+      <div className="bg-paper-deep rounded-2xl shadow-md p-4">
         <QRCodeSVG
           value={joinUrl}
           size={256}
@@ -50,15 +50,15 @@ export default function ShareScreen({ sessionId, hostName }: Props) {
       </div>
 
       {/* Readable URL — selectable for manual copy-paste */}
-      <p className="text-sm text-gray-600 break-all text-center select-all">
+      <p className="text-sm text-ink-2 break-all text-center select-all">
         {joinUrl}
       </p>
 
       <button
         onClick={copyLink}
         disabled={copied}
-        className="w-full py-3 px-4 rounded-xl border-2 border-gray-300 text-gray-700 font-medium
-                   hover:border-gray-400 hover:bg-gray-50 transition-colors
+        className="w-full py-3 px-4 rounded-xl border-2 border-rule text-ink-2 font-medium
+                   hover:border-muted hover:bg-paper-deep transition-colors
                    disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {copied ? 'Copied!' : 'Copy link'}
@@ -66,13 +66,13 @@ export default function ShareScreen({ sessionId, hostName }: Props) {
 
       <a
         href={`/session/${sessionId}?name=${encodeURIComponent(hostName)}`}
-        className="w-full py-3 px-4 rounded-xl bg-indigo-600 text-white font-medium text-center
-                   hover:bg-indigo-700 transition-colors"
+        className="w-full py-3 px-4 rounded-xl bg-accent text-paper font-medium text-center
+                   hover:bg-accent-deep transition-colors"
       >
         Join as host
       </a>
 
-      <p className="text-xs text-gray-400">Link expires in ~4 hours</p>
+      <p className="text-xs text-muted">Link expires in ~4 hours</p>
     </div>
   )
 }

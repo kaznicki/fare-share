@@ -141,8 +141,8 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
   if (connectionError) {
     return (
       <div className="w-full max-w-sm mx-auto p-4">
-        <p className="text-red-500 text-center p-4">{connectionError}</p>
-        <p className="text-gray-500 text-center text-sm">Ask the host to reshare the link.</p>
+        <p className="text-accent text-center p-4">{connectionError}</p>
+        <p className="text-muted text-center text-sm">Ask the host to reshare the link.</p>
       </div>
     )
   }
@@ -150,7 +150,7 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
   if (!session) {
     return (
       <div className="w-full max-w-sm mx-auto p-4">
-        <p className="text-gray-400 text-center p-8">Connecting...</p>
+        <p className="text-ink-2 text-center p-8">Connecting...</p>
       </div>
     )
   }
@@ -159,17 +159,17 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
     <div className="w-full max-w-sm mx-auto p-4">
       <h1 className="text-2xl font-bold mb-2">Session items</h1>
 
-      <p className="text-xs text-gray-400 mb-3">
+      <p className="text-xs text-muted mb-3">
         At the table: {session.participants.join(', ')}
       </p>
 
       {reconnecting && (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm p-3 rounded-lg mb-4 text-center">
+        <div className="bg-paper-deep border border-accent text-ink text-sm p-3 rounded-lg mb-4 text-center">
           Reconnecting... Pull down to refresh if this persists.
         </div>
       )}
 
-      <ul className="divide-y divide-gray-100 mb-24">
+      <ul className="divide-y divide-rule mb-24">
         {session.items.map((item) => (
           <ClaimableItem
             key={item.id}
@@ -182,18 +182,18 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
         ))}
       </ul>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-paper-deep border-t border-rule p-4">
         {finalizeError && (
-          <p className="text-sm text-red-600 mb-2 text-center">{finalizeError}</p>
+          <p className="text-sm text-accent mb-2 text-center">{finalizeError}</p>
         )}
         <div className="flex items-center justify-between">
-          <span className="text-lg font-semibold text-gray-900">
+          <span className="text-lg font-semibold text-ink font-mono tabular-nums">
             Your total: ${(myTotalCents / 100).toFixed(2)}
           </span>
           {isHost && (
             <button
               type="button"
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold disabled:opacity-50"
+              className="bg-accent text-paper px-4 py-2 rounded-lg text-sm font-bold hover:bg-accent-deep disabled:opacity-50"
               onClick={handleFinalizeClick}
               disabled={reconnecting}
             >

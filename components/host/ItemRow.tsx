@@ -22,7 +22,7 @@ export default function ItemRow({ item, onChange, onDelete, autoFocusName = fals
           <input
             autoFocus
             type="text"
-            className="flex-1 w-full border-b border-gray-400 outline-none bg-transparent"
+            className="flex-1 w-full border-b border-muted outline-none bg-transparent"
             defaultValue={item.name}
             onBlur={(e) => {
               onChange({ name: e.target.value })
@@ -31,7 +31,7 @@ export default function ItemRow({ item, onChange, onDelete, autoFocusName = fals
           />
         ) : (
           <span
-            className="cursor-pointer text-gray-800"
+            className="cursor-pointer text-ink"
             onClick={() => setEditingField('name')}
           >
             {item.name || 'Tap to add name'}
@@ -42,7 +42,7 @@ export default function ItemRow({ item, onChange, onDelete, autoFocusName = fals
       {/* Qty stepper */}
       <div className="flex items-center gap-1">
         <button
-          className="w-7 h-7 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center hover:bg-gray-100"
+          className="w-7 h-7 rounded-full border border-rule text-ink-2 flex items-center justify-center hover:bg-paper-deep"
           onClick={() => onChange({ qty: Math.max(1, item.qty - 1) })}
           aria-label="Decrease quantity"
         >
@@ -50,7 +50,7 @@ export default function ItemRow({ item, onChange, onDelete, autoFocusName = fals
         </button>
         <span className="w-5 text-center text-sm">{item.qty}</span>
         <button
-          className="w-7 h-7 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center hover:bg-gray-100"
+          className="w-7 h-7 rounded-full border border-rule text-ink-2 flex items-center justify-center hover:bg-paper-deep"
           onClick={() => onChange({ qty: item.qty + 1 })}
           aria-label="Increase quantity"
         >
@@ -66,7 +66,7 @@ export default function ItemRow({ item, onChange, onDelete, autoFocusName = fals
             type="number"
             step="0.01"
             min="0"
-            className="w-24 text-right border-b border-gray-400 outline-none bg-transparent"
+            className="w-24 text-right border-b border-muted outline-none bg-transparent"
             defaultValue={(item.priceCents / 100).toFixed(2)}
             onBlur={(e) => {
               onChange({ priceCents: Math.round((parseFloat(e.target.value) || 0) * 100) })
@@ -75,7 +75,7 @@ export default function ItemRow({ item, onChange, onDelete, autoFocusName = fals
           />
         ) : (
           <span
-            className="cursor-pointer text-gray-800"
+            className="cursor-pointer text-ink font-mono tabular-nums"
             onClick={() => setEditingField('price')}
           >
             ${(item.priceCents / 100).toFixed(2)}
@@ -87,7 +87,7 @@ export default function ItemRow({ item, onChange, onDelete, autoFocusName = fals
       <button
         onClick={onDelete}
         aria-label="Delete item"
-        className="text-red-400 hover:text-red-600 ml-1"
+        className="text-muted hover:text-accent ml-1"
       >
         ✕
       </button>

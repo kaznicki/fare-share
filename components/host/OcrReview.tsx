@@ -54,14 +54,14 @@ export default function OcrReview({ initial, onComplete }: Props) {
 
       {/* Zero-item banner */}
       {items.length === 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4 text-amber-800">
+        <div className="bg-paper-deep border border-accent rounded-lg p-4 mb-4 text-ink">
           OCR extracted 0 items — add items manually below
         </div>
       )}
 
       {/* Session creation error banner */}
       {sessionError && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-red-800">
+        <div className="bg-paper-deep border border-accent rounded-lg p-4 mb-4 text-ink">
           {sessionError}
         </div>
       )}
@@ -84,14 +84,14 @@ export default function OcrReview({ initial, onComplete }: Props) {
         {/* Add Item button */}
         <button
           onClick={addItem}
-          className="mt-3 w-full py-2 border border-dashed border-gray-300 rounded-lg text-gray-500 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+          className="mt-3 w-full py-2 border border-dashed border-rule rounded-lg text-muted hover:bg-paper-deep hover:border-muted transition-colors"
         >
           + Add Item
         </button>
       </div>
 
       {/* Sticky footer card — TaxTipFields + name input + Create Session */}
-      <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+      <div className="bg-paper-deep rounded-2xl shadow-md overflow-hidden">
         <TaxTipFields
           taxCents={taxCents}
           tipCents={tipCents}
@@ -101,21 +101,21 @@ export default function OcrReview({ initial, onComplete }: Props) {
         />
 
         {/* Create Session button — disabled while pending or host name is empty */}
-        <div className="px-4 pb-4 pt-2 bg-white">
+        <div className="px-4 pb-4 pt-2 bg-paper-deep">
           <div className="mb-3">
-            <label className="block text-sm text-gray-600 mb-1">Your name</label>
+            <label className="block text-sm text-ink-2 mb-1">Your name</label>
             <input
               type="text"
               placeholder="Enter your name"
               value={hostName}
               onChange={(e) => setHostName(e.target.value)}
-              className="w-full py-2 px-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full py-2 px-3 border border-rule rounded-lg text-ink placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
           <button
             onClick={createSession}
             disabled={isPending || !hostName.trim()}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold rounded-xl transition-colors"
+            className="w-full py-3 bg-accent hover:bg-accent-deep text-paper font-semibold rounded-xl transition-colors disabled:opacity-50"
           >
             {isPending ? 'Creating...' : 'Create Session'}
           </button>

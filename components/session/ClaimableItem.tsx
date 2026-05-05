@@ -27,13 +27,13 @@ export default function ClaimableItem({ item, claimants, participantName, onClai
     'flex flex-col py-3 px-3 w-full text-left border rounded-lg mb-2 transition-colors duration-300 '
 
   if (isShared) {
-    rowClass += 'bg-blue-50 border-blue-200'
+    rowClass += 'bg-paper-deep border-rule'
   } else if (isMine) {
-    rowClass += 'bg-green-50 border-green-200'
+    rowClass += 'bg-accent/10 border-accent'
   } else if (isTheirs) {
-    rowClass += 'bg-gray-50 border-gray-200'
+    rowClass += 'bg-paper border-rule'
   } else {
-    rowClass += 'bg-white border-gray-200'
+    rowClass += 'bg-paper-deep border-rule'
   }
 
   const handleTap = () => {
@@ -47,15 +47,15 @@ export default function ClaimableItem({ item, claimants, participantName, onClai
   return (
     <button type="button" className={rowClass} onClick={handleTap}>
       <div className="flex justify-between items-center w-full">
-        <span className={`text-gray-900 ${isMine ? 'font-bold' : 'font-normal'}`}>
+        <span className={`text-ink ${isMine ? 'font-bold' : 'font-normal'}`}>
           {item.name}
         </span>
-        <span className="text-gray-700 text-sm whitespace-nowrap ml-2">
+        <span className="text-ink-2 text-sm whitespace-nowrap ml-2 font-mono tabular-nums">
           {splitPrice}
         </span>
       </div>
       {claimants.length > 0 && (
-        <span className="text-xs text-gray-400 mt-1 text-left">
+        <span className="text-xs text-muted mt-1 text-left">
           {claimants.join(', ')}
         </span>
       )}
