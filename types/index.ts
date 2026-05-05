@@ -1,4 +1,4 @@
-// Canonical domain types for Tab Splitter.
+// Canonical domain types for Fare Share.
 // All monetary values are integer cents. No floats for money.
 import type { BillSplitResult } from '@/lib/bill-split'
 

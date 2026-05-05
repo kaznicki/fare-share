@@ -1,4 +1,4 @@
-// Bill-splitting math engine for Tab Splitter.
+// Bill-splitting math engine for Fare Share.
 // All monetary values are integer cents. No floats are used for money.
 // Tax and tip are distributed using the Largest Remainder Method (LRM)
 // to guarantee cent-exact proportional distribution with no rounding errors.
