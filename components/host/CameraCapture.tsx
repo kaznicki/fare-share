@@ -62,8 +62,11 @@ export default function CameraCapture({ onComplete }: Props) {
 
   return (
     <div className="w-full flex flex-col gap-4 py-6">
-      <h1 className="text-2xl font-bold text-center text-gray-900">Photograph Receipt</h1>
-      <p className="text-center text-gray-500 text-sm">
+      <div className="flex justify-center pt-6 pb-4">
+        <img src="/logo-lockup.svg" alt="Fare Share" className="h-16 w-auto" />
+      </div>
+      <h2 className="text-base font-semibold text-center text-ink-2">Photograph Receipt</h2>
+      <p className="text-center text-muted text-sm">
         Point your camera at the receipt and tap the button below.
       </p>
 
@@ -82,7 +85,7 @@ export default function CameraCapture({ onComplete }: Props) {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="w-full py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors"
+          className="w-full py-4 bg-accent text-paper text-lg font-semibold rounded-xl hover:bg-accent-deep active:bg-accent-deep transition-colors"
         >
           Take Photo
         </button>
@@ -90,12 +93,12 @@ export default function CameraCapture({ onComplete }: Props) {
 
       {/* Error banner */}
       {error && (
-        <div className="w-full bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col gap-3">
-          <p className="text-amber-800 text-sm font-medium">{error}</p>
+        <div className="w-full bg-paper-deep border border-accent rounded-xl p-4 flex flex-col gap-3">
+          <p className="text-ink text-sm font-medium">{error}</p>
           <button
             type="button"
             onClick={() => onComplete({ items: [], taxCents: 0, tipCents: 0 })}
-            className="self-start text-amber-700 underline text-sm font-medium"
+            className="self-start text-accent underline text-sm font-medium"
           >
             Continue anyway
           </button>
@@ -117,7 +120,7 @@ export default function CameraCapture({ onComplete }: Props) {
               type="button"
               onClick={handleRetake}
               disabled={isPending}
-              className="flex-1 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors disabled:opacity-50"
+              className="flex-1 py-3 border border-rule text-ink-2 font-semibold rounded-xl hover:bg-paper-deep active:bg-paper-deep transition-colors disabled:opacity-50"
             >
               Retake
             </button>
@@ -125,7 +128,7 @@ export default function CameraCapture({ onComplete }: Props) {
               type="button"
               onClick={handleSubmit}
               disabled={isPending || !capturedFile}
-              className="flex-1 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3 bg-accent text-paper font-semibold rounded-xl hover:bg-accent-deep active:bg-accent-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPending ? 'Analyzing...' : 'Submit Receipt'}
             </button>
