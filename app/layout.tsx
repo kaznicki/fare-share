@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import HeaderBar from "@/components/brand/HeaderBar";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -44,6 +45,7 @@ export default function RootLayout({
       <body
         className={`${jakarta.variable} ${instrument.variable} ${jetbrains.variable} antialiased`}
       >
+        <HeaderBar />
         {children}
       </body>
     </html>
