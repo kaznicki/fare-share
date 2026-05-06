@@ -1,30 +1,11 @@
-# Tab Splitter
+# Fare Share
 
 ## Current State
 
-**Shipped:** v1.1 Real Receipts & Polish (2026-04-30)
-**Active:** v1.2.1 Fare Share Rebrand & Guest Onboarding
+**Shipped:** v1.2.1 Fare Share Rebrand & Guest Onboarding (2026-05-05)
+**Active:** Planning next milestone
 
-v1.1 closed all 4 v1.0 todos: live OCR validated on real receipts, bill total displayed before session creation, tip selector shows selected state, unfinalize flow preserves claims, and consistent visual polish applied across all screens.
-
----
-
-## Current Milestone: v1.2.1 Fare Share Rebrand & Guest Onboarding
-
-**Goal:** Rebrand from "Tab Splitter" to "Fare Share" by adopting the complete brand system delivered by Claude Design (`design_handoff_logo/`) — logo + design tokens + typography + component repaint — and onboard guests on the join page with an app description and usage instructions.
-
-**Target features:**
-- Full rename: page titles, metadata, README, `package.json` name, all user-visible "Tab Splitter" strings → "Fare Share"
-- "Receipt Fold" logo system integrated (6 SVG variants from `design_handoff_logo/assets/`)
-- CSS design tokens (ink / paper / copper accent palette) replacing the current blue + amber system
-- Typography swap: Geist Sans → Plus Jakarta Sans (UI/wordmark), with Instrument Serif and JetBrains Mono added
-- Existing components re-skinned to the new palette
-- Persistent header bar with the Fare Share lockup on every screen
-- Hero lockup treatment at the top of host start page (`/host`) and guest join page
-- App description and four-step usage instructions on the guest join page
-- Raster icon variants (apple-touch-icon, favicon PNG fallbacks)
-
-Note: "Fare Share" uses the food sense of "fare". Brand system specified by Claude Design — reproduce exactly, no creative variations. Host start page already has instructions — kept, but its `<h1>` is demoted under the new hero. PWA installability remains deferred (sessions require live WebSocket).
+v1.2.1 completed the full visual rebrand: all user-visible "Tab Splitter" strings gone, Receipt Fold logo system integrated, ink/paper/copper design tokens, Plus Jakarta Sans typography, persistent header bar on every screen, hero lockups, and guest onboarding copy on the join page.
 
 ---
 
@@ -53,21 +34,18 @@ Everyone pays exactly what they ordered (plus their proportional share of tax an
 - ✓ Host can unfinalize and return to claiming view with all claims intact — v1.1
 - ✓ Targeted visual polish applied across all screens — v1.1
 
+- ✓ All user-visible "Tab Splitter" strings replaced with "Fare Share" — v1.2.1
+- ✓ Receipt Fold logo system integrated (6 SVGs + 3 raster fallbacks) — v1.2.1
+- ✓ CSS design tokens introduced (ink/paper/copper palette, Tailwind v4 bridge) — v1.2.1
+- ✓ Plus Jakarta Sans + Instrument Serif + JetBrains Mono — v1.2.1
+- ✓ All components repainted to new palette; zero legacy blue/amber utilities — v1.2.1
+- ✓ Persistent header bar with Fare Share lockup on every screen — v1.2.1
+- ✓ Hero lockup on host start page and guest join page; "Photograph Receipt" demoted to h2 — v1.2.1
+- ✓ Guest join page: app description + four-step usage instructions — v1.2.1
+
 ### Active
 
-**v1.2.1 — Fare Share Rebrand & Guest Onboarding** (see `.planning/REQUIREMENTS.md`)
-
-- BRAND-01: All user-visible "Tab Splitter" strings replaced with "Fare Share"
-- BRAND-02: 6 brand SVG assets integrated from `design_handoff_logo/`
-- BRAND-03: CSS design tokens introduced (ink / paper / copper palette)
-- BRAND-04: Plus Jakarta Sans + Instrument Serif + JetBrains Mono replace Geist Sans
-- BRAND-05: Existing components re-skinned to new palette
-- BRAND-06: Raster icon variants generated (apple-touch-icon, favicon fallbacks)
-- ONBOARD-01: Hero Fare Share lockup at top of host start page; "Photograph Receipt" demoted
-- ONBOARD-02: Hero Fare Share lockup at top of guest join page
-- ONBOARD-03: App description on guest join page
-- ONBOARD-04: Four-step guest usage instructions
-- ONBOARD-05: Persistent header bar with Fare Share lockup on every screen
+*(Define with `/gsd-new-milestone`)*
 
 ### Out of Scope
 
@@ -81,9 +59,11 @@ Everyone pays exactly what they ordered (plus their proportional share of tax an
 
 ## Context
 
-Shipped v1.1 with ~24,000 LOC TypeScript/TSX across ~112 files.
+Shipped v1.2.1 with ~96 files changed, +5,782/−6,578 lines over the rebrand milestone.
 
-Tech stack: Next.js 15, custom WebSocket server (ws), GPT-4o Vision, Zustand, Tailwind v4, Vitest.
+Tech stack: Next.js 15, custom WebSocket server (ws), GPT-4o Vision, Tailwind v4, Vitest. Typography: Plus Jakarta Sans + Instrument Serif + JetBrains Mono via next/font/google.
+
+Design system: ink `#1A1714`, paper `#FAF7F2`, accent (copper) `oklch(64% 0.17 35)` / `#C75B3D`, accent-deep `oklch(52% 0.17 35)` / `#A04425`. All tokens as CSS custom properties + Tailwind v4 utilities.
 
 Session flow: host scans receipt → OCR extracts items → host reviews/corrects → host creates session (QR/link generated) → participants join by name → participants claim items with real-time sync → host finalizes → all participants see exact amounts owed.
 
@@ -113,6 +93,11 @@ Real receipt testing notes: GPT-4o handles most receipt formats well. Known edge
 | CSS hidden pattern for SessionRoom | Conditional render disconnects WebSocket; all participants need broadcast | ✓ Good — unfinalize broadcast works for all tabs |
 | totalCents derived from existing props | No interface change; subtotalCents/taxCents/tipCents already in TaxTipFields | ✓ Good — zero prop proliferation |
 | isActive formula mirrors click handler | Guarantees exact match on preset detection | ✓ Good — no off-by-one issues |
+| Pre-process SVGs at filesystem boundary (bake in hex) | CSS vars don't resolve through `<img>` tag boundary | ✓ Good — static assets carry correct copper color |
+| FareShareLogo as inline-SVG React component | Runtime CSS var resolution; dark-mode ready without asset regeneration | ✓ Good — theming works without rebuild |
+| HeaderBar in app/layout.tsx above {children} | Applies to all routes automatically; no per-page boilerplate | ✓ Good — confirmed on all 6 screens by UAT |
+| Wave execution (09-01+09-02 parallel, 09-03+09-04 parallel) | File-conflict surface minimized; Wave 1 establishes foundation Wave 2 consumes | ✓ Good — clean merge, no conflicts |
+| React.memo + useCallback on ClaimableItem/sendClaim | Full-state WebSocket broadcast + transition-colors caused flicker on claims | ✓ Good — fixed post-UAT |
 
 ## Evolution
 
@@ -132,4 +117,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-02 — v1.2.1 milestone started*
+*Last updated: 2026-05-05 after v1.2.1 milestone*

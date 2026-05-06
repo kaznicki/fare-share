@@ -1,10 +1,10 @@
-# Roadmap: Tab Splitter (rebranding to Fare Share in v1.2.1)
+# Roadmap: Fare Share
 
 ## Milestones
 
 - ✅ **v1.0 MVP** — Phases 1–5 (shipped 2026-04-10)
 - ✅ **v1.1 Real Receipts & Polish** — Phases 6–8 (shipped 2026-04-30)
-- 🟡 **v1.2.1 Fare Share Rebrand & Guest Onboarding** — Phase 9 (started 2026-05-02)
+- ✅ **v1.2.1 Fare Share Rebrand & Guest Onboarding** — Phase 9 (shipped 2026-05-05)
 
 ## Phases
 
@@ -32,26 +32,14 @@ See `.planning/milestones/v1.1-ROADMAP.md` for full phase details.
 
 </details>
 
-## v1.2.1 Fare Share Rebrand & Guest Onboarding
+<details>
+<summary>✅ v1.2.1 Fare Share Rebrand & Guest Onboarding (Phase 9) — SHIPPED 2026-05-05</summary>
 
-### Phase 9: Fare Share Rebrand & Guest Onboarding
+- [x] Phase 9: Fare Share Rebrand & Guest Onboarding (4/4 plans) — completed 2026-05-05
 
-**Goal:** Adopt the complete Fare Share brand system delivered by Claude Design (logo + design tokens + typography + repaint), rename all user-visible "Tab Splitter" strings, and onboard guests on the join page with hero, description, and usage instructions.
+See `.planning/milestones/v1.2.1-ROADMAP.md` for full phase details.
 
-**Canonical refs:** `design_handoff_logo/README.md`, `design_handoff_logo/assets/`
-
-**Requirements:** BRAND-01, BRAND-02, BRAND-03, BRAND-04, BRAND-05, BRAND-06, ONBOARD-01, ONBOARD-02, ONBOARD-03, ONBOARD-04, ONBOARD-05
-
-**Success criteria:**
-1. Loading the app shows "Fare Share" in tab title, header bar, and all visible headings — no remaining user-facing "Tab Splitter" strings; `app/layout.tsx` "Create Next App" defaults are also fixed
-2. Every screen (host capture, OCR review, share, join, session, summary) shows a persistent header bar with the Fare Share lockup
-3. Host start page (`/host`) and guest join page show a hero lockup at the top; "Photograph Receipt" h1 is demoted to a smaller subhead under the host hero
-4. Guest join page shows the locked app description plus the four-step instruction list above the name input
-5. App is repainted to the warm ink / paper / copper palette (CTAs are copper, no remaining `bg-blue-600`); typography is Plus Jakarta Sans (with Instrument Serif and JetBrains Mono available); design tokens defined as CSS custom properties + Tailwind v4 `@theme`
-6. `apple-touch-icon-180.png`, `favicon-32.png`, `favicon-16.png` exist and are referenced from `app/layout.tsx`; PWA installability remains deferred
-7. Logo geometry, stroke weights, color values, and typography reproduce `design_handoff_logo/README.md` exactly — no creative variations
-
----
+</details>
 
 ## Progress
 
@@ -65,4 +53,4 @@ See `.planning/milestones/v1.1-ROADMAP.md` for full phase details.
 | 6. Live OCR | v1.1 | 2/2 | Complete | 2026-04-29 |
 | 7. UX & Display Fixes | v1.1 | 3/3 | Complete | 2026-04-30 |
 | 8. Visual Polish | v1.1 | 1/1 | Complete | 2026-04-30 |
-| 9. Fare Share Rebrand & Guest Onboarding | v1.2.1 | 4/4 | All plans done (verification pending) | — |
+| 9. Fare Share Rebrand & Guest Onboarding | v1.2.1 | 4/4 | Complete | 2026-05-05 |

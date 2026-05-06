@@ -1,4 +1,5 @@
 'use client'
+import { memo } from 'react'
 import type { Item } from '@/types'
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
   onUnclaim: (itemId: string) => void
 }
 
-export default function ClaimableItem({ item, claimants, participantName, onClaim, onUnclaim }: Props) {
+function ClaimableItem({ item, claimants, participantName, onClaim, onUnclaim }: Props) {
   const isMine = claimants.includes(participantName)
   const isShared = isMine && claimants.length > 1
   const isTheirs = claimants.length > 0 && !isMine
@@ -24,7 +25,7 @@ export default function ClaimableItem({ item, claimants, participantName, onClai
     : fullPrice
 
   let rowClass =
-    'flex flex-col py-3 px-3 w-full text-left border rounded-lg mb-2 transition-colors duration-300 '
+    'flex flex-col py-3 px-3 w-full text-left border rounded-lg mb-2 '
 
   if (isShared) {
     rowClass += 'bg-paper-deep border-rule'
@@ -62,3 +63,12 @@ export default function ClaimableItem({ item, claimants, participantName, onClai
     </button>
   )
 }
+
+export default memo(ClaimableItem, (prev, next) =>
+  prev.item === next.item &&
+  prev.participantName === next.participantName &&
+  prev.onClaim === next.onClaim &&
+  prev.onUnclaim === next.onUnclaim &&
+  prev.claimants.length === next.claimants.length &&
+  prev.claimants.every((c, i) => c === next.claimants[i])
+)

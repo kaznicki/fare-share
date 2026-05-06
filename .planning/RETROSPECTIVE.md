@@ -101,6 +101,52 @@
 
 ---
 
+## Milestone: v1.2.1 — Fare Share Rebrand & Guest Onboarding
+
+**Shipped:** 2026-05-05
+**Phases:** 1 (Phase 9) | **Plans:** 4 | **Duration:** 3 days (2026-05-02 → 2026-05-05)
+
+### What Was Built
+
+- Six brand SVGs color-fixed and placed in `public/`; three PNG raster fallbacks generated via sharp
+- Eight CSS design tokens at `:root` + Tailwind v4 `@theme inline` bridge; `FareShareLogo` inline-SVG component
+- Persistent `HeaderBar` in `app/layout.tsx`, hero lockups on host + guest join, full palette repaint of 8 components
+- All "Tab Splitter" strings gone; guest join page onboarding copy (description + 4-step instructions)
+- Post-UAT fix: `ClaimableItem` `React.memo` + `useCallback` to eliminate WebSocket-driven flicker
+
+### What Worked
+
+- **Wave execution** — splitting 4 plans into 2 parallel waves (Wave 1: assets+tokens, Wave 2: layout+copy) eliminated merge conflicts and kept execution time to ~3 days
+- **Design handoff as source of truth** — having `design_handoff_logo/README.md` as a locked spec meant zero creative decisions during execution; every pixel question had a documented answer
+- **Pre-processing SVGs at the filesystem boundary** — baking in hex values at copy time was the right call; the alternative (CSS vars in static `<img>`) would have silently broken theming
+- **Human UAT covering typography + color fidelity** — automation can grep for class names but can't verify that `oklch()` renders correctly in a real browser; the 6-item UAT list covered exactly the things that needed eyes
+
+### What Was Inefficient
+
+- **Verification report written before UAT** — the VERIFICATION.md was authored with status `human_needed` and 6 open items, then UAT happened a session later. Writing the UAT checklist into the verification report up-front is good; leaving the session open for days before closing it adds unnecessary context-reload cost.
+- **Flickering bug found in UAT and fixed post-close** — the `transition-colors duration-300` + full-state broadcast interaction should have been caught during execution. The WebSocket broadcast pattern is documented in CONTEXT.md; the CSS transition conflict wasn't anticipated. Worth noting for future phases that touch ClaimableItem or add CSS transitions to components that receive broadcast-driven props.
+
+### Patterns Established
+
+- **SVG color-fix at copy time** — when a static SVG will be referenced via `<img>`, bake hex values in at the filesystem boundary; `var(--token)` won't resolve through the `<img>` tag
+- **Raster icon recipe** — `sharp(svg).resize(N).png().toFile(...)` using sharp's transitive presence in Next.js; no new top-level dependency
+- **Inline-SVG React component for brand marks** — `FareShareLogo.tsx` uses `var(--accent, #C75B3D)` internally so it responds to CSS token overrides at runtime
+- **`React.memo` with content-equality comparator** — when a parent broadcasts full state on every WS message, children that receive derived arrays (e.g., `claims[id] ?? []`) need content-equality, not reference-equality, to avoid spurious re-renders
+
+### Key Lessons
+
+1. **Lock the design spec before execution, not during** — having the full brand system in `design_handoff_logo/` before any plan was written meant zero decisions during execution. This is the right model for visual rebrand work.
+2. **UAT timing matters** — opening the UAT window and closing it in the same session avoids context reload. Plan for UAT to happen immediately after the final commit, not a day later.
+3. **Animated transitions on WebSocket-driven components should be opt-in, not default** — `transition-colors` feels harmless until the component is re-rendered 10x/sec by broadcast updates. The safe default for real-time components is no transition; add it only if the UX explicitly requires it.
+
+### Cost Observations
+
+- Model mix: predominantly sonnet-4-6 (all 4 plans + verification)
+- Sessions: ~3 over 3 days
+- Notable: Wave execution reduced total session time significantly — 2 parallel worktrees doing real work vs. sequential execution
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -109,6 +155,7 @@
 |-----------|----------|--------|-------|------------|
 | v1.0 MVP | 55 days | 5 | 16 | Initial build — established all core patterns |
 | v1.1 Polish | 20 days | 3 | 6 | Plans executing in 1–2 min as patterns solidified |
+| v1.2.1 Rebrand | 3 days | 1 | 4 | Wave execution; design-spec-first eliminates in-execution decisions |
 
 ### Cumulative Quality
 
@@ -116,9 +163,12 @@
 |-----------|-------|-----------------------|
 | v1.0 MVP | 13 Vitest (bill-split unit) + 4 human UAT | 0 critical (2 warnings deferred as todos) |
 | v1.1 Polish | 26 Vitest (bill-split + OCR validation + tax-tip formulas) + UAT | 0 critical |
+| v1.2.1 Rebrand | 26 Vitest (unchanged) + 6-item visual UAT | 1 post-UAT fix (ClaimableItem flicker) |
 
 ### Top Lessons (Verified Across Milestones)
 
 1. Behavior-level success criteria prevent gap-closure plans
 2. Human UAT at phase boundaries is cheaper than post-hoc gap closure
 3. Patterns documented in CONTEXT.md/PATTERNS.md pay off at execution time — v1.1 plans wrote themselves
+4. Lock the design/spec artifact before planning — v1.2.1 design handoff eliminated all in-execution creative decisions
+5. CSS transitions on WebSocket-driven components need explicit justification; default to none

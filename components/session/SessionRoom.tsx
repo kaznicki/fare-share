@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SessionData, ServerMessage } from '@/types'
 import type { BillSplitResult } from '@/lib/bill-split'
 import ClaimableItem from './ClaimableItem'
@@ -93,19 +93,19 @@ export default function SessionRoom({ sessionId, participantName, isHost, onFina
     }
   }, [sessionId, participantName, retryCount])
 
-  const sendClaim = (itemId: string) => {
+  const sendClaim = useCallback((itemId: string) => {
     const ws = wsRef.current
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: 'claim', sessionId, participantName, itemId }))
     }
-  }
+  }, [sessionId, participantName])
 
-  const sendUnclaim = (itemId: string) => {
+  const sendUnclaim = useCallback((itemId: string) => {
     const ws = wsRef.current
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: 'unclaim', sessionId, participantName, itemId }))
     }
-  }
+  }, [sessionId, participantName])
 
   const handleFinalizeClick = () => {
     if (!session) return

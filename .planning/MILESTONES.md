@@ -36,3 +36,21 @@
 - Four surgical CSS fixes: Arial override removed (Geist Sans active), OcrReview heading unified, card shadows on SummaryScreen and OcrReview footer, two-accent color split verified (VIS-01)
 
 ---
+
+## v1.2.1 Fare Share Rebrand & Guest Onboarding (Shipped: 2026-05-05)
+
+**Phases completed:** 1 phase (9), 4 plans, ~30 commits
+**Timeline:** 2026-05-02 → 2026-05-05 (3 days)
+**Files changed:** 96 (+5,782 / −6,578 lines)
+
+**Key accomplishments:**
+
+- Six brand SVGs color-fixed and copied into `public/` (copper `#C75B3D` baked in at filesystem boundary); three PNG raster fallbacks generated via sharp — zero new top-level dependencies
+- Eight CSS design tokens at `:root` + Tailwind v4 `@theme inline` bridge; `FareShareLogo` inline-SVG React component with runtime CSS var resolution
+- Persistent `HeaderBar` mounted in `app/layout.tsx` above `{children}` — Fare Share lockup visible on all six screens; confirmed by human UAT
+- Eight components fully repainted to ink/paper/copper palette — zero legacy `bg-blue-*/bg-indigo-*/bg-amber-*` utilities remain
+- All user-visible "Tab Splitter" strings replaced with "Fare Share" across package.json, server.ts, README, app/layout.tsx, and all components
+- Guest join page ships locked app description + four-step usage instructions above the name input; host capture "Photograph Receipt" h1 demoted to h2 under hero lockup
+- Typography: Plus Jakarta Sans (UI), Instrument Serif (editorial), JetBrains Mono (prices/codes) via `next/font/google`; human UAT confirmed font rendering
+
+---

@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2.1
 milestone_name: Fare Share Rebrand & Guest Onboarding
-status: executing
+status: complete
 stopped_at: ""
 last_updated: "2026-05-05T00:00:00.000Z"
-last_activity: 2026-05-05 -- All 4 plans complete; phase verification + code review pending
+last_activity: 2026-05-05 -- v1.2.1 shipped; all 11 requirements validated; git tag v1.2.1
 progress:
   phases_total: 1
-  phases_complete: 0
+  phases_complete: 1
   plans_total: 4
   plans_complete: 4
 ---
@@ -17,23 +17,23 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-02)
+See: .planning/PROJECT.md (updated 2026-05-05)
 
 **Core value:** Everyone pays exactly what they ordered (plus proportional tax and tip) without doing any mental math
-**Current focus:** v1.2.1 — Rebrand to Fare Share, add logo + guest onboarding copy
+**Current focus:** v1.2.1 complete — planning next milestone
 
 ## Current Position
 
-Phase: 9 of 1 — Fare Share Rebrand & Guest Onboarding
+Milestone: v1.2.1 — SHIPPED 2026-05-05
+Phase: 9 of 1 — Complete
 Plan: 4 of 4 complete
-Status: All plans done — phase verification + code review pending
-Last activity: 2026-05-05 — All 4 plans committed inline; build passes
+Status: Milestone closed, git tagged v1.2.1
 
 ## v1.2.1 Phase Overview
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| 9. Fare Share Rebrand & Guest Onboarding | Rebrand to "Fare Share", add logo, onboard guests with title + description + instructions | BRAND-01, BRAND-02, ONBOARD-01, ONBOARD-02, ONBOARD-03, ONBOARD-04 | 4/4 plans complete (verification pending) |
+| 9. Fare Share Rebrand & Guest Onboarding | Rebrand to "Fare Share", adopt full brand system, onboard guests | BRAND-01–06, ONBOARD-01–05 | ✅ Complete — all 11 validated |
 
 ## Accumulated Context
 
@@ -46,17 +46,17 @@ Last activity: 2026-05-05 — All 4 plans committed inline; build passes
 - Full-state broadcast on every WebSocket message (enables reconnect for free)
 - CSS hidden pattern for always-mounted components (keeps WebSocket open across screen transitions)
 - Deployment: Railway/Fly.io/Render (not Vercel — persistent WebSocket required)
+- React.memo + useCallback on ClaimableItem to prevent flicker from broadcast-driven re-renders
 
-### Key files for v1.2.1
+### Brand system (v1.2.1)
 
-- `app/host/page.tsx` — host start page (camera capture entry point)
-- `app/session/[id]/page.tsx` (or wherever the guest join page lives) — guest first screen
-- `components/session/JoinForm.tsx` — guest join form (title + description + instructions go above this)
-- `app/layout.tsx` — page metadata (`<title>`, description)
-- `package.json`, `README.md` — project name strings
+- Tokens: --ink #1A1714, --paper #FAF7F2, --accent oklch(64% 0.17 35) / #C75B3D, --accent-deep oklch(52% 0.17 35)
+- Typography: Plus Jakarta Sans (UI), Instrument Serif (editorial), JetBrains Mono (prices)
+- Logo: components/brand/FareShareLogo.tsx (inline-SVG); public/logo-lockup.svg (for <img> heroes)
+- HeaderBar: components/brand/HeaderBar.tsx, mounted globally in app/layout.tsx
 
 ### Session Continuity
 
 Last session: 2026-05-05
-Stopped at: All 4 plans complete; pending phase verification + code review
-Resume with: `/gsd-verify-work 9` then `/gsd-code-review 9`
+Stopped at: v1.2.1 milestone complete
+Resume with: `/gsd-new-milestone` to start next milestone
